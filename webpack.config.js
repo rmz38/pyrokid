@@ -34,6 +34,9 @@ module.exports = {
     contentBase: path.resolve(__dirname, 'dist'),
     writeToDisk: true,
     open: true,
+    watchOptions: {
+      ignored: /node_modules/
+    }
   },
 
   plugins: [
