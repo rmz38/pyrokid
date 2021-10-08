@@ -1,4 +1,5 @@
-import { Input } from 'phaser';
+import { BodyType } from 'matter';
+import { Input, NONE } from 'phaser';
 import { getGameWidth, getGameHeight } from '../helpers';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
@@ -7,225 +8,161 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   key: 'Game',
 };
 let player;
-let stars;
 let platforms;
 let cursors;
-let ground;
-let movingPlatform;
-let crate;
-let crates;
-let test = [];
-function collectStar (player, star)
-{
-    star.disableBody(true, true);
-}
-function crateCollide (crate1, crate2)
-{
-    crate1.body.setVelocity(0,0)
-    crate2.body.setVelocity(0,0)
-}
-function createBox(posX, posY, width, height, isDynamic){
- 
-    // this is how we create a generic Box2D body
-    let box = this.planck.world.createBody();
-    if(isDynamic){
+let wasd;
+const crates = {};
+let touchingGround = true;
+let fire;
+let fireActive = false;
 
-        // Box2D bodies born as static bodies, but we can make them dynamic
-        box.setDynamic();
-    }
-
-    // a body can have one or more fixtures. This is how we create a box fixture inside a body
-    box.createFixture(this.planck.Box(width / 2 / this.worldScale, height / 2 / this.worldScale));
-
-    // now we place the body in the world
-    box.setPosition(this.planck.Vec2(posX / this.worldScale, posY / this.worldScale));
-
-    // time to set mass information
-    box.setMassData({
-        mass: 1,
-        center: this.planck.Vec2(),
-
-        // I have to say I do not know the meaning of this "I", but if you set it to zero, bodies won't rotate
-        I: 1
-    });
-
-    // now we create a graphics object representing the body
-    var color = new Phaser.Display.Color();
-    color.random();
-    color.brighten(50).saturate(100);
-    let userData = this.add.graphics();
-    userData.fillStyle(color.color, 1);
-    userData.fillRect(- width / 2, - height / 2, width, height);
-
-    // a body can have anything in its user data, normally it's used to store its sprite
-    box.setUserData(userData);
-}
 export class GameScene extends Phaser.Scene {
   [x: string]: any;
   public speed = 200;
-
-  private cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
-  private image: Phaser.Physics.Arcade.Sprite;
-//   private player;
-//   private stars;
-//   private platforms;
-//   private cursors;
-//   private movingPlatform;
   constructor() {
     super(sceneConfig);
   }
-  public preload ()
-  {
-      this.load.image('sky', 'assets/sky.png');
-      this.load.image('ground', 'assets/platform.png');
-      this.load.image('star', 'assets/star.png');
-      this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-      this.load.spritesheet('crate', 'assets/crate.png', { frameWidth: 79, frameHeight: 80 });
+  public preload() {
+    this.load.image('background', 'assets/backgrounds/TutorialBackground1.png');
+    this.load.image('ground', 'assets/platform.png');
+    this.load.image('star', 'assets/star.png');
+    this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.spritesheet('crate', 'assets/crate.png', { frameWidth: 79, frameHeight: 80 });
   }
   public create(): void {
-    this.add.image(400, 300, 'sky');
-    // this.physics.world.setFPS(120);
-    console.log(this)
+    this.add.image(400, 300, 'background');
+    const rec = this.matter.bodies.rectangle(0, 24, 20, 1, { isSensor: true, label: 'groundSensor' });
+    this.matter.world.setBounds(0, 0, 800, 600, 32, true, true, false, true);
+    platforms = this.matter.add.sprite(400, 568, 'ground');
 
-    // platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+    const playerBody = this.matter.bodies.rectangle(0, 0, 32, 48);
+    const compound = this.matter.body.create({
+      parts: [playerBody, rec],
+      inertia: Infinity,
+      render: { sprite: { xOffset: 0.5, yOffset: 0.5 } },
+    });
+    player = this.matter.add.sprite(0, 0, 'dude');
+    console.log(player);
+    player.setExistingBody(compound);
+    player.body.render.sprite.xOffset = 0;
+    player.body.render.sprite.yOffset = 0;
+    player.setPosition(100, 450);
 
-    // platforms.create(600, 400, 'ground');
-    // platforms.create(50, 250, 'ground');
-    // platforms.create(750, 220, 'ground');
-    const groundTexture = this.add.graphics()
-    // groundTexture.fillStyle(0x666666)
-    // groundTexture.fillRect(0, 0, 640, 40)
-    groundTexture.fillStyle(0x666666)
-    groundTexture.fillRect(0, 0, 640, 40)
-    groundTexture.generateTexture('demo_basic_ground', 640, 40)
-    // groundTexture.destroy()
+    this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: -1,
+    });
 
-    // Ground Sprite
-    //@ts-ignore
-    // const groundSprite = createBox(10,10,10,10)
-    // groundSprite.setBody('box')
-    // groundSprite.setStatic()
-    movingPlatform = this.planck.add.sprite(0, 0, groundTexture);
-    // movingPlatform.setBody('ground')
-    // movingPlatform.setPosition(400, 400)
+    this.anims.create({
+      key: 'turn',
+      frames: [{ key: 'dude', frame: 4 }],
+      frameRate: 20,
+    });
 
-    // movingPlatform.setImmovable(true);
-    // movingPlatform.body.allowGravity = false;
-    // movingPlatform.setVelocityX(50);
+    this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
+      frameRate: 10,
+      repeat: -1,
+    });
 
-    // player = this.physics.add.sprite(100, 450, 'dude');
+    this.anims.create({
+      key: 'cratepic',
+      frames: this.anims.generateFrameNumbers('crate', { start: 0, end: 0 }),
+      frameRate: 10,
+      repeat: -1,
+    });
 
-    // player.setBounce(0.2);
-    // player.setCollideWorldBounds(true);
+    cursors = this.input.keyboard.createCursorKeys();
 
-    // this.anims.create({
-    //     key: 'left',
-    //     frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-    //     frameRate: 10,
-    //     repeat: -1
-    // });
+    wasd = this.input.keyboard.addKeys('W,S,A,D');
 
-    // this.anims.create({
-    //     key: 'turn',
-    //     frames: [ { key: 'dude', frame: 4 } ],
-    //     frameRate: 20
-    // });
+    for (let i = 0; i < 10; i += 1) {
+      const label = 'crate_' + i;
+      crates[label] = this.matter.add.sprite(400, 300 + i * 60, 'crate', null, { label: label });
+      crates[label].setRectangle(50, 50, { render: { sprite: { xOffset: 0, yOffset: 0.15 } }, label: label });
+      crates[label].setBounce(0);
+      // hash instead
+    }
 
-    // this.anims.create({
-    //     key: 'right',
-    //     frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-    //     frameRate: 10,
-    //     repeat: -1
-    // });
+    this.matter.world.on('collisionstart', function (event) {
+      //  Loop through all of the collision pairs
+      const pairs = event.pairs;
 
+      for (let i = 0; i < pairs.length; i++) {
+        const bodyA = pairs[i].bodyA;
+        const bodyB = pairs[i].bodyB;
+        console.log(pairs[i]);
 
-    // this.anims.create({
-    //     key: 'cratepic',
-    //     frames: this.anims.generateFrameNumbers('crate', { start: 0, end: 0 }),
-    //     frameRate: 10,
-    //     repeat: -1
-    // });
+        //  sensor collisions
+        if (pairs[i].isSensor) {
+          let playerBody;
 
-    // cursors = this.input.keyboard.createCursorKeys();
+          if (bodyA.isSensor) {
+            playerBody = bodyA;
+          } else if (bodyB.isSensor) {
+            playerBody = bodyB;
+          }
 
-    // stars = this.physics.add.group({
-    //     key: 'star',
-    //     repeat: 11,
-    //     setXY: { x: 12, y: 0, stepX: 70 }
-    // });
-
-    // stars.children.iterate(function (child) {
-
-    //     child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-
-    // });
-
-    // crates = this.physics.add.group({
-    //     key: 'crate',
-    //     frame: 0,
-    //     repeat: 7,
-    //     setXY: { x: 200, y: 500, stepX: 0, stepY: -48 }
-    // });
-    // let i = 0
-    // crates.children.iterate(function (child) {
-    //     child.body.setSize(48,48);
-    //     child.setOffset(15, 30);
-    //     child.setBounce(1);
-    //     test[i] = child
-    //     i += 1
-    // });
-    // // for(let i = 0; i < 10; i+= 1) {
-    // //     crates[i] = this.physics.add.sprite(400 + i * 50, 300, 'crate')
-    // //     crates[i].body.allowGravity = true;
-    // //     crates[i].body.setSize(48,48);
-    // //     crates[i].setOffset(15,30)
-    // //     this.physics.add.collider(player, crates[i]);
-    // //     this.physics.add.collider(crates[i], platforms);
-    // // }
-
-    // this.physics.add.collider(player, platforms);
-    // this.physics.add.collider(player, movingPlatform);
-    // this.physics.add.collider(stars, platforms);
-    // this.physics.add.collider(stars, movingPlatform);
-    // this.physics.add.collider(crates, test);
-    // this.physics.add.collider(crates, platforms);
-    // this.physics.add.collider(crates, player);
-    // // this.physics.add.overlap(crates, crates, crateCollide, null, this)
-    // this.physics.add.overlap(player, stars, collectStar, null, this);
+          if (playerBody.label === 'groundSensor') {
+            touchingGround = true;
+          }
+        }
+        // fire collision
+        if (bodyA.label === 'fire' && bodyB.label.includes('crate')) {
+          fire.destroy();
+          setTimeout(() => {
+            crates[bodyB.label].destroy();
+          }, 1000);
+        }
+        if (bodyB.label === 'fire' && bodyA.label.includes('crate')) {
+          fire.destroy();
+          setTimeout(() => {
+            crates[bodyA.label].destroy();
+          }, 1000);
+        }
+      }
+    });
   }
 
   public update(): void {
-    // if (cursors.left.isDown)
-    // {
-    //     player.setVelocity(-160);
+    if (wasd.A.isDown) {
+      player.setVelocityX(-7);
 
-    //     player.anims.play('left', true);
-    // }
-    // else if (cursors.right.isDown)
-    // {
-    //     player.setVelocityX(160);
+      player.anims.play('left', true);
+    } else if (wasd.D.isDown) {
+      player.setVelocityX(7);
 
-    //     player.anims.play('right', true);
-    // }
-    // else
-    // {
-    //     player.setVelocityX(0);
+      player.anims.play('right', true);
+    } else {
+      player.setVelocityX(0);
 
-    //     player.anims.play('turn');
-    // }
+      player.anims.play('turn');
+    }
 
-    // if (cursors.up.isDown && player.body.touching.down)
-    // {
-    //     player.setVelocityY(-330);
-    // }
-
-    // if (movingPlatform.x >= 500)
-    // {
-    //     movingPlatform.setVelocityX(-50);
-    // }
-    // else if (movingPlatform.x <= 300)
-    // {
-    //     movingPlatform.setVelocityX(50);
-    // }
+    if (wasd.W.isDown && touchingGround) {
+      player.setVelocityY(-10);
+      touchingGround = false;
+    }
+    if (
+      (cursors.right.isDown || cursors.down.isDown || cursors.up.isDown || cursors.left.isDown) &&
+      fireActive === false
+    ) {
+      fire = this.matter.add.image(player.body.position.x, player.body.position.y, 'star', null, {
+        isSensor: true,
+        label: 'fire',
+      });
+      fire.setIgnoreGravity(true);
+      fire.setVelocityX(10);
+      fireActive = true;
+      setTimeout(() => {
+        if (fireActive) {
+          fireActive = false;
+          fire.destroy();
+        }
+      }, 500);
+    }
   }
 }
