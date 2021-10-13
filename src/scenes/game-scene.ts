@@ -11,10 +11,36 @@ let player;
 let platforms;
 let cursors;
 let wasd;
-const crates = {};
+interface IHash {
+  [details: string]: Crate;
+}
+interface Crate {
+  crate: Phaser.Physics.Matter.Sprite;
+  onFire: boolean;
+  fixtures: [];
+  
+}
+const crates: IHash = {};
 let touchingGround = true;
 let fire;
 let fireActive = false;
+
+function igniteCrate(game, crateLabel: string, destroyFire: boolean) {
+  if (destroyFire) {
+    fire.destroy();
+  }
+  crates[crateLabel].onFire = true;
+  console.log(crates[crateLabel].crate);
+  const squareFire = game.add.sprite(crates[crateLabel].crate.x, crates[crateLabel].crate.y - 10, 'squareFire');
+  squareFire.alpha = 0.7;
+  squareFire.anims.play('squareFire', true);
+  setTimeout(() => {
+    const fireDisappear = game.add.sprite(crates[crateLabel].crate.x, crates[crateLabel].crate.y - 10, 'fireDisappear');
+    fireDisappear.anims.play('fireDisappear', false);
+    crates[crateLabel].crate.destroy();
+    squareFire.destroy();
+  }, 1000);
+}
 
 export class GameScene extends Phaser.Scene {
   [x: string]: any;
@@ -25,9 +51,11 @@ export class GameScene extends Phaser.Scene {
   public preload() {
     this.load.image('background', 'assets/backgrounds/TutorialBackground1.png');
     this.load.image('ground', 'assets/platform.png');
-    this.load.image('star', 'assets/star.png');
+    this.load.spritesheet('fireball', 'assets/fireball.png', { frameWidth: 38, frameHeight: 19 });
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
     this.load.spritesheet('crate', 'assets/crate.png', { frameWidth: 79, frameHeight: 80 });
+    this.load.spritesheet('squareFire', 'assets/squareFire.png', { frameWidth: 79, frameHeight: 80 });
+    this.load.spritesheet('fireDisappear', 'assets/fireDisappear.png', { frameWidth: 84, frameHeight: 133 });
   }
   public create(): void {
     this.add.image(400, 300, 'background');
@@ -42,7 +70,6 @@ export class GameScene extends Phaser.Scene {
       render: { sprite: { xOffset: 0.5, yOffset: 0.5 } },
     });
     player = this.matter.add.sprite(0, 0, 'dude');
-    console.log(player);
     player.setExistingBody(compound);
     player.body.render.sprite.xOffset = 0;
     player.body.render.sprite.yOffset = 0;
@@ -75,18 +102,41 @@ export class GameScene extends Phaser.Scene {
       repeat: -1,
     });
 
+    this.anims.create({
+      key: 'squareFire',
+      frames: this.anims.generateFrameNumbers('squareFire', { start: 0, end: 5 }),
+      frameRate: 30,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: 'fireball',
+      frames: this.anims.generateFrameNumbers('fireball', { start: 0, end: 1 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: 'fireDisappear',
+      frames: this.anims.generateFrameNumbers('fireDisappear', { start: 0, end: 39 }),
+      frameRate: 60,
+    });
     cursors = this.input.keyboard.createCursorKeys();
 
     wasd = this.input.keyboard.addKeys('W,S,A,D');
 
     for (let i = 0; i < 10; i += 1) {
       const label = 'crate_' + i;
-      crates[label] = this.matter.add.sprite(400, 300 + i * 60, 'crate', null, { label: label });
-      crates[label].setRectangle(50, 50, { render: { sprite: { xOffset: 0, yOffset: 0.15 } }, label: label });
-      crates[label].setBounce(0);
+      crates[label] = {
+        crate: this.matter.add.sprite(400, 300 + i * 60, 'crate', null, { label: label }),
+        onFire: false,
+        fixtures: [],
+      };
+      crates[label].crate.setRectangle(50, 50, { render: { sprite: { xOffset: 0, yOffset: 0.15 } }, label: label });
+      crates[label].crate.setBounce(0);
       // hash instead
     }
-
+    const game = this;
     this.matter.world.on('collisionstart', function (event) {
       //  Loop through all of the collision pairs
       const pairs = event.pairs;
@@ -94,34 +144,30 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < pairs.length; i++) {
         const bodyA = pairs[i].bodyA;
         const bodyB = pairs[i].bodyB;
-        console.log(pairs[i]);
 
         //  sensor collisions
         if (pairs[i].isSensor) {
           let playerBody;
+          let otherBody;
 
           if (bodyA.isSensor) {
             playerBody = bodyA;
+            otherBody = bodyB;
           } else if (bodyB.isSensor) {
             playerBody = bodyB;
+            otherBody = bodyB;
           }
 
-          if (playerBody.label === 'groundSensor') {
+          if (playerBody.label === 'groundSensor' && otherBody.label != 'fire') {
             touchingGround = true;
           }
         }
         // fire collision
         if (bodyA.label === 'fire' && bodyB.label.includes('crate')) {
-          fire.destroy();
-          setTimeout(() => {
-            crates[bodyB.label].destroy();
-          }, 1000);
+          igniteCrate(game, bodyB.label, true);
         }
         if (bodyB.label === 'fire' && bodyA.label.includes('crate')) {
-          fire.destroy();
-          setTimeout(() => {
-            crates[bodyA.label].destroy();
-          }, 1000);
+          igniteCrate(game, bodyA.label, true);
         }
       }
     });
@@ -150,12 +196,18 @@ export class GameScene extends Phaser.Scene {
       (cursors.right.isDown || cursors.down.isDown || cursors.up.isDown || cursors.left.isDown) &&
       fireActive === false
     ) {
-      fire = this.matter.add.image(player.body.position.x, player.body.position.y, 'star', null, {
+      fire = this.matter.add.sprite(player.body.position.x, player.body.position.y, 'fireball', null, {
         isSensor: true,
         label: 'fire',
       });
+      fire.anims.play('fireball', true);
       fire.setIgnoreGravity(true);
-      fire.setVelocityX(10);
+      const xDir = cursors.right.isDown ? 1 : -1;
+      const xVel = cursors.right.isDown || cursors.left.isDown ? 10 : 0;
+      fire.setVelocityX(xVel * xDir);
+      const yDir = cursors.down.isDown ? 1 : -1;
+      const yVel = cursors.down.isDown || cursors.up.isDown ? 10 : 0;
+      fire.setVelocityY(yVel * yDir);
       fireActive = true;
       setTimeout(() => {
         if (fireActive) {

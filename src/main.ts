@@ -16,10 +16,10 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
   physics: {
     default: 'matter',
     matter: {
-        enableSleeping: false,
-        debug: true
-    }
-},
+      enableSleeping: false,
+      debug: true,
+    },
+  },
 
   parent: 'game',
   backgroundColor: '#000000',
