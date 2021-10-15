@@ -226,22 +226,30 @@ export class GameScene extends Phaser.Scene {
       for (let j = 0; j < 3; j += 1) {
         const label = 'house' + i;
         const currCrate = {
-          // crate: this.matter.add.sprite(200, 550 - i * 50, 'crate', null, { label: label, isSensor: true }),
-          // crate: this.matter.bodies.rectangle(200, 200, 50, 50, { label: 'rectangle', isSensor: true }),
-          crate: { x: 200 + j * 50, y: 550 - i * 50 },
+          // crate: this.matter.add.sprite(200, 550 - i * 50, 'crate', null, { label: label }),
+          crate: this.matter.bodies.rectangle(200 + j * 50, 550 - i * 50, 50, 50),
+          // crate: { x: 200 + j * 50, y: 550 - i * 50 },
           onFire: false,
           fireSprite: null,
           neighbors: new Set<Crate>(),
         };
         house.crates.add(currCrate);
-        // house.crates[label].crate.setRectangle(50, 50, {
+        // currCrate.crate.setRectangle(50, 50, {
         //   render: { sprite: { xOffset: 0, yOffset: 0.15 } },
         //   label: label,
         // });
-        // house.crates[label].crate.setBounce(0);
-        // house.crates[label].crate.setPosition(200 + j * 50, 550 - i * 50);
+        // // house.crates[label].crate.setBounce(0);
+        // currCrate.crate.setPosition(200 + j * 50, 550 - i * 50);
       }
     }
+    // const houseCrates = [];
+    // house.crates.forEach((c) => houseCrates.push(c.crate));
+    // const houseCompound = this.matter.body.create({
+    //   parts: houseCrates,
+    //   inertia: Infinity,
+    //   render: { sprite: { xOffset: 0.5, yOffset: 0.5 } },
+    // });
+    // house.house.setExistingBody(houseCompound);
     const game = this;
     this.matter.world.on('collisionstart', function (event) {
       //  Loop through all of the collision pairs
