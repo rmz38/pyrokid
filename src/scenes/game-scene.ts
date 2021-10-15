@@ -15,33 +15,99 @@ interface IHash {
   [details: string]: Crate;
 }
 interface Crate {
-  crate: Phaser.Physics.Matter.Sprite;
+  crate: any;
   onFire: boolean;
-  fixtures: [];
-  
+  neighbors: Set<Crate>;
+  fireSprite: Phaser.GameObjects.Sprite;
+}
+interface House {
+  house: any;
+  crates: Set<Crate>;
+  onFire: boolean;
 }
 const crates: IHash = {};
 let touchingGround = true;
 let fire;
 let fireActive = false;
-
-function igniteCrate(game, crateLabel: string, destroyFire: boolean) {
+const xTiles: integer = 50;
+const yTiles: integer = 50;
+let bat;
+let house: House;
+function igniteCrate(game, currCrate: Crate, destroyFire: boolean) {
   if (destroyFire) {
     fire.destroy();
   }
-  crates[crateLabel].onFire = true;
-  console.log(crates[crateLabel].crate);
-  const squareFire = game.add.sprite(crates[crateLabel].crate.x, crates[crateLabel].crate.y - 10, 'squareFire');
-  squareFire.alpha = 0.7;
-  squareFire.anims.play('squareFire', true);
-  setTimeout(() => {
-    const fireDisappear = game.add.sprite(crates[crateLabel].crate.x, crates[crateLabel].crate.y - 10, 'fireDisappear');
-    fireDisappear.anims.play('fireDisappear', false);
-    crates[crateLabel].crate.destroy();
-    squareFire.destroy();
-  }, 1000);
+  if (currCrate.onFire) {
+    return;
+  }
+  currCrate.onFire = true;
+  currCrate.fireSprite = game.add.sprite(currCrate.crate.x, currCrate.crate.y - 10, 'squareFire');
+  currCrate.fireSprite.anims.play('squareFire', false);
+  currCrate.fireSprite.alpha = 0.7;
+  game.time.delayedCall(1000, () => {
+    if (currCrate.fireSprite.active) {
+      currCrate.fireSprite.destroy();
+    }
+    const fireDisappear = game.add.sprite(currCrate.crate.x, currCrate.crate.y - 10, 'fireDisappear');
+    fireDisappear.anims.play('fireDisappear', false, true);
+    fireDisappear.once('animationcomplete', () => {
+      fireDisappear.destroy();
+    });
+    if (currCrate.crate.active) {
+      currCrate.crate.destroy();
+    }
+    currCrate.neighbors.forEach((neighbor) => {
+      igniteCrate(game, neighbor, false);
+    });
+  });
 }
-
+function igniteHouse(game, currHouse: House, destroyFire) {
+  if (destroyFire) {
+    fire.destroy();
+  }
+  if (currHouse.onFire) {
+    return;
+  }
+  currHouse.onFire = true;
+  house.crates.forEach((crate) => {
+    igniteCrate(game, crate, true);
+  });
+  game.time.delayedCall(1000, () => {
+    house.house.destroy();
+  });
+}
+// setTimeout(() => {
+//   const fireDisappear = game.add.sprite(currCrate.crate.x, currCrate.crate.y - 10, 'fireDisappear');
+//   fireDisappear.anims.play('fireDisappear', false, true);
+//   fireDisappear.once('animationcomplete', () => {
+//     fireDisappear.destroy();
+//   });
+//   currCrate.neighbors.forEach((neighbor) => {
+//     if (neighbor.crate.active) {
+//       igniteCrate(game, neighbor, false);
+//     }
+//   });
+//   currCrate.crate.destroy();
+//   squareFire.destroy();
+// }, 1000);
+function addNeighbor(crate1: Crate, crate2: Crate) {
+  // crate1.neighbors.clear();
+  // crate2.neighbors.clear();
+  const xDiff = Math.abs(Math.floor(crate1.crate.x / xTiles) - Math.floor(crate2.crate.x / xTiles));
+  const yDiff = Math.abs(Math.floor(crate1.crate.y / yTiles) - Math.floor(crate2.crate.y / yTiles));
+  if ((xDiff < 2 && yDiff < 1) || (xDiff < 1 && yDiff < 2)) {
+    if (crate2.crate.active && crate1.crate.active) {
+      if (!crate2.onFire) {
+        crate1.neighbors.add(crate2);
+      }
+      if (!crate1.onFire) {
+        crate2.neighbors.add(crate1);
+      }
+    }
+  }
+  console.log(xDiff);
+  console.log(yDiff);
+}
 export class GameScene extends Phaser.Scene {
   [x: string]: any;
   public speed = 200;
@@ -51,6 +117,7 @@ export class GameScene extends Phaser.Scene {
   public preload() {
     this.load.image('background', 'assets/backgrounds/TutorialBackground1.png');
     this.load.image('ground', 'assets/platform.png');
+    this.load.image('house', 'assets/house.png');
     this.load.spritesheet('fireball', 'assets/fireball.png', { frameWidth: 38, frameHeight: 19 });
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
     this.load.spritesheet('crate', 'assets/crate.png', { frameWidth: 79, frameHeight: 80 });
@@ -61,7 +128,7 @@ export class GameScene extends Phaser.Scene {
     this.add.image(400, 300, 'background');
     const rec = this.matter.bodies.rectangle(0, 24, 20, 1, { isSensor: true, label: 'groundSensor' });
     this.matter.world.setBounds(0, 0, 800, 600, 32, true, true, false, true);
-    platforms = this.matter.add.sprite(400, 568, 'ground');
+    // platforms = this.matter.add.sprite(400, 568, 'ground');
 
     const playerBody = this.matter.bodies.rectangle(0, 0, 32, 48);
     const compound = this.matter.body.create({
@@ -125,22 +192,64 @@ export class GameScene extends Phaser.Scene {
 
     wasd = this.input.keyboard.addKeys('W,S,A,D');
 
-    for (let i = 0; i < 10; i += 1) {
+    for (let i = 0; i < 5; i += 1) {
       const label = 'crate_' + i;
       crates[label] = {
-        crate: this.matter.add.sprite(400, 300 + i * 60, 'crate', null, { label: label }),
+        crate: this.matter.add.sprite(400, 550 - i * 50, 'crate', null, { label: label }),
         onFire: false,
-        fixtures: [],
+        fireSprite: null,
+        neighbors: new Set<Crate>(),
       };
+      // const top = this.matter.bodies.rectangle(0, -25, 10, 1, { isSensor: true, label: label });
+      // const right = this.matter.bodies.rectangle(25, 0, 1, 10, { isSensor: true, label: label });
+      // const bottom = this.matter.bodies.rectangle(0, 25, 10, 1, { isSensor: true, label: label });
+      // const left = this.matter.bodies.rectangle(-25, 0, 1, 10, { isSensor: true, label: label });
+      // const rec = this.matter.bodies.rectangle(0, 0, 50, 50);
+      // const compound = this.matter.body.create({
+      //   parts: [top, right, bottom, left, rec],
+      //   inertia: Infinity,
+      //   render: { sprite: { xOffset: 0, yOffset: 0.15 } },
+      // });
+      // crates[label].crate.setExistingBody(compound);
       crates[label].crate.setRectangle(50, 50, { render: { sprite: { xOffset: 0, yOffset: 0.15 } }, label: label });
+      // crates[label].crate.body.setInertia(Infinity);
       crates[label].crate.setBounce(0);
-      // hash instead
+      crates[label].crate.setPosition(400, 550 - i * 50);
+      // hash instead, tilize
+    }
+    house = {
+      house: this.matter.add.sprite(175, 450, 'house', 0, { label: 'house' }),
+      crates: new Set(),
+      onFire: false,
+    };
+    for (let i = 0; i < 4; i += 1) {
+      for (let j = 0; j < 3; j += 1) {
+        const label = 'house' + i;
+        const currCrate = {
+          // crate: this.matter.add.sprite(200, 550 - i * 50, 'crate', null, { label: label, isSensor: true }),
+          // crate: this.matter.bodies.rectangle(200, 200, 50, 50, { label: 'rectangle', isSensor: true }),
+          crate: { x: 200 + j * 50, y: 550 - i * 50 },
+          onFire: false,
+          fireSprite: null,
+          neighbors: new Set<Crate>(),
+        };
+        house.crates.add(currCrate);
+        // house.crates[label].crate.setRectangle(50, 50, {
+        //   render: { sprite: { xOffset: 0, yOffset: 0.15 } },
+        //   label: label,
+        // });
+        // house.crates[label].crate.setBounce(0);
+        // house.crates[label].crate.setPosition(200 + j * 50, 550 - i * 50);
+      }
     }
     const game = this;
     this.matter.world.on('collisionstart', function (event) {
       //  Loop through all of the collision pairs
+      Object.keys(crates).forEach((key) => {
+        const crate = crates[key];
+        crate.neighbors.clear();
+      });
       const pairs = event.pairs;
-
       for (let i = 0; i < pairs.length; i++) {
         const bodyA = pairs[i].bodyA;
         const bodyB = pairs[i].bodyB;
@@ -164,10 +273,32 @@ export class GameScene extends Phaser.Scene {
         }
         // fire collision
         if (bodyA.label === 'fire' && bodyB.label.includes('crate')) {
-          igniteCrate(game, bodyB.label, true);
+          igniteCrate(game, crates[bodyB.label], true);
         }
         if (bodyB.label === 'fire' && bodyA.label.includes('crate')) {
-          igniteCrate(game, bodyA.label, true);
+          igniteCrate(game, crates[bodyA.label], true);
+        }
+        if (bodyA.label === 'fire' && bodyB.label.includes('house')) {
+          Object.keys(house.crates).forEach((key) => {
+            igniteCrate(game, house.crates[key], true);
+          });
+        }
+        if (bodyB.label === 'fire' && bodyA.label.includes('house')) {
+          igniteHouse(game, house, true);
+        }
+        // if (bodyA.label.includes('crate') && bodyB.label.includes('crate')) {
+        //   addNeighbor(crates[bodyA.label], crates[bodyB.label]);
+        // }
+      }
+    });
+    this.matter.world.on('collisionactive', function (event) {
+      //  Loop through all of the collision pairs
+      const pairs = event.pairs;
+      for (let i = 0; i < pairs.length; i++) {
+        const bodyA = pairs[i].bodyA;
+        const bodyB = pairs[i].bodyB;
+        if (bodyA.label.includes('crate') && bodyB.label.includes('crate')) {
+          addNeighbor(crates[bodyA.label], crates[bodyB.label]);
         }
       }
     });
@@ -200,6 +331,15 @@ export class GameScene extends Phaser.Scene {
         isSensor: true,
         label: 'fire',
       });
+      if (cursors.left.isDown) {
+        fire.setRotation(Math.PI);
+      }
+      if (cursors.down.isDown) {
+        fire.setRotation(Math.PI / 2);
+      }
+      if (cursors.up.isDown) {
+        fire.setRotation((3 * Math.PI) / 2);
+      }
       fire.anims.play('fireball', true);
       fire.setIgnoreGravity(true);
       const xDir = cursors.right.isDown ? 1 : -1;
@@ -216,5 +356,12 @@ export class GameScene extends Phaser.Scene {
         }
       }, 500);
     }
+    Object.keys(crates).forEach((key) => {
+      const crate = crates[key];
+      if (crate.fireSprite != null && crate.crate.active) {
+        crate.fireSprite.x = crate.crate.x;
+        crate.fireSprite.y = crate.crate.y - 10;
+      }
+    });
   }
 }
