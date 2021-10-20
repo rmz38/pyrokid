@@ -1,6 +1,8 @@
 import { BodyType } from 'matter';
 import { Input, NONE } from 'phaser';
 import { getGameWidth, getGameHeight } from '../helpers';
+import Player from '../objects/player';
+import Crate from '../objects/crate';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -14,19 +16,18 @@ let wasd;
 interface IHash {
   [details: string]: Crate;
 }
-interface Crate {
-  crate: any;
-  onFire: boolean;
-  neighbors: Set<Crate>;
-  fireSprite: Phaser.GameObjects.Sprite;
-}
+// interface Crate {
+//   crate: any;
+//   onFire: boolean;
+//   neighbors: Set<Crate>;
+//   fireSprite: Phaser.GameObjects.Sprite;
+// }
 interface House {
   house: any;
   crates: Set<Crate>;
   onFire: boolean;
 }
 const crates: IHash = {};
-let touchingGround = true;
 let fire;
 let fireActive = false;
 const xTiles: integer = 50;
@@ -126,41 +127,9 @@ export class GameScene extends Phaser.Scene {
   }
   public create(): void {
     this.add.image(400, 300, 'background');
-    const rec = this.matter.bodies.rectangle(0, 24, 20, 1, { isSensor: true, label: 'groundSensor' });
     this.matter.world.setBounds(0, 0, 800, 600, 32, true, true, false, true);
     // platforms = this.matter.add.sprite(400, 568, 'ground');
-
-    const playerBody = this.matter.bodies.rectangle(0, 0, 32, 48);
-    const compound = this.matter.body.create({
-      parts: [playerBody, rec],
-      inertia: Infinity,
-      render: { sprite: { xOffset: 0.5, yOffset: 0.5 } },
-    });
-    player = this.matter.add.sprite(0, 0, 'dude');
-    player.setExistingBody(compound);
-    player.body.render.sprite.xOffset = 0;
-    player.body.render.sprite.yOffset = 0;
-    player.setPosition(100, 450);
-
-    this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: 'turn',
-      frames: [{ key: 'dude', frame: 4 }],
-      frameRate: 20,
-    });
-
-    this.anims.create({
-      key: 'right',
-      frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-      frameRate: 10,
-      repeat: -1,
-    });
+    player = new Player(this);
 
     this.anims.create({
       key: 'cratepic',
@@ -306,22 +275,14 @@ export class GameScene extends Phaser.Scene {
 
   public update(): void {
     if (wasd.A.isDown) {
-      player.setVelocityX(-7);
-
-      player.anims.play('left', true);
+      player.moveLeft();
     } else if (wasd.D.isDown) {
-      player.setVelocityX(7);
-
-      player.anims.play('right', true);
+      player.moveRight();
     } else {
-      player.setVelocityX(0);
-
-      player.anims.play('turn');
+      player.turn();
     }
-
-    if (wasd.W.isDown && touchingGround) {
-      player.setVelocityY(-10);
-      touchingGround = false;
+    if (wasd.W.isDown && player.touchingGround) {
+      player.jump();
     }
     if (
       (cursors.right.isDown || cursors.down.isDown || cursors.up.isDown || cursors.left.isDown) &&
