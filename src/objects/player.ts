@@ -57,5 +57,11 @@ class Player {
     this.player.setVelocityY(-10);
     this.touchingGround = false;
   }
+  public getX() {
+    return this.player.body.position.x;
+  }
+  public getY() {
+    return this.player.body.position.y;
+  }
 }
 export default Player;
