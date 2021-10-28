@@ -5,6 +5,7 @@ class Spider {
   constructor(game: any, armored: boolean) {
     const spiderRight = game.matter.bodies.rectangle(37, 0, 10, 10, { isSensor: true, label: 'spiderTurnSensor' });
     const spiderLeft = game.matter.bodies.rectangle(-37, 0, 10, 10, { isSensor: true, label: 'spiderTurnSensor' });
+    spiderLeft.collisionFilter.category = 0x0100;
     const spiderBody = game.matter.bodies.rectangle(0, 0, 77, 50, { label: 'spider' });
     const compound = game.matter.body.create({
       parts: [spiderBody, spiderRight, spiderLeft],
@@ -48,7 +49,7 @@ class Spider {
     if (this.armored) {
       this.armored = false;
       const lastIndex = this.sprite.anims.currentFrame.index;
-      this.sprite.anims.play({ key: 'spider', startFrame: lastIndex });
+      this.sprite.anims.play({ key: 'spider', startFrame: lastIndex - 1 });
       //change sprite
     } else {
       this.sprite.destroy();

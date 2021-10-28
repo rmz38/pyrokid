@@ -7,6 +7,8 @@ import CompoundCrate from '../objects/compoundCrate';
 import Lizard from '../objects/lizard';
 import Spider from '../objects/spider';
 import Dirt from '../objects/dirt';
+import Steel from '../objects/steel';
+import Lava from '../objects/lava';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -19,6 +21,7 @@ let platforms;
 let cursors;
 let wasd;
 let dirtTiles;
+let lava;
 interface CrateHash {
   [details: string]: Crate;
 }
@@ -69,7 +72,6 @@ function igniteCompound(game, curr: CompoundCrate, destroyFire) {
   if (destroyFire) {
     fire.destroy();
   }
-  console.log(curr);
   if (curr.onFire) {
     return;
   }
@@ -109,15 +111,11 @@ function igniteCrate(game, currCrate: any) {
       [x, y + 1],
       [x, y - 1],
     ];
-    console.log(candidates);
-    console.log(compounds['house']);
-    console.log(tiles);
     for (let i = 0; i < candidates.length; i++) {
       const x = candidates[i][0];
       const y = candidates[i][1];
       if (x >= 0 && x < xTiles && y >= 0 && y < yTiles) {
         tiles[x][y].forEach((e) => {
-          console.log('triggered');
           igniteCompound(game, e.owner, false);
         });
       }
@@ -139,6 +137,8 @@ export class GameScene extends Phaser.Scene {
     this.load.image('ground', 'assets/squares/platform.png');
     this.load.image('house', 'assets/squares/house.png');
     this.load.image('dirtTile', 'assets/squares/dirtTile.png');
+    this.load.image('steelTile', 'assets/squares/steelTile.png');
+    this.load.image('lavaTile', 'assets/squares/lavaTile.png');
     this.load.spritesheet('fireball', 'assets/fireball.png', { frameWidth: 38, frameHeight: 19 });
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
     this.load.spritesheet('lizard', 'assets/monsters/lizard.png', { frameWidth: 70, frameHeight: 50 });
@@ -207,6 +207,9 @@ export class GameScene extends Phaser.Scene {
     }
     compounds['house'] = new CompoundCrate(this, new Set(tempowner), 'house', 'house');
     const game = this;
+    const steel = new Steel(game, 750, 500);
+    lava = new Lava(game, 700, 550);
+    console.log(lava);
     this.matter.world.on('collisionstart', function (event) {
       //  Loop through all of the collision pairs
       Object.keys(crates).forEach((key) => {
@@ -217,8 +220,6 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < pairs.length; i++) {
         const bodyA = pairs[i].bodyA;
         const bodyB = pairs[i].bodyB;
-        console.log(bodyA.label);
-        console.log(bodyB.label);
         if (
           (bodyB.label === 'lizard' && bodyA.label === 'fire') ||
           (bodyA.label === 'lizard' && bodyB.label === 'fire')
@@ -234,6 +235,22 @@ export class GameScene extends Phaser.Scene {
           fire.destroy();
           fireActive = false;
           spider.hitFire();
+        }
+        if (
+          (bodyB.label.includes('lizard') && bodyA.label === 'lava') ||
+          (bodyA.label.includes('lizard') && bodyB.label === 'lava')
+        ) {
+          console.log("lavahit");
+          lava.ignite(game);
+        }
+        if (
+          (bodyB.label.includes('spider') && bodyA.label.includes('lizard')) ||
+          (bodyA.label.includes('spider') && bodyB.label.includes('lizard'))
+        ) {
+          console.log('lizardspider');
+          if (lizard.onFire) {
+            spider.hitFire();
+          }
         }
         if (bodyB.label.includes('lizard') && bodyA.label.includes('crate') && lizard.onFire) {
           igniteCompound(game, crates[bodyA.label].owner, false);

@@ -3,10 +3,12 @@ class Lizard {
   onFire: boolean;
   fireSprite: any;
   velocity: integer;
+  spiderSensor: any;
   constructor(game: any) {
     const lizRight = game.matter.bodies.rectangle(37, 0, 10, 10, { isSensor: true, label: 'lizardTurnSensor' });
     const lizLeft = game.matter.bodies.rectangle(-37, 0, 10, 10, { isSensor: true, label: 'lizardTurnSensor' });
     const lizardBody = game.matter.bodies.rectangle(0, 0, 70, 50, { label: 'lizard' });
+    // const spiderSensor = game.matter.bodies.rectangle(0, 0, 70, 50, { label: 'lizard' });
     const compound = game.matter.body.create({
       parts: [lizardBody, lizRight, lizLeft],
       inertia: Infinity,
@@ -18,6 +20,9 @@ class Lizard {
     lizard.setPosition(150, 500);
     lizard.setCollisionCategory(0x001);
     lizard.setCollidesWith(0x0100);
+    console.log(lizard);
+    console.log(lizLeft);
+    lizLeft.collisionFilter.category = 0x0100;
     this.sprite = lizard;
     this.createAnims(game);
     this.sprite.anims.play('lizard', true);
@@ -28,7 +33,7 @@ class Lizard {
     game.anims.create({
       key: 'lizard',
       frames: game.anims.generateFrameNumbers('lizard', { start: 0, end: 29 }),
-      frameRate: 30,
+      frameRate: 60,
       repeat: -1,
     });
   }
