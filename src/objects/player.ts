@@ -2,9 +2,7 @@ class Player {
   player: any;
   touchingGround: boolean;
   constructor(game: any) {
-    const rec = game.matter.bodies.rectangle(0, 24, 20, 1, { isSensor: true, label: 'groundSensor' });
-    game.matter.world.setBounds(0, 0, 800, 600, 32, true, true, false, true);
-    // platforms = this.matter.add.sprite(400, 568, 'ground');
+    const rec = game.matter.bodies.rectangle(0, 24, 10, 1, { isSensor: true, label: 'groundSensor' });
 
     const playerBody = game.matter.bodies.rectangle(0, 0, 32, 48);
     const compound = game.matter.body.create({
@@ -17,6 +15,7 @@ class Player {
     player.body.render.sprite.xOffset = 0;
     player.body.render.sprite.yOffset = 0;
     player.setPosition(100, 450);
+    player.setCollisionCategory(0x0100);
     this.player = player;
     this.createAnims(game);
   }
