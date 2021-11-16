@@ -14,7 +14,7 @@ class Lizard {
       inertia: Infinity,
       render: { sprite: { xOffset: 0, yOffset: 0 } },
     });
-    this.velocity = 2;
+    this.velocity = 1;
     const lizard = game.matter.add.sprite(0, 0, 'lizard');
     lizard.setExistingBody(compound);
     lizard.setPosition(150, 500);
@@ -33,7 +33,7 @@ class Lizard {
     game.anims.create({
       key: 'lizard',
       frames: game.anims.generateFrameNumbers('lizard', { start: 0, end: 29 }),
-      frameRate: 60,
+      frameRate: 30,
       repeat: -1,
     });
   }

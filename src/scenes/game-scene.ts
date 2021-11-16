@@ -327,6 +327,9 @@ export class GameScene extends Phaser.Scene {
       const pos = getTile(curr.crate.position.x, curr.crate.position.y);
       tiles[pos[0]][pos[1]].add(curr);
     });
+    console.log(typeof lava);
+    // const pos = getTile(lava.sprite.position.x, lava.sprite.position.y);
+    // tiles[pos[0]][pos[1]].add(lava);
     // const lizPos = getTile(lizard.sprite.x, lizard.sprite.y);
     // tiles[lizPos[0]][lizPos[1]].add(lizard);
     lizard.sprite.setVelocityX(lizard.velocity);
