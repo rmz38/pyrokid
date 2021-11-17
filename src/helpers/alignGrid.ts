@@ -56,11 +56,13 @@ class AlignGrid {
     const col = Math.floor(y1 / TILE_SIZE);
     const x2 = row * TILE_SIZE + TILE_SIZE / 2;
     const y2 = col * TILE_SIZE + TILE_SIZE / 2;
+    //if clearing instead
     if (objName == 'clear') {
       if (this.grid[row][col]) {
         this.grid[row][col].destroy();
       }
       this.grid[row][col] = null;
+
       return;
     }
 
@@ -81,7 +83,6 @@ class AlignGrid {
     this.grid[row][col] = obj;
     obj.x = x2;
     obj.y = y2;
-    console.log(this.playerTile);
   }
   getRowOrCol(pixel: integer): integer {
     return Math.floor(pixel / TILE_SIZE);
@@ -114,48 +115,68 @@ class AlignGrid {
    * @param ex end x pixel coordinate
    * @param ey end y pixel coordinate
    */
-  clump(sx, sy, ex, ey): void {
+  clump(sr, sc, er, ec): void {
     const curr = new Set<string>();
-    const sr = this.getRowOrCol(sx);
-    const sc = this.getRowOrCol(sy);
-    const er = this.getRowOrCol(ex);
-    const ec = this.getRowOrCol(ey);
+    const check = new Set<string>();
+    // const sr = this.getRowOrCol(sx);
+    // const sc = this.getRowOrCol(sy);
+    // const er = this.getRowOrCol(ex);
+    // const ec = this.getRowOrCol(ey);
+    // const sr = 0;
+    // const sc = 0;
+    // const er = 10;
+    // const ec = 10;
     for (let i = sr; i <= er; i++) {
       for (let j = sc; j <= ec; j++) {
-        curr.add(i + ',' + j);
-        if (this.clumps.has(this.grid[i][j].clumpId)) {
-          const toAdd = this.clumps.get(this.grid[i][j].clumpId);
-          toAdd.forEach((e) => {
-            curr.add(e);
-          });
+        if (this.grid[i][j]) {
+          curr.add(i + ',' + j);
+          check.add(i + ',' + j);
+          if (this.grid[i][j].frame != 0) {
+            this.neighbors(i, j).forEach((e) => {
+              const nx = this.unpack(e)[0];
+              const ny = this.unpack(e)[1];
+              if (this.grid[nx][ny]) {
+                check.add(e);
+              }
+            });
+          }
         }
       }
     }
     // figure out which tile texture to use based on spritesheet
+    // ensured that none are null in curr
     curr.forEach((e) => {
       const i = this.unpack(e)[0];
       const j = this.unpack(e)[1];
       if (clumpables.has(this.grid[i][j].name)) {
         const candidates = this.neighbors(i, j);
+        // all sides of the tile grabbed from the tilesheets
         const id = [1, 1, 1, 1, 1, 1, 1, 1];
         let pointer = 0;
         for (let x = 0; x < candidates.length; x++) {
           const coord = candidates[x];
           const a = this.unpack(coord)[0];
           const b = this.unpack(coord)[1];
-          if (!(curr.has(coord) && this.grid[a][b].name == this.grid[i][j].name)) {
-            if (pointer % 2 == 0) {
+          if (!(check.has(coord) && this.grid[a][b].name == this.grid[i][j].name)) {
+            if (x % 2 == 0) {
               id[pointer] = 0;
             } else {
               id[pointer] = 0;
               id[pointer + 1] = 0;
-              id[pointer + 2] = 0;
+              // wrap around to 7
+              if (pointer + 2 > 7) {
+                id[0] = 0;
+              } else {
+                id[pointer + 2] = 0;
+              }
             }
           }
-          if (pointer % 2 == 1) {
+          // console.log(pointer);
+          if (x % 2 == 1) {
             pointer += 2;
           }
         }
+        console.log(id.join(''));
         this.grid[i][j].setFrame(tiles[id.join('')]);
       }
     });
