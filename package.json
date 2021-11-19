@@ -15,6 +15,8 @@
     "lint": "eslint src"
   },
   "dependencies": {
+    "file-saver": "^2.0.5",
+    "fs": "^0.0.1-security",
     "phaser": "^3.50.0"
   },
   "devDependencies": {

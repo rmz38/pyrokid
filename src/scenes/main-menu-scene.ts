@@ -25,7 +25,7 @@ export class MainMenuScene extends Phaser.Scene {
       this.scene.start('Game');
     });
 
-    new MenuButton(this, 100, 250, 'Settings', () => {
+    new MenuButton(this, 100, 250, 'Level Editor', () => {
       this.scene.start('LevelEditor');
     });
 

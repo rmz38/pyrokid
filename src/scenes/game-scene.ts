@@ -9,6 +9,7 @@ import Spider from '../objects/spider';
 import Dirt from '../objects/dirt';
 import Steel from '../objects/steel';
 import Lava from '../objects/lava';
+import { MenuButton } from '../ui/menu-button';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -16,17 +17,19 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   key: 'Game',
 };
 let player;
-let lizard;
-let platforms;
 let cursors;
 let wasd;
-let dirtTiles;
-let lava;
 interface CrateHash {
   [details: string]: Crate;
 }
 interface ComHash {
   [details: string]: CompoundCrate;
+}
+interface LizardHash {
+  [details: string]: Lizard;
+}
+interface SpiderHash {
+  [details: string]: Spider;
 }
 const world_bound_width = 1200;
 const world_bound_height = 600;
@@ -43,7 +46,6 @@ let fire;
 let fireActive = false;
 let fireCooldown = false;
 let house;
-let spider;
 const TILE_SIZE: integer = 50;
 const xTiles: integer = Math.floor(world_bound_width / TILE_SIZE);
 const yTiles: integer = Math.floor(world_bound_height / TILE_SIZE);
@@ -65,9 +67,6 @@ function clearTiles() {
     }
   }
 }
-// function igniteLizard(game, curr, destroyFire) {
-//   return null;
-// }
 function igniteCompound(game, curr: CompoundCrate, destroyFire) {
   if (destroyFire) {
     fire.destroy();
@@ -129,6 +128,9 @@ function igniteCrate(game, currCrate: any) {
 export class GameScene extends Phaser.Scene {
   [x: string]: any;
   public speed = 200;
+  public lizards: LizardHash = {};
+  public spiders: SpiderHash = {};
+  public lavas = {};
   constructor() {
     super(sceneConfig);
   }
@@ -136,33 +138,44 @@ export class GameScene extends Phaser.Scene {
     this.load.image('background', 'assets/backgrounds/TutorialBackground1.png');
     this.load.image('ground', 'assets/squares/platform.png');
     this.load.image('house', 'assets/squares/house.png');
-    this.load.image('dirtTile', 'assets/squares/dirtTile.png');
-    this.load.image('steelTile', 'assets/squares/steelTile.png');
-    this.load.image('lavaTile', 'assets/squares/lavaTile.png');
+    this.load.spritesheet('crate', 'assets/clumpables/crateTiles.png', { frameWidth: 50, frameHeight: 50 });
+    this.load.spritesheet('dirt', 'assets/clumpables/dirtTiles.png', { frameWidth: 50, frameHeight: 50 });
+    this.load.spritesheet('steel', 'assets/clumpables/steelTiles.png', { frameWidth: 50, frameHeight: 50 });
+    this.load.spritesheet('lava', 'assets/clumpables/lavaTiles.png', { frameWidth: 50, frameHeight: 50 });
     this.load.spritesheet('fireball', 'assets/fireball.png', { frameWidth: 38, frameHeight: 19 });
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
     this.load.spritesheet('lizard', 'assets/monsters/lizard.png', { frameWidth: 70, frameHeight: 50 });
     this.load.spritesheet('spider', 'assets/monsters/spider.png', { frameWidth: 77, frameHeight: 61 });
     this.load.spritesheet('spiderArmored', 'assets/monsters/spiderArmored.png', { frameWidth: 77, frameHeight: 61 });
-    this.load.spritesheet('crate', 'assets/squares/crate.png', { frameWidth: 79, frameHeight: 80 });
     this.load.spritesheet('squareFire', 'assets/squares/squareFire.png', { frameWidth: 79, frameHeight: 80 });
     this.load.spritesheet('fireDisappear', 'assets/squares/fireDisappear.png', { frameWidth: 84, frameHeight: 133 });
+    this.load.json('level', 'assets/levels/testlevel.json');
   }
   public create(): void {
-    this.add.image(400, 300, 'background');
+    const background = this.add.image(world_bound_width / 2, world_bound_height / 2, 'background');
+    background.setScale(world_bound_width / background.width);
     this.matter.world.setBounds(0, 0, world_bound_width, world_bound_height, 32, true, true, false, true);
     this.cameras.main.setBounds(0, 0, world_bound_width, world_bound_height).setName('main');
     // platforms = this.matter.add.sprite(400, 568, 'ground');
-    player = new Player(this);
+    const data = this.cache.json.get('level');
+    // const jsonData = JSON.parse();
+    player = new Player(data.player[0].x, data.player[0].y, this);
     this.cameras.main.startFollow(player.player, false, 0.2, 0.2);
-    lizard = new Lizard(this);
-    spider = new Spider(this, true);
-    this.anims.create({
-      key: 'cratepic',
-      frames: this.anims.generateFrameNumbers('crate', { start: 0, end: 0 }),
-      frameRate: 10,
-      repeat: -1,
+    // make lizards
+    for (let i = 0; i < data.lizard.length; i++) {
+      const e = data.lizard[i];
+      this.lizards['lizard' + i] = new Lizard(e.x, e.y, this, i);
+    }
+    data.dirt.forEach((e) => {
+      new Dirt(e.x, e.y, this, e.frame);
     });
+    // data.steel.forEach((e) => {
+    //   new Steel(e.x, e.y, this, e.frame);
+    // });
+    for (let i = 0; i < data.lava.length; i++) {
+      const e = data.lava[i];
+      this.lavas['lava' + i] = new Lava(e.x, e.y, this, e.frame, i);
+    }
 
     this.anims.create({
       key: 'squareFire',
@@ -186,30 +199,7 @@ export class GameScene extends Phaser.Scene {
     cursors = this.input.keyboard.createCursorKeys();
 
     wasd = this.input.keyboard.addKeys('W,S,A,D');
-
-    for (let i = 0; i < 5; i += 1) {
-      const label = 'crate_' + i;
-      crates[label] = new Crate(this, 400, 550 - i * 50, label, null);
-      compounds[label] = new CompoundCrate(this, new Set([crates[label]]), 'crate', label);
-      // hash instead, tileize
-    }
-    for (let i = 0; i < 20; i += 1) {
-      const test = new Dirt(this, i * 50, 600);
-    }
-    //demo house
-    const tempowner = [];
-    for (let i = 0; i < 3; i += 1) {
-      for (let j = 0; j < 4; j += 1) {
-        const label = 'cratehouse_' + i + j;
-        crates[label] = new Crate(this, 500 + i * 50, 550 - j * 50, label, null);
-        tempowner.push(crates[label]);
-      }
-    }
-    compounds['house'] = new CompoundCrate(this, new Set(tempowner), 'house', 'house');
     const game = this;
-    const steel = new Steel(game, 750, 500);
-    lava = new Lava(game, 700, 550);
-    console.log(lava);
     this.matter.world.on('collisionstart', function (event) {
       //  Loop through all of the collision pairs
       Object.keys(crates).forEach((key) => {
@@ -220,42 +210,38 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < pairs.length; i++) {
         const bodyA = pairs[i].bodyA;
         const bodyB = pairs[i].bodyB;
-        if (
-          (bodyB.label === 'lizard' && bodyA.label === 'fire') ||
-          (bodyA.label === 'lizard' && bodyB.label === 'fire')
-        ) {
+        const a = bodyA.label;
+        const b = bodyB.label;
+        if ((b.includes('lizard') && a === 'fire') || (a.includes('lizard') && b === 'fire')) {
           fire.destroy();
           fireActive = false;
-          lizard.ignite(game);
+          const lizard = a.includes('lizard') ? a : b;
+          game.lizards[lizard].ignite(game);
         }
-        if (
-          (bodyB.label === 'spider' && bodyA.label === 'fire') ||
-          (bodyA.label === 'spider' && bodyB.label === 'fire')
-        ) {
+        if ((b.includes('spider') && a === 'fire') || (a.includes('spider') && b === 'fire')) {
           fire.destroy();
           fireActive = false;
-          spider.hitFire();
+          // if (b)
+          // spider.hitFire();
         }
-        if (
-          (bodyB.label.includes('lizard') && bodyA.label === 'lava') ||
-          (bodyA.label.includes('lizard') && bodyB.label === 'lava')
-        ) {
-          console.log("lavahit");
-          lava.ignite(game);
-        }
-        if (
-          (bodyB.label.includes('spider') && bodyA.label.includes('lizard')) ||
-          (bodyA.label.includes('spider') && bodyB.label.includes('lizard'))
-        ) {
-          console.log('lizardspider');
-          if (lizard.onFire) {
-            spider.hitFire();
+        if ((b.includes('lizard') && a.includes('lava')) || (a.includes('lizard') && b.includes('lava'))) {
+          const lava = a.includes('lava') ? a : b;
+          const lizard = a.includes('lava') ? b : a;
+          if (game.lizards[lizard].onFire) {
+            game.lavas[lava].ignite(game);
           }
         }
-        if (bodyB.label.includes('lizard') && bodyA.label.includes('crate') && lizard.onFire) {
+        if ((b.includes('spider') && a.includes('lizard')) || (a.includes('spider') && b.includes('lizard'))) {
+          console.log('lizardspider');
+          const lizard = a.includes('lizard') ? a : b;
+          if (game.lizards[lizard].onFire) {
+            // spider.hitFire();
+          }
+        }
+        if (b.includes('lizard') && a.includes('crate') && game.lizards[0].onFire) {
           igniteCompound(game, crates[bodyA.label].owner, false);
         }
-        if (bodyA.label.includes('lizard') && bodyB.label.includes('crate') && lizard.onFire) {
+        if (a.includes('lizard') && b.includes('crate') && game.lizards[0].onFire) {
           igniteCompound(game, crates[bodyB.label].owner, false);
         }
         //  sensor collisions
@@ -276,15 +262,15 @@ export class GameScene extends Phaser.Scene {
           }
         }
         // fire collision
-        if (bodyA.label === 'fire' && bodyB.label.includes('crate')) {
-          igniteCompound(game, crates[bodyB.label].owner, true);
+        if (a === 'fire' && b.includes('crate')) {
+          igniteCompound(game, crates[b].owner, true);
         }
         if (bodyB.label === 'fire' && bodyA.label.includes('crate')) {
-          igniteCompound(game, crates[bodyA.label].owner, true);
+          igniteCompound(game, crates[a].owner, true);
         }
-        if (bodyA.label.includes('TurnSensor') || bodyB.label.includes('TurnSensor')) {
-          const monsterBody = bodyA.label.includes('TurnSensor') ? bodyA : bodyB;
-          const otherBody = bodyA.label.includes('TurnSensor') ? bodyB : bodyA;
+        if (bodyA.isSensor || bodyB.isSensor) {
+          const monsterBody = bodyA.isSensor ? bodyA : bodyB;
+          const otherBody = bodyA.isSensor ? bodyB : bodyA;
           let turnFlag = true;
           monsterCollisionLabels.forEach((label) => {
             if (otherBody.label.includes(label)) {
@@ -293,31 +279,17 @@ export class GameScene extends Phaser.Scene {
           });
           if (turnFlag) {
             if (monsterBody.label.includes('lizard')) {
-              lizard.flip();
+              game.lizards[monsterBody.label].flip();
             } else {
-              spider.flip();
+              // spider.flip();
             }
           }
         }
-        // if (
-        //   (bodyB.label === 'spiderTurnSensor' && bodyA.label !== 'fire') ||
-        //   (bodyA.label === 'spiderTurnSensor' && bodyB.label !== 'fire')
-        // ) {
-        //   spider.flip();
-        // }
       }
     });
-    // this.matter.world.on('collisionactive', function (event) {
-    //   //  Loop through all of the collision pairs
-    //   const pairs = event.pairs;
-    //   for (let i = 0; i < pairs.length; i++) {
-    //     const bodyA = pairs[i].bodyA;
-    //     const bodyB = pairs[i].bodyB;
-    //     if (bodyA.label.includes('crate') && bodyB.label.includes('crate')) {
-    //       addNeighbor(crates[bodyA.label], crates[bodyB.label]);
-    //     }
-    //   }
-    // });
+    new MenuButton(this, 10, 10, 'Back to Menu', () => {
+      this.scene.start('MainMenu');
+    });
   }
   public update(): void {
     clearTiles();
@@ -327,13 +299,13 @@ export class GameScene extends Phaser.Scene {
       const pos = getTile(curr.crate.position.x, curr.crate.position.y);
       tiles[pos[0]][pos[1]].add(curr);
     });
-    console.log(typeof lava);
-    // const pos = getTile(lava.sprite.position.x, lava.sprite.position.y);
-    // tiles[pos[0]][pos[1]].add(lava);
-    // const lizPos = getTile(lizard.sprite.x, lizard.sprite.y);
-    // tiles[lizPos[0]][lizPos[1]].add(lizard);
-    lizard.sprite.setVelocityX(lizard.velocity);
-    if (spider.sprite.active) {
+    for (const [key, lizard] of Object.entries(this.lizards)) {
+      lizard.sprite.setVelocityX(lizard.velocity);
+      if (lizard.onFire) {
+        lizard.syncFire();
+      }
+    }
+    for (const [key, spider] of Object.entries(this.spiders)) {
       spider.sprite.setVelocityX(spider.velocity);
     }
     if (wasd.A.isDown) {
@@ -389,8 +361,5 @@ export class GameScene extends Phaser.Scene {
         crate.syncFire();
       }
     });
-    if (lizard.onFire) {
-      lizard.syncFire();
-    }
   }
 }

@@ -15,7 +15,12 @@ export class MenuButton extends Phaser.GameObjects.Rectangle {
     this.label = scene.add
       .text(x + padding, y + padding, text)
       .setFontSize(18)
-      .setAlign('center');
+      .setAlign('center')
+      .setDepth(2);
+    this.label.scrollFactorX = 0;
+    this.label.scrollFactorY = 0;
+    this.scrollFactorX = 0;
+    this.scrollFactorY = 0;
 
     const labelWidth = this.label.width + padding;
     const labelHeight = this.label.height + padding;

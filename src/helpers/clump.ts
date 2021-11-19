@@ -47,3 +47,10 @@ export const tiles = {
   '01111111': 45,
   '01010101': 46,
 };
+
+const indexesTemp = {};
+
+for (const [key, value] of Object.entries(tiles)) {
+  indexesTemp[value] = key;
+}
+export const indexes = indexesTemp;

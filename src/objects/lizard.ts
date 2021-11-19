@@ -4,10 +4,11 @@ class Lizard {
   fireSprite: any;
   velocity: integer;
   spiderSensor: any;
-  constructor(game: any) {
-    const lizRight = game.matter.bodies.rectangle(37, 0, 10, 10, { isSensor: true, label: 'lizardTurnSensor' });
-    const lizLeft = game.matter.bodies.rectangle(-37, 0, 10, 10, { isSensor: true, label: 'lizardTurnSensor' });
-    const lizardBody = game.matter.bodies.rectangle(0, 0, 70, 50, { label: 'lizard' });
+  id: integer;
+  constructor(x: integer, y: integer, game: any, id: integer) {
+    const lizRight = game.matter.bodies.rectangle(20, 0, 10, 10, { isSensor: true, label: 'lizard' + id });
+    const lizLeft = game.matter.bodies.rectangle(-20, 0, 10, 10, { isSensor: true, label: 'lizard' + id });
+    const lizardBody = game.matter.bodies.rectangle(0, 0, 40, 50, { label: 'lizard' + id });
     // const spiderSensor = game.matter.bodies.rectangle(0, 0, 70, 50, { label: 'lizard' });
     const compound = game.matter.body.create({
       parts: [lizardBody, lizRight, lizLeft],
@@ -17,7 +18,7 @@ class Lizard {
     this.velocity = 1;
     const lizard = game.matter.add.sprite(0, 0, 'lizard');
     lizard.setExistingBody(compound);
-    lizard.setPosition(150, 500);
+    lizard.setPosition(x, y);
     lizard.setCollisionCategory(0x001);
     lizard.setCollidesWith(0x0100);
     console.log(lizard);
@@ -37,7 +38,7 @@ class Lizard {
       repeat: -1,
     });
   }
-  public flip(game) {
+  public flip() {
     this.sprite.flipX = !this.sprite.flipX;
     this.velocity = -1 * this.velocity;
   }

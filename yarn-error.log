@@ -1,5 +1,5 @@
 Arguments: 
-  /home/rmz38/.nvm/versions/node/v12.21.0/bin/node /home/rmz38/.yarn/bin/yarn.js add @types/phaser3-planck
+  /home/rmz38/.nvm/versions/node/v12.21.0/bin/node /home/rmz38/.yarn/bin/yarn.js add file=saver
 
 PATH: 
   /home/rmz38/.yarn/bin:/home/rmz38/.config/yarn/global/node_modules/.bin:/home/rmz38/.nvm/versions/node/v12.21.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler:/mnt/c/Program Files (x86)/Common Files/Oracle/Java/javapath:/mnt/c/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler:/mnt/c/Program Files (x86)/Razer Chroma SDK/bin:/mnt/c/Program Files/Razer Chroma SDK/bin:/mnt/c/Program Files (x86)/Razer/ChromaBroadcast/bin:/mnt/c/Program Files/Razer/ChromaBroadcast/bin:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files/Intel/WiFi/bin/:/mnt/c/Program Files/Common Files/Intel/WirelessCommon/:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Windows/system32/config/systemprofile/AppData/Local/Microsoft/WindowsApps:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Users/zhour/AppData/Local/Microsoft/WindowsApps:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/Microsoft SQL Server/130/Tools/Binn/:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA NvDLISR:/mnt/d/node/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Users/zhour/AppData/Local/Programs/Python/Python37:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/d/Ruby27-x64/bin:/mnt/c/Users/zhour/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/zhour/AppData/Roaming/npm:/mnt/c/Users/zhour/.dotnet/tools:/mnt/d/4410/mingw64/bin:/mnt/c/Windows/System32/glew-2.1.0/bin/Release/Win32/glew32.dll:/mnt/d/Heroku/bin:/mnt/c/Users/zhour/AppData/Local/Programs/Python/Python37/Scripts:/mnt/c/Users/zhour/AppData/Local/Google/Cloud SDK/google-cloud-sdk/bin:/snap/bin
@@ -14,7 +14,7 @@ Platform:
   linux x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2fphaser3-planck: Not found
+  Error: https://registry.yarnpkg.com/file=saver: Not found
       at Request.params.callback [as _callback] (/home/rmz38/.yarn/lib/cli.js:67031:18)
       at Request.self.callback (/home/rmz38/.yarn/lib/cli.js:140885:22)
       at Request.emit (events.js:314:20)
@@ -44,8 +44,7 @@ npm manifest:
       "lint": "eslint src"
     },
     "dependencies": {
-      "phaser": "^3.50.0",
-      "phaser3-planck": "^0.0.4"
+      "phaser": "^3.50.0"
     },
     "devDependencies": {
       "@typescript-eslint/eslint-plugin": "^3.0.2",
@@ -3563,7 +3562,7 @@ Lockfile:
     dependencies:
       find-up "^4.0.0"
   
-  planck-js@^0.3.12:
+  planck-js@^0.3.12, planck-js@^0.3.31:
     version "0.3.31"
     resolved "https://registry.yarnpkg.com/planck-js/-/planck-js-0.3.31.tgz#dc87a999f6d425633d7abd8c77078fcb5a9babd2"
     integrity sha512-fwKYnL92pF2nXdMPeBq/Aipu+m8LztcEcNjdcrQm/sWKDR01Ej0g121KS1oO7NW23WnRzxw24a7V4KI2JlFpSg==

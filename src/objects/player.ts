@@ -1,7 +1,7 @@
 class Player {
   player: any;
   touchingGround: boolean;
-  constructor(game: any) {
+  constructor(x: integer, y: integer, game: any) {
     const rec = game.matter.bodies.rectangle(0, 24, 10, 1, { isSensor: true, label: 'groundSensor' });
 
     const playerBody = game.matter.bodies.rectangle(0, 0, 32, 48);
@@ -14,7 +14,7 @@ class Player {
     player.setExistingBody(compound);
     player.body.render.sprite.xOffset = 0;
     player.body.render.sprite.yOffset = 0;
-    player.setPosition(100, 450);
+    player.setPosition(x, y);
     player.setCollisionCategory(0x0100);
     this.player = player;
     this.createAnims(game);

@@ -52,6 +52,7 @@ class AlignGrid {
   }
   placeAt(x1, y1, objName, game: Phaser.Scene): void {
     //converted centered coordinates in pixels to place in grid square
+    console.log(objName);
     const row = Math.floor(x1 / TILE_SIZE);
     const col = Math.floor(y1 / TILE_SIZE);
     const x2 = row * TILE_SIZE + TILE_SIZE / 2;
@@ -59,7 +60,22 @@ class AlignGrid {
     //if clearing instead
     if (objName == 'clear') {
       if (this.grid[row][col]) {
+        const name = this.grid[row][col].name;
+        const frame = this.grid[row][col].frame.name;
+        if (name == 'player') {
+          return;
+        }
         this.grid[row][col].destroy();
+        this.grid[row][col] = null;
+        if (clumpables.has(name) && frame != 0) {
+          this.neighbors(row, col).forEach((e) => {
+            const nx = this.unpack(e)[0];
+            const ny = this.unpack(e)[1];
+            if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
+              this.clump(nx, ny, nx, ny);
+            }
+          });
+        }
       }
       this.grid[row][col] = null;
 
@@ -110,6 +126,7 @@ class AlignGrid {
   }
   /**
    * start and end of rectangle drawn by mouse to clump selected tiles
+   * FIX TO TAKE SET OF TILES INSTEAD OF RECTANGLE? TODO
    * @param sx start x pixel coordinate
    * @param sy start y pixel coordinate
    * @param ex end x pixel coordinate
@@ -126,16 +143,17 @@ class AlignGrid {
     // const sc = 0;
     // const er = 10;
     // const ec = 10;
+    // DO BFS
     for (let i = sr; i <= er; i++) {
       for (let j = sc; j <= ec; j++) {
         if (this.grid[i][j]) {
           curr.add(i + ',' + j);
           check.add(i + ',' + j);
-          if (this.grid[i][j].frame != 0) {
+          if (this.grid[i][j].frame.name != 0) {
             this.neighbors(i, j).forEach((e) => {
               const nx = this.unpack(e)[0];
               const ny = this.unpack(e)[1];
-              if (this.grid[nx][ny]) {
+              if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
                 check.add(e);
               }
             });
@@ -176,7 +194,6 @@ class AlignGrid {
             pointer += 2;
           }
         }
-        console.log(id.join(''));
         this.grid[i][j].setFrame(tiles[id.join('')]);
       }
     });

@@ -9,7 +9,7 @@ class Crate {
   // timeIgnite: number;
   constructor(game, x: integer, y: integer, label, owner: CompoundCrate) {
     this.crate = game.matter.bodies.rectangle(x, y, 50, 50, {
-      render: { sprite: { xOffset: 0, yOffset: 0.15 } },
+      // render: { sprite: { xOffset: 0, yOffset: 0.15 } },
       label: label,
       inertia: Infinity,
     });

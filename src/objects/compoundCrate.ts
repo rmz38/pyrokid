@@ -15,7 +15,7 @@ class CompoundCrate {
     const compoundBody = game.matter.body.create({
       parts: crateBodies,
       inertia: Infinity,
-      render: { sprite: { xOffset: 0, yOffset: yOffset } },
+      // render: { sprite: { xOffset: 0, yOffset: yOffset } },
       // isStatic: true,
       ignoreGravity: false,
       // frictionStatic: 1.0,

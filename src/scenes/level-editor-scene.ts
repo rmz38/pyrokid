@@ -1,12 +1,4 @@
-import Player from '../objects/player';
-import Crate from '../objects/crate';
-import CompoundCrate from '../objects/compoundCrate';
-import Lizard from '../objects/lizard';
-import Spider from '../objects/spider';
-import Dirt from '../objects/dirt';
-import Steel from '../objects/steel';
-import Lava from '../objects/lava';
-import { game } from '../main';
+import { MenuButton } from '../ui/menu-button';
 import AlignGrid from '../helpers/alignGrid';
 import LevelEditorButton from '../helpers/levelEditorButton';
 
@@ -16,13 +8,12 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   key: 'LevelEditor',
 };
 const W_WIDTH = 1200;
-const W_HEIGHT = 600;
+const W_HEIGHT = 700;
+import FileSaver = require('file-saver');
 let cursors;
 let controls;
-let grid;
 let pointer;
 let aGrid;
-let graphics;
 // let menuPositions = [];
 // let menuNames = []
 // for (let i = 0; i < 8; i++) {
@@ -40,7 +31,7 @@ export class LevelEditor extends Phaser.Scene {
     super(sceneConfig);
   }
   public preload() {
-    this.load.image('background', 'assets/backgrounds/level-editor.png');
+    this.load.image('backgroundDirt', 'assets/backgrounds/level-editor.png');
     this.load.image('house', 'assets/squares/house.png');
     this.load.spritesheet('crate', 'assets/clumpables/crateTiles.png', { frameWidth: 50, frameHeight: 50 });
     this.load.spritesheet('dirt', 'assets/clumpables/dirtTiles.png', { frameWidth: 50, frameHeight: 50 });
@@ -53,14 +44,14 @@ export class LevelEditor extends Phaser.Scene {
     this.load.spritesheet('spiderArmored', 'assets/monsters/spiderArmored.png', { frameWidth: 77, frameHeight: 61 });
     this.load.spritesheet('squareFire', 'assets/squares/squareFire.png', { frameWidth: 79, frameHeight: 80 });
     this.load.spritesheet('fireDisappear', 'assets/squares/fireDisappear.png', { frameWidth: 84, frameHeight: 133 });
+    this.load.json('leveleditorlevel', 'assets/levels/leveleditor.json');
   }
   public create(): void {
-    // const graphics = this.add.graphics();
     let sx = 0;
     let sy = 0;
     let draw = false;
     pointer = this.input.activePointer;
-    const background = this.add.image(W_WIDTH / 2, W_HEIGHT / 2, 'background');
+    const background = this.add.image(W_WIDTH / 2, W_HEIGHT / 2, 'backgroundDirt');
     background.setScale(W_WIDTH / background.width);
     cursors = this.input.keyboard.createCursorKeys();
     this.matter.world.setBounds(0, 0, W_WIDTH, W_HEIGHT, 32, true, true, false, true);
@@ -72,9 +63,9 @@ export class LevelEditor extends Phaser.Scene {
       right: cursors.right,
       up: cursors.up,
       down: cursors.down,
-      acceleration: 0.04,
+      acceleration: 0.3,
       drag: 0.0005,
-      maxSpeed: 0.7,
+      maxSpeed: 0.3,
     };
 
     const gridConfig = {
@@ -84,12 +75,13 @@ export class LevelEditor extends Phaser.Scene {
     };
     aGrid = new AlignGrid(gridConfig);
     controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
-    new LevelEditorButton(550, 150, 'Clump', '#fff', 'clump', this);
+    new LevelEditorButton(550, 20, 'Download', '#fff', 'download', this);
+    new LevelEditorButton(550, 75, 'Clump', '#fff', 'clump', this);
     const menuNames = ['Clear', 'Crate', 'Lava', 'Dirt', 'Steel', 'Lizard', 'Spider', 'Player', 'Armored\n Spider'];
     const menuSelects = ['clear', 'crate', 'lava', 'dirt', 'steel', 'lizard', 'spider', 'player', 'spiderArmored'];
     const menuButtons = [];
     for (let i = 0; i < 8; i++) {
-      menuButtons.push(new LevelEditorButton(550, 200 + i * 36, menuNames[i], '#fff', menuSelects[i], this));
+      menuButtons.push(new LevelEditorButton(550, 130 + i * 55, menuNames[i], '#fff', menuSelects[i], this));
     }
     this.input.on('pointerdown', function (pointer) {
       sx = pointer.worldX;
@@ -107,12 +99,15 @@ export class LevelEditor extends Phaser.Scene {
       draw = false;
       game.graphics.clear();
       if (game.selected == 'clump') {
-        aGrid.clump(sx, sy, pointer.worldX, pointer.worldY);
+        const sr = aGrid.getRowOrCol(Math.min(sx, pointer.worldX));
+        const sc = aGrid.getRowOrCol(Math.min(sy, pointer.worldY));
+        const er = aGrid.getRowOrCol(Math.max(sx, pointer.worldX));
+        const ec = aGrid.getRowOrCol(Math.max(sy, pointer.worldY));
+        aGrid.clump(sr, sc, er, ec);
       }
     });
     this.input.on('pointermove', function (pointer) {
       if (draw && pointer.noButtonDown() === false && game.selected == 'clump') {
-        console.log('asdf');
         // graphics.clear();
         const graphics = game.graphics;
         graphics.clear();
@@ -122,18 +117,58 @@ export class LevelEditor extends Phaser.Scene {
         graphics.strokeRect(sx, sy, pointer.worldX - sx, pointer.worldY - sy);
       }
     });
-    // const crateButton = new LevelEditorButton(550, , 'Crate', '#fff', 'crate', this);
-    // const lavaButton = new LevelEditorButton(550, 236, 'Lava', '#fff', 'lava', this);
-    // const dirtButton = new LevelEditorButton(550, 272, 'Dirt', '#fff', 'dirt', this);
-    // const steelButton = new LevelEditorButton(550, 308, 'Steel', '#fff', 'steel', this);
-    // const lizardButton = new LevelEditorButton(550, 308, 'Lizard', '#fff', 'lizard', this);
-    // const spiderButton = new LevelEditorButton(550, 308, 'Spider', '#fff', 'spider', this);
-    // const armorSpiderButton = new LevelEditorButton(550, 308, 'Armored Spider', '#fff', 'spiderArmored', this);
-    // const playerButton = new LevelEditorButton(550, 308, 'Player', '#fff', 'player', this);
+    aGrid.show();
+    const preset = this.cache.json.get('leveleditorlevel');
+    aGrid.placeAt(preset.player[0].x, preset.player[0].y, 'player', this);
+    preset.dirt.forEach((e) => {
+      aGrid.placeAt(e.x, e.y, 'dirt', this);
+    });
+    new MenuButton(this, 10, 10, 'Back to Menu', () => {
+      this.scene.start('MainMenu');
+    });
+  }
+  public generateJson() {
+    const clumpables = new Set(['crate', 'lava', 'dirt', 'steel']);
+    const json = {
+      player: [],
+      lizard: [],
+      spider: [],
+      armoredSpider: [],
+      dirt: [],
+      lava: [],
+      crate: [],
+      steel: [],
+    };
+    const grid = aGrid.grid;
+    for (let i = 0; i < grid.length; i++) {
+      for (let j = 0; j < grid[0].length; j++) {
+        if (grid[i][j]) {
+          const obj = grid[i][j];
+          // if (clumpables.has(obj.name)) {
+          //   json[obj.name].push({
+          //     x: obj.x,
+          //     y: obj.y,
+          //     frame: obj.frame.name,
+          //   });
+          // }
+          console.log(obj.name);
+          json[obj.name].push({
+            x: obj.x,
+            y: obj.y,
+            frame: obj.frame.name,
+          });
+        }
+      }
+    }
+    // const download = JSON.stringify(json, null, 2);
+    const fileToSave = new Blob([JSON.stringify(json, null, 4)], {
+      type: 'application/json',
+      // name: 'level.json',
+    });
+    FileSaver(fileToSave, 'level.json');
   }
   public update(time, delta): void {
     controls.update(delta);
-    aGrid.show();
     if (pointer.isDown) {
       if (this.selected == 'clump') {
         // this.graphics.clear();

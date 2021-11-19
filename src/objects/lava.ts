@@ -3,13 +3,13 @@ class Lava {
   onFire: boolean;
   fireSprite: any;
   hinges: Set<integer>;
-  constructor(game: any, x: integer, y: integer) {
+  constructor(x: integer, y: integer, game: any, frame: integer, id: integer) {
     const rec = game.matter.bodies.rectangle(x, y, 50, 50, {
       inertia: Infinity,
       isStatic: true,
-      label: 'lava',
+      label: 'lava' + id,
     });
-    const lava = game.matter.add.image(x, y, 'lavaTile', { label: 'lava' });
+    const lava = game.matter.add.sprite(x, y, 'lava', frame, { label: 'lava' + id });
     lava.setExistingBody(rec);
     lava.setCollisionCategory(0x0100);
     lava.setPosition(x, y);

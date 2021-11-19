@@ -1,7 +1,8 @@
 class Dirt {
   sprite: any;
-  constructor(game: any, x :integer, y: integer) {
-    const sprite = game.matter.add.image(x, y, 'dirtTile', { isStatic: true });
+  constructor(x: integer, y: integer, game: Phaser.Scene, frame: integer) {
+    console.log(game);
+    const sprite = game.matter.add.sprite(x, y, 'dirt', frame, { isStatic: true });
     sprite.setPosition(x, y);
     sprite.setStatic(true);
     sprite.setCollisionCategory(0x0100);
