@@ -9,6 +9,7 @@ class Steel {
     steel.setExistingBody(rec);
     steel.setCollisionCategory(0x0100);
     steel.setPosition(x, y);
+    steel.setBounce(0);
     this.sprite = steel;
   }
 }

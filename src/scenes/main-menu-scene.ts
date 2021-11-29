@@ -16,13 +16,15 @@ export class MainMenuScene extends Phaser.Scene {
 
   public create(): void {
     this.add
-      .text(100, 50, 'This is a sample main menu. Click the "Start" button below to run your game.', {
+      .text(100, 50, 'Pyrokid', {
         color: '#FFFFFF',
       })
       .setFontSize(24);
+    localStorage.setItem('useleveleditor', 'false');
 
-    new MenuButton(this, 100, 150, 'Start Game', () => {
-      this.scene.start('Game');
+    new MenuButton(this, 100, 150, 'Level Select', () => {
+      localStorage.setItem('useleveleditor', 'false');
+      this.scene.start('LevelSelect');
     });
 
     new MenuButton(this, 100, 250, 'Level Editor', () => {

@@ -1,5 +1,5 @@
 class Player {
-  player: any;
+  sprite: any;
   touchingGround: boolean;
   constructor(x: integer, y: integer, game: any) {
     const rec = game.matter.bodies.rectangle(0, 24, 10, 1, { isSensor: true, label: 'groundSensor' });
@@ -12,11 +12,12 @@ class Player {
     });
     const player = game.matter.add.sprite(0, 0, 'dude');
     player.setExistingBody(compound);
+    player.setFriction(0);
     player.body.render.sprite.xOffset = 0;
     player.body.render.sprite.yOffset = 0;
     player.setPosition(x, y);
     player.setCollisionCategory(0x0100);
-    this.player = player;
+    this.sprite = player;
     this.createAnims(game);
   }
   public createAnims(game) {
@@ -41,26 +42,26 @@ class Player {
     });
   }
   public moveLeft() {
-    this.player.setVelocityX(-7);
-    this.player.anims.play('left', true);
+    this.sprite.setVelocityX(-3);
+    this.sprite.anims.play('left', true);
   }
   public moveRight() {
-    this.player.setVelocityX(7);
-    this.player.anims.play('right', true);
+    this.sprite.setVelocityX(3);
+    this.sprite.anims.play('right', true);
   }
   public turn() {
-    this.player.setVelocityX(0);
-    this.player.anims.play('turn');
+    this.sprite.setVelocityX(0);
+    this.sprite.anims.play('turn');
   }
   public jump() {
-    this.player.setVelocityY(-10);
+    this.sprite.setVelocityY(-7);
     this.touchingGround = false;
   }
   public getX() {
-    return this.player.body.position.x;
+    return this.sprite.body.position.x;
   }
   public getY() {
-    return this.player.body.position.y;
+    return this.sprite.body.position.y;
   }
 }
 export default Player;

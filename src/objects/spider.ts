@@ -2,11 +2,11 @@ class Spider {
   sprite: any;
   velocity: integer;
   armored: boolean;
-  constructor(game: any, armored: boolean) {
-    const spiderRight = game.matter.bodies.rectangle(37, 0, 10, 10, { isSensor: true, label: 'spiderTurnSensor' });
-    const spiderLeft = game.matter.bodies.rectangle(-37, 0, 10, 10, { isSensor: true, label: 'spiderTurnSensor' });
+  constructor(x: integer, y: integer, game: any, id: integer, armored: boolean) {
+    const spiderRight = game.matter.bodies.rectangle(37, 0, 10, 10, { isSensor: true, label: 'spider' + id });
+    const spiderLeft = game.matter.bodies.rectangle(-37, 0, 10, 10, { isSensor: true, label: 'spider' + id });
     spiderLeft.collisionFilter.category = 0x0100;
-    const spiderBody = game.matter.bodies.rectangle(0, 0, 77, 50, { label: 'spider' });
+    const spiderBody = game.matter.bodies.rectangle(0, 0, 77, 50, { label: 'spider' + id });
     const compound = game.matter.body.create({
       parts: [spiderBody, spiderRight, spiderLeft],
       inertia: Infinity,
@@ -16,7 +16,7 @@ class Spider {
     const spider = game.matter.add.sprite(0, 0, 'spider');
     spider.setCollisionCategory(0x0001);
     spider.setExistingBody(compound);
-    spider.setPosition(150, 500);
+    spider.setPosition(x, y);
     spider.setCollidesWith(0x0100);
     this.sprite = spider;
     this.createAnims(game);

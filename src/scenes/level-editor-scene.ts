@@ -75,7 +75,7 @@ export class LevelEditor extends Phaser.Scene {
     };
     aGrid = new AlignGrid(gridConfig);
     controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
-    new LevelEditorButton(550, 20, 'Download', '#fff', 'download', this);
+    new LevelEditorButton(550, 20, 'Start Level', '#fff', 'download', this);
     new LevelEditorButton(550, 75, 'Clump', '#fff', 'clump', this);
     const menuNames = ['Clear', 'Crate', 'Lava', 'Dirt', 'Steel', 'Lizard', 'Spider', 'Player', 'Armored\n Spider'];
     const menuSelects = ['clear', 'crate', 'lava', 'dirt', 'steel', 'lizard', 'spider', 'player', 'spiderArmored'];
@@ -160,12 +160,19 @@ export class LevelEditor extends Phaser.Scene {
         }
       }
     }
-    // const download = JSON.stringify(json, null, 2);
-    const fileToSave = new Blob([JSON.stringify(json, null, 4)], {
-      type: 'application/json',
-      // name: 'level.json',
-    });
-    FileSaver(fileToSave, 'level.json');
+    const download = JSON.stringify(json, null, 2);
+
+    // start level immediately instead of download
+    localStorage.setItem('leveleditorlevel', download);
+    localStorage.setItem('useleveleditor', 'true');
+    this.scene.start('Game');
+
+    // for downloads
+    // const fileToSave = new Blob([JSON.stringify(json, null, 4)], {
+    //   type: 'application/json',
+    //   // name: 'level.json',
+    // });
+    // FileSaver(fileToSave, 'level.json');
   }
   public update(time, delta): void {
     controls.update(delta);

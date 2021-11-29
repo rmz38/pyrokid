@@ -1,34 +1,38 @@
 import CompoundCrate from './compoundCrate';
 
 class Crate {
-  crate: any; // not sprite
+  sprite: Phaser.Physics.Matter.Sprite;
   onFire: boolean;
-  neighbors: Set<Crate>;
   fireSprite: Phaser.GameObjects.Sprite;
   owner: CompoundCrate;
   // timeIgnite: number;
-  constructor(game, x: integer, y: integer, label, owner: CompoundCrate) {
-    this.crate = game.matter.bodies.rectangle(x, y, 50, 50, {
-      // render: { sprite: { xOffset: 0, yOffset: 0.15 } },
-      label: label,
+  constructor(x: integer, y: integer, id: integer, game: Phaser.Scene, frame = 0) {
+    const rec = game.matter.bodies.rectangle(x, y, 50, 50, {
+      label: 'crate' + id,
       inertia: Infinity,
     });
+    const crate = game.matter.add.sprite(x, y, 'crate', frame);
+    crate.setExistingBody(rec);
     // this.crate.setRectangle(100, 50, {
     //   render: { sprite: { xOffset: 0, yOffset: 0.15 } },
     //   label: label,
     //   inertia: Infinity,
     // });
-    this.crate.bounce = 0;
+    crate.setBounce(0);
+    this.sprite = crate;
     this.onFire = false;
-    this.neighbors = new Set();
     this.fireSprite = null;
-    this.owner = owner;
-    console.log(this.crate);
+    console.log(this.sprite);
     // this.timeIgnite = null;
   }
   public syncFire() {
-    this.fireSprite.x = this.crate.position.x;
-    this.fireSprite.y = this.crate.position.y - 10;
+    if (this.sprite.active) {
+      this.fireSprite.x = this.sprite.x;
+      this.fireSprite.y = this.sprite.y - 10;
+    }
+  }
+  public destroy() {
+    this.sprite.destroy();
   }
 }
 export default Crate;
