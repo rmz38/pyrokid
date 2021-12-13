@@ -1,3 +1,6 @@
+function getTile(x: number, y: number) {
+  return [Math.floor(x / 50), Math.floor(y / 50)];
+}
 class Lava {
   sprite: any;
   onFire: boolean;
@@ -15,7 +18,7 @@ class Lava {
     lava.setPosition(x, y);
     this.sprite = lava;
   }
-  public ignite(game) {
+  public ignite(game, tiles, xTiles, yTiles) {
     if (this.onFire) {
       return;
     }
@@ -24,6 +27,34 @@ class Lava {
     this.fireSprite.play('squareFire', false);
     this.fireSprite.alpha = 0.7;
     this.fireSprite.y = this.sprite.y - 10;
+    const pos = getTile(this.sprite.x, this.sprite.y);
+    const x = pos[0];
+    const y = pos[1];
+    const candidates = [
+      [x - 1, y],
+      [x + 1, y],
+      [x, y + 1],
+      [x, y - 1],
+    ];
+    for (let i = 0; i < candidates.length; i++) {
+      const x = candidates[i][0];
+      const y = candidates[i][1];
+      if (x >= 0 && x < xTiles && y >= 0 && y < yTiles) {
+        tiles[x][y].forEach((e) => {
+          // if (e instanceof Crate) {
+          //   igniteCompound(game, e.owner, false);
+          // } else {
+          //TODO: MAKE IGNITE COMPOUND IN UTILS FUNCTION
+          if (e instanceof Lava) {
+            e.ignite(game, tiles, xTiles, yTiles);
+          } else {
+            // TODO: ignite crates
+            // e.ignite
+          }
+          // }
+        });
+      }
+    }
   }
 }
 export default Lava;

@@ -44,6 +44,7 @@ export class LevelEditor extends Phaser.Scene {
     this.load.spritesheet('spiderArmored', 'assets/monsters/spiderArmored.png', { frameWidth: 77, frameHeight: 61 });
     this.load.spritesheet('squareFire', 'assets/squares/squareFire.png', { frameWidth: 79, frameHeight: 80 });
     this.load.spritesheet('fireDisappear', 'assets/squares/fireDisappear.png', { frameWidth: 84, frameHeight: 133 });
+    this.load.image('exit', 'assets/exit.png');
     this.load.json('leveleditorlevel', 'assets/levels/leveleditor.json');
   }
   public create(): void {
@@ -75,13 +76,42 @@ export class LevelEditor extends Phaser.Scene {
     };
     aGrid = new AlignGrid(gridConfig);
     controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
-    new LevelEditorButton(550, 20, 'Start Level', '#fff', 'download', this);
-    new LevelEditorButton(550, 75, 'Clump', '#fff', 'clump', this);
-    const menuNames = ['Clear', 'Crate', 'Lava', 'Dirt', 'Steel', 'Lizard', 'Spider', 'Player', 'Armored\n Spider'];
-    const menuSelects = ['clear', 'crate', 'lava', 'dirt', 'steel', 'lizard', 'spider', 'player', 'spiderArmored'];
+    // new LevelEditorButton(550, 20, 'Start Level', '#fff', 'start', this);
+    // new LevelEditorButton(700, 20, 'download', '#fff', 'download', this);
+    // new LevelEditorButton(550, 75, 'Clump', '#fff', 'clump', this);
+    const menuNames = [
+      'Start Level',
+      'Download',
+      'Clump',
+      'Exit',
+      'Clear',
+      'Crate',
+      'Lava',
+      'Dirt',
+      'Steel',
+      'Lizard',
+      'Spider',
+      'Player',
+      'Armored\n Spider',
+    ];
+    const menuSelects = [
+      'start',
+      'download',
+      'clump',
+      'exit',
+      'clear',
+      'crate',
+      'lava',
+      'dirt',
+      'steel',
+      'lizard',
+      'spider',
+      'player',
+      'spiderArmored',
+    ];
     const menuButtons = [];
-    for (let i = 0; i < 8; i++) {
-      menuButtons.push(new LevelEditorButton(550, 130 + i * 55, menuNames[i], '#fff', menuSelects[i], this));
+    for (let i = 0; i < menuNames.length; i++) {
+      menuButtons.push(new LevelEditorButton(700, 50 + i * 40, menuNames[i], '#fff', menuSelects[i], this));
     }
     this.input.on('pointerdown', function (pointer) {
       sx = pointer.worldX;
@@ -127,8 +157,7 @@ export class LevelEditor extends Phaser.Scene {
       this.scene.start('MainMenu');
     });
   }
-  public generateJson() {
-    const clumpables = new Set(['crate', 'lava', 'dirt', 'steel']);
+  public generateJson(start = true): void {
     const json = {
       player: [],
       lizard: [],
@@ -138,20 +167,13 @@ export class LevelEditor extends Phaser.Scene {
       lava: [],
       crate: [],
       steel: [],
+      exit: [],
     };
     const grid = aGrid.grid;
     for (let i = 0; i < grid.length; i++) {
       for (let j = 0; j < grid[0].length; j++) {
         if (grid[i][j]) {
           const obj = grid[i][j];
-          // if (clumpables.has(obj.name)) {
-          //   json[obj.name].push({
-          //     x: obj.x,
-          //     y: obj.y,
-          //     frame: obj.frame.name,
-          //   });
-          // }
-          console.log(obj.name);
           json[obj.name].push({
             x: obj.x,
             y: obj.y,
@@ -163,16 +185,18 @@ export class LevelEditor extends Phaser.Scene {
     const download = JSON.stringify(json, null, 2);
 
     // start level immediately instead of download
-    localStorage.setItem('leveleditorlevel', download);
-    localStorage.setItem('useleveleditor', 'true');
-    this.scene.start('Game');
-
-    // for downloads
-    // const fileToSave = new Blob([JSON.stringify(json, null, 4)], {
-    //   type: 'application/json',
-    //   // name: 'level.json',
-    // });
-    // FileSaver(fileToSave, 'level.json');
+    if (start) {
+      localStorage.setItem('leveleditorlevel', download);
+      localStorage.setItem('useleveleditor', 'true');
+      this.scene.start('Game');
+    } else {
+      // for downloads
+      const fileToSave = new Blob([JSON.stringify(json, null, 4)], {
+        type: 'application/json',
+        // name: 'level.json',
+      });
+      FileSaver(fileToSave, 'level.json');
+    }
   }
   public update(time, delta): void {
     controls.update(delta);

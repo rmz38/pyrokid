@@ -18,6 +18,7 @@ class Crate {
     //   label: label,
     //   inertia: Infinity,
     // });
+    crate.setCollisionCategory(0x0100);
     crate.setBounce(0);
     this.sprite = crate;
     this.onFire = false;

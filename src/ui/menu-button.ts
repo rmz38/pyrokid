@@ -7,14 +7,23 @@ const minimumHeight = 50;
 export class MenuButton extends Phaser.GameObjects.Rectangle {
   private label: Phaser.GameObjects.Text;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, text: string, onClick?: () => void, w?: integer, h?: integer) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    text: string,
+    onClick?: () => void,
+    w?: integer,
+    h?: integer,
+    fontSize = 18,
+  ) {
     super(scene, x, y);
     scene.add.existing(this);
     this.setOrigin(0, 0);
 
     this.label = scene.add
       .text(x + padding, y + padding, text)
-      .setFontSize(18)
+      .setFontSize(fontSize)
       .setAlign('center')
       .setDepth(2);
     this.label.scrollFactorX = 0;
@@ -27,7 +36,17 @@ export class MenuButton extends Phaser.GameObjects.Rectangle {
     const labelHeight = rectH + 2 * padding;
 
     this.width = labelWidth >= minimumWidth ? labelWidth : minimumWidth;
-    this.height = labelHeight >= minimumHeight ? labelHeight : minimumHeight;
+    // this.height = labelHeight >= minimumHeight ? labelHeight : minimumHeight;
+    if (w) {
+      this.width = labelWidth;
+    } else {
+      this.width = labelWidth >= minimumWidth ? labelWidth : minimumWidth;
+    }
+    if (h) {
+      this.height = labelHeight;
+    } else {
+      this.height = labelHeight >= minimumHeight ? labelHeight : minimumHeight;
+    }
 
     this.setInteractive({ useHandCursor: true })
       .on('pointerover', this.enterMenuButtonHoverState)
