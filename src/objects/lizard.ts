@@ -45,18 +45,9 @@ class Lizard {
     console.log(lizLeft);
     // lizLeft.collisionFilter.category = 0x0100;
     this.sprite = lizard;
-    this.createAnims(game);
     this.sprite.anims.play('lizard', true);
     this.onFire = false;
     this.fireSprite = null;
-  }
-  public createAnims(game) {
-    game.anims.create({
-      key: 'lizard',
-      frames: game.anims.generateFrameNumbers('lizard', { start: 0, end: 29 }),
-      frameRate: 30,
-      repeat: -1,
-    });
   }
   public flip() {
     this.sprite.flipX = !this.sprite.flipX;

@@ -15,7 +15,7 @@ class Player {
       label: 'player',
       render: { sprite: { xOffset: 0.5, yOffset: 0.6 } },
     });
-    const player = game.matter.add.sprite(0, 0, 'dude', { label: 'player' });
+    const player = game.matter.add.sprite(0, 0, 'player', { label: 'player' });
     player.setExistingBody(compound);
     player.setFriction(0);
     player.body.render.sprite.xOffset = 0;
@@ -24,28 +24,6 @@ class Player {
     player.setCollisionCategory(0x0100);
     player.label = 'player';
     this.sprite = player;
-    this.createAnims(game);
-  }
-  public createAnims(game) {
-    game.anims.create({
-      key: 'left',
-      frames: game.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    game.anims.create({
-      key: 'turn',
-      frames: [{ key: 'dude', frame: 4 }],
-      frameRate: 20,
-    });
-
-    game.anims.create({
-      key: 'right',
-      frames: game.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-      frameRate: 10,
-      repeat: -1,
-    });
   }
   public moveLeft() {
     this.sprite.setVelocityX(-3);

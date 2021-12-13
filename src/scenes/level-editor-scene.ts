@@ -30,23 +30,6 @@ export class LevelEditor extends Phaser.Scene {
   constructor() {
     super(sceneConfig);
   }
-  public preload() {
-    this.load.image('backgroundDirt', 'assets/backgrounds/level-editor.png');
-    this.load.image('house', 'assets/squares/house.png');
-    this.load.spritesheet('crate', 'assets/clumpables/crateTiles.png', { frameWidth: 50, frameHeight: 50 });
-    this.load.spritesheet('dirt', 'assets/clumpables/dirtTiles.png', { frameWidth: 50, frameHeight: 50 });
-    this.load.spritesheet('steel', 'assets/clumpables/steelTiles.png', { frameWidth: 50, frameHeight: 50 });
-    this.load.spritesheet('lava', 'assets/clumpables/lavaTiles.png', { frameWidth: 50, frameHeight: 50 });
-    this.load.spritesheet('fireball', 'assets/fireball.png', { frameWidth: 38, frameHeight: 19 });
-    this.load.spritesheet('player', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.spritesheet('lizard', 'assets/monsters/lizard.png', { frameWidth: 70, frameHeight: 50 });
-    this.load.spritesheet('spider', 'assets/monsters/spider.png', { frameWidth: 77, frameHeight: 61 });
-    this.load.spritesheet('spiderArmored', 'assets/monsters/spiderArmored.png', { frameWidth: 77, frameHeight: 61 });
-    this.load.spritesheet('squareFire', 'assets/squares/squareFire.png', { frameWidth: 79, frameHeight: 80 });
-    this.load.spritesheet('fireDisappear', 'assets/squares/fireDisappear.png', { frameWidth: 84, frameHeight: 133 });
-    this.load.image('exit', 'assets/exit.png');
-    this.load.json('leveleditorlevel', 'assets/levels/leveleditor.json');
-  }
   public create(): void {
     let sx = 0;
     let sy = 0;
@@ -84,6 +67,7 @@ export class LevelEditor extends Phaser.Scene {
       'Download',
       'Clump',
       'Exit',
+      'Bomb',
       'Clear',
       'Crate',
       'Lava',
@@ -99,6 +83,7 @@ export class LevelEditor extends Phaser.Scene {
       'download',
       'clump',
       'exit',
+      'bomb',
       'clear',
       'crate',
       'lava',

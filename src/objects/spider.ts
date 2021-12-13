@@ -29,27 +29,12 @@ class Spider {
     spider.setPosition(x, y);
     spider.setCollidesWith(0x0100);
     this.sprite = spider;
-    this.createAnims(game);
     if (armored) {
       this.sprite.anims.play('spiderArmored', true);
     } else {
       this.sprite.anims.play('spider', true);
     }
     this.armored = true;
-  }
-  public createAnims(game) {
-    game.anims.create({
-      key: 'spider',
-      frames: game.anims.generateFrameNumbers('spider', { start: 0, end: 9 }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    game.anims.create({
-      key: 'spiderArmored',
-      frames: game.anims.generateFrameNumbers('spiderArmored', { start: 0, end: 9 }),
-      frameRate: 10,
-      repeat: -1,
-    });
   }
   public flip() {
     this.sprite.flipX = !this.sprite.flipX;
