@@ -12,14 +12,14 @@ import Lava from '../objects/lava';
 import { MenuButton } from '../ui/menu-button';
 import { indexes } from '../helpers/clump';
 import Exit from '../objects/exit';
-import { initAnims } from '../helpers/init';
+import { initAnims, jointBlocks } from '../helpers/init';
+import { createCollisions } from '../helpers/collision-controller';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
   visible: false,
   key: 'Game',
 };
-let player;
 let cursors;
 let wasd;
 interface CrateHash {
@@ -36,7 +36,6 @@ interface SpiderHash {
 }
 const world_bound_width = 1200;
 const world_bound_height = 600;
-const monsterCollisionLabels = new Set<string>(['lizard', 'spider', 'fire']);
 function getTile(x: number, y: number) {
   return [Math.floor(x / 50), Math.floor(y / 50)];
 }
@@ -48,7 +47,6 @@ function clearTiles(game: GameScene) {
   }
 }
 export class GameScene extends Phaser.Scene {
-  [x: string]: any;
   public speed = 200;
   public lizards: LizardHash = {};
   public spiders: SpiderHash = {};
@@ -58,6 +56,7 @@ export class GameScene extends Phaser.Scene {
   public fireActive = false;
   public fireCooldown = false;
   public tiles = [];
+  public player: Player;
   TILE_SIZE: integer = 50;
   xTiles: integer = Math.floor(world_bound_width / this.TILE_SIZE);
   yTiles: integer = Math.floor(world_bound_height / this.TILE_SIZE);
@@ -66,56 +65,6 @@ export class GameScene extends Phaser.Scene {
   public level = 'level' + localStorage.getItem('level');
   constructor() {
     super(sceneConfig);
-  }
-  public jointBlocks(blocks, data) {
-    const track = new Set<Steel>();
-    const items = [];
-    data.steel.forEach((e) => items.push(e));
-    data.crate.forEach((e) => items.push(e));
-    items.forEach((e) => {
-      track.add(blocks[e.x + ',' + e.y]);
-      const sprite = blocks[e.x + ',' + e.y].sprite;
-      const id = indexes[e.frame];
-      // odd numbers are sides
-      const sides = id.split('');
-      const up = blocks[e.x + ',' + (e.y - 50)];
-      const right = blocks[e.x + 50 + ',' + e.y];
-      const down = blocks[e.x + ',' + (e.y + 50)];
-      const left = blocks[e.x - 50 + ',' + e.y];
-      if (sides[1] == 1 && !track.has(up)) {
-        const up = blocks[e.x + ',' + (e.y - 50)];
-        this.matter.add.joint(sprite.body, up.sprite.body, 10, 1, {
-          pointA: { x: 0, y: -25 },
-          pointB: { x: 0, y: 25 },
-          angularStiffness: 1,
-        });
-        track.add(up);
-      }
-      if (sides[3] == 1 && !track.has(right)) {
-        this.matter.add.joint(sprite.body, right.sprite.body, 0, 1, {
-          pointA: { x: 25, y: 0 },
-          pointB: { x: -25, y: 0 },
-          angularStiffness: 1,
-        });
-        track.add(right);
-      }
-      if (sides[5] == 1 && !track.has(down)) {
-        this.matter.add.joint(sprite.body, down.sprite.body, 0, 1, {
-          pointA: { x: 0, y: 25 },
-          pointB: { x: 0, y: -25 },
-          angularStiffness: 1,
-        });
-        track.add(down);
-      }
-      if (sides[7] == 1 && !track.has(left)) {
-        this.matter.add.joint(sprite.body, left.sprite.body, 0, 1, {
-          pointA: { x: -25, y: 0 },
-          pointB: { x: 25, y: 0 },
-          angularStiffness: 1,
-        });
-        track.add(left);
-      }
-    });
   }
   public create(): void {
     const background = this.add.image(world_bound_width / 2, world_bound_height / 2, 'background');
@@ -137,10 +86,10 @@ export class GameScene extends Phaser.Scene {
       for (let j = 0; j < this.yTiles; j++) {
         row.push(new Set());
       }
-      this.push(row);
+      this.tiles.push(row);
     }
-    player = new Player(data.player[0].x, data.player[0].y, this);
-    this.cameras.main.startFollow(player.sprite, false, 0.2, 0.2);
+    this.player = new Player(data.player[0].x, data.player[0].y, this);
+    this.cameras.main.startFollow(this.player.sprite, false, 0.2, 0.2);
     this.cameras.main.fadeIn(100, 0, 0, 0);
     // make lizards
     this.lizards = {};
@@ -223,12 +172,13 @@ export class GameScene extends Phaser.Scene {
 
     // const compoundTest = new CompoundCrate(this, crates, 'test1');
 
-    this.jointBlocks(blocks, data);
+    jointBlocks(this, blocks, data);
     for (let i = 0; i < data.lava.length; i++) {
       const e = data.lava[i];
       this.lavas['lava' + i] = new Lava(e.x, e.y, this, e.frame, i);
     }
     initAnims(this);
+    createCollisions(this);
     cursors = this.input.keyboard.createCursorKeys();
 
     wasd = this.input.keyboard.addKeys('W,S,A,D');
@@ -260,14 +210,14 @@ export class GameScene extends Phaser.Scene {
       spider.update();
     }
     if (wasd.A.isDown) {
-      player.moveLeft();
+      this.player.moveLeft();
     } else if (wasd.D.isDown) {
-      player.moveRight();
+      this.player.moveRight();
     } else {
-      player.turn();
+      this.player.turn();
     }
-    if (wasd.W.isDown && player.touchingGround) {
-      player.jump();
+    if (wasd.W.isDown && this.player.touchingGround) {
+      this.player.jump();
     }
     if (
       (cursors.right.isDown || cursors.down.isDown || cursors.up.isDown || cursors.left.isDown) &&
@@ -275,7 +225,7 @@ export class GameScene extends Phaser.Scene {
       !this.fireCooldown
     ) {
       this.fireCooldown = true;
-      this.fire = this.matter.add.sprite(player.getX(), player.getY(), 'fireball', null, {
+      this.fire = this.matter.add.sprite(this.player.getX(), this.player.getY(), 'fireball', null, {
         isSensor: true,
         label: 'fire',
       });

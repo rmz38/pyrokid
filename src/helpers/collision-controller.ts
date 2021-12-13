@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import CompoundCrate from '../objects/compoundCrate';
 import Crate from '../objects/crate';
 import { GameScene } from '../scenes/game-scene';
+const monsterCollisionLabels = new Set<string>(['lizard', 'spider', 'fire']);
 
 function isMonster(s: string) {
   return s.includes('spider') || s.includes('lizard');
@@ -64,11 +65,11 @@ function igniteCrate(game, currCrate: Crate) {
       const x = candidates[i][0];
       const y = candidates[i][1];
       if (x >= 0 && x < game.xTiles && y >= 0 && y < game.yTiles) {
-        tiles[x][y].forEach((e) => {
+        game.tiles[x][y].forEach((e) => {
           if (e instanceof Crate) {
             igniteCompound(game, e.owner, false);
           } else {
-            e.ignite(game, tiles, xTiles, yTiles);
+            e.ignite(game, game.tiles, game.xTiles, game.yTiles);
           }
         });
       }
@@ -135,7 +136,7 @@ export const createCollisions = (game: GameScene): void => {
         const lizard = a.includes('lava') ? b : a;
         console.log(lizard);
         if (game.lizards[lizard].onFire) {
-          game.lavas[lava].ignite(game, tiles, game.xTiles, game.yTiles);
+          game.lavas[lava].ignite(game, game.tiles, game.xTiles, game.yTiles);
         }
         if (game.lavas[lava].onFire) {
           game.lizards[lizard].ignite(game);
@@ -175,7 +176,7 @@ export const createCollisions = (game: GameScene): void => {
       // update above section to comply with format
       if ((a === 'fire' && b.includes('lava')) || (b === 'fire' && a.includes('lava'))) {
         const lava = a.includes('lava') ? a : b;
-        game.lavas[lava].ignite(game, tiles, game.xTiles, game.yTiles);
+        game.lavas[lava].ignite(game, game.tiles, game.xTiles, game.yTiles);
         game.fire.destroy();
       }
       if ((b.includes('spider') && a.includes('lizard')) || a.includes('spider' && b.includes('lizard)'))) {
