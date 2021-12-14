@@ -26,7 +26,7 @@ function igniteCompound(game, curr: CompoundCrate, destroyFire) {
   });
   game.time.delayedCall(1000, () => {
     curr.crates.forEach((e) => {
-      e.destroy();
+      e.destroy(game);
     });
   });
 }
@@ -120,7 +120,6 @@ export const createCollisions = (game: GameScene): void => {
       }
       if (a == 'playerTop' || b == 'playerTop') {
         const otherBody = a !== 'playerTop' ? bodyA : bodyB;
-        console.log(otherBody);
         if (otherBody.velocity.y > 0) {
           game.scene.restart();
         }
@@ -134,7 +133,6 @@ export const createCollisions = (game: GameScene): void => {
       if ((b.includes('lizard') && a.includes('lava')) || (a.includes('lizard') && b.includes('lava'))) {
         const lava = a.includes('lava') ? a : b;
         const lizard = a.includes('lava') ? b : a;
-        console.log(lizard);
         if (game.lizards[lizard].onFire) {
           game.lavas[lava].ignite(game, game.tiles, game.xTiles, game.yTiles);
         }

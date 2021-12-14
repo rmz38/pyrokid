@@ -25,7 +25,6 @@ class Lizard {
     //   ignoreGravity: true,
     // });
     this.collisionSensor.alpha = 0;
-    console.log(this.collisionSensor.body);
 
     // const spiderSensor = game.matter.bodies.rectangle(0, 0, 70, 50, { label: 'lizard' });
     const compound = game.matter.body.create({

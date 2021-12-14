@@ -1,7 +1,7 @@
 class Steel {
   sprite: any;
   hinges: Set<integer>;
-  constructor(x: integer, y: integer, game: any, frame: integer) {
+  constructor(x: integer, y: integer, game: Phaser.Scene, frame: integer) {
     const rec = game.matter.bodies.rectangle(x, y, 50, 50, {
       inertia: Infinity,
       label: 'steel',

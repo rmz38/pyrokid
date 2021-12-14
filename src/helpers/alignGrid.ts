@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { tiles } from './clump';
+import { tiles, indexes } from './clump';
 const TILE_SIZE = 50;
 const clumpables = new Set<string>(['dirt', 'lava', 'crate', 'steel']);
 class AlignGrid {
@@ -9,7 +9,8 @@ class AlignGrid {
   cols: integer;
   scene: any;
   graphics: any;
-  grid: Array<Array<any>>;
+  grid: Array<Array<Phaser.Physics.Matter.Image>>;
+  connectors: Set<string>;
   selected: string;
   playerTile: Array<integer>;
   public counter: integer = 0;
@@ -118,6 +119,10 @@ class AlignGrid {
       i - 1 + ',' + j,
     ];
   }
+  neighbors4(i, j): Array<string> {
+    // eslint-disable-next-line prettier/prettier
+    return [i + ',' + (j - 1), i + 1 + ',' + j, i + ',' + (j + 1), i - 1 + ',' + j];
+  }
   unpack(coord: string): Array<integer> {
     const split = coord.indexOf(',');
     const i = parseInt(coord.substring(0, split));
@@ -135,14 +140,6 @@ class AlignGrid {
   clump(sr, sc, er, ec): void {
     const curr = new Set<string>();
     const check = new Set<string>();
-    // const sr = this.getRowOrCol(sx);
-    // const sc = this.getRowOrCol(sy);
-    // const er = this.getRowOrCol(ex);
-    // const ec = this.getRowOrCol(ey);
-    // const sr = 0;
-    // const sc = 0;
-    // const er = 10;
-    // const ec = 10;
     // DO BFS
     for (let i = sr; i <= er; i++) {
       for (let j = sc; j <= ec; j++) {
@@ -195,6 +192,44 @@ class AlignGrid {
           }
         }
         this.grid[i][j].setFrame(tiles[id.join('')]);
+      }
+    });
+  }
+  connect(sr, sc, er, ec): void {
+    const curr = new Set<string>();
+    const check = new Set<string>();
+    // DO BFS and add tiles to initalized bfs
+    for (let i = sr; i <= er; i++) {
+      for (let j = sc; j <= ec; j++) {
+        if (this.grid[i][j]) {
+          curr.add(i + ',' + j);
+        }
+      }
+    }
+    // figure out which tile texture to use based on spritesheet
+    // ensured that none are null in curr
+    curr.forEach((e) => {
+      const i = this.unpack(e)[0];
+      const j = this.unpack(e)[1];
+      if (clumpables.has(this.grid[i][j].name)) {
+        const candidates = this.neighbors(i, j);
+        // all sides of the tile grabbed from the tilesheets
+        const id: Array<string> = indexes[parseInt(this.grid[i][j].frame.name)].split('');
+        for (let x = 0; x < candidates.length; x++) {
+          const coord = candidates[x];
+          const a = this.getPixel(this.unpack(coord)[0]);
+          const b = this.getPixel(this.unpack(coord)[1]);
+          const neighborId = indexes[parseInt(this.grid[a][b].frame.name)];
+          let ip = this.getPixel(i);
+          let jp = this.getPixel(j);
+          const coordId = ip + ',' + jp;
+          // find the id of the frame to use and what sides are available to join
+          LEFTOFF HERE CHECK ALL SIDES
+          if (chec)
+          ip += (a - i) * 25;
+          jp += (b - j) * 25;
+          }
+        }
       }
     });
   }

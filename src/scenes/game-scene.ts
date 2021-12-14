@@ -14,6 +14,7 @@ import { indexes } from '../helpers/clump';
 import Exit from '../objects/exit';
 import { initAnims, jointBlocks } from '../helpers/init';
 import { createCollisions } from '../helpers/collision-controller';
+import Connector from '../objects/connector';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -120,7 +121,7 @@ export class GameScene extends Phaser.Scene {
       this.crates['crate' + counter] = blocks[e.x + ',' + e.y];
       counter += 1;
     });
-
+    new Connector(this.crates['crate' + 0], this.crates['crate' + 1], this);
     data.exit.forEach((e) => {
       new Exit(e.x, e.y, this);
     });

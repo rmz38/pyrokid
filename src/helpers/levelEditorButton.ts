@@ -18,8 +18,8 @@ class LevelEditorButton {
         }
       },
       75,
-      15,
-      12,
+      10,
+      10,
     );
     button.on('pointerover', () => {
       game.onButton = true;

@@ -31,6 +31,7 @@ export class MainMenuScene extends Phaser.Scene {
     this.load.spritesheet('squareFire', 'assets/squares/squareFire.png', { frameWidth: 79, frameHeight: 80 });
     this.load.spritesheet('fireDisappear', 'assets/squares/fireDisappear.png', { frameWidth: 84, frameHeight: 133 });
     this.load.image('exit', 'assets/exit.png');
+    this.load.image('connector', 'assets/connector.png');
     this.load.json('leveleditorlevel', 'assets/levels/leveleditor.json');
   }
   public create(): void {

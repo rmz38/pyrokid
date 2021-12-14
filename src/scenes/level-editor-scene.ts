@@ -66,6 +66,7 @@ export class LevelEditor extends Phaser.Scene {
       'Start Level',
       'Download',
       'Clump',
+      'Connect',
       'Exit',
       'Bomb',
       'Clear',
@@ -76,12 +77,13 @@ export class LevelEditor extends Phaser.Scene {
       'Lizard',
       'Spider',
       'Player',
-      'Armored\n Spider',
+      'Armor Spider',
     ];
     const menuSelects = [
       'start',
       'download',
       'clump',
+      'connector',
       'exit',
       'bomb',
       'clear',
@@ -96,12 +98,12 @@ export class LevelEditor extends Phaser.Scene {
     ];
     const menuButtons = [];
     for (let i = 0; i < menuNames.length; i++) {
-      menuButtons.push(new LevelEditorButton(700, 50 + i * 40, menuNames[i], '#fff', menuSelects[i], this));
+      menuButtons.push(new LevelEditorButton(700, 50 + i * 30, menuNames[i], '#fff', menuSelects[i], this));
     }
     this.input.on('pointerdown', function (pointer) {
       sx = pointer.worldX;
       sy = pointer.worldY;
-      if (game.selected == 'clump') {
+      if (game.selected == 'clump' || game.selected == 'connector') {
         draw = true;
       }
     });
@@ -113,16 +115,18 @@ export class LevelEditor extends Phaser.Scene {
     this.input.on('pointerup', function () {
       draw = false;
       game.graphics.clear();
+      const sr = aGrid.getRowOrCol(Math.min(sx, pointer.worldX));
+      const sc = aGrid.getRowOrCol(Math.min(sy, pointer.worldY));
+      const er = aGrid.getRowOrCol(Math.max(sx, pointer.worldX));
+      const ec = aGrid.getRowOrCol(Math.max(sy, pointer.worldY));
       if (game.selected == 'clump') {
-        const sr = aGrid.getRowOrCol(Math.min(sx, pointer.worldX));
-        const sc = aGrid.getRowOrCol(Math.min(sy, pointer.worldY));
-        const er = aGrid.getRowOrCol(Math.max(sx, pointer.worldX));
-        const ec = aGrid.getRowOrCol(Math.max(sy, pointer.worldY));
         aGrid.clump(sr, sc, er, ec);
+      } else if (game.selected == 'selected') {
+        //TODO
       }
     });
     this.input.on('pointermove', function (pointer) {
-      if (draw && pointer.noButtonDown() === false && game.selected == 'clump') {
+      if (draw && pointer.noButtonDown() === false && (game.selected == 'clump' || game.selected == 'connector')) {
         // graphics.clear();
         const graphics = game.graphics;
         graphics.clear();
@@ -186,7 +190,7 @@ export class LevelEditor extends Phaser.Scene {
   public update(time, delta): void {
     controls.update(delta);
     if (pointer.isDown) {
-      if (this.selected == 'clump') {
+      if (this.selected == 'clump' || this.selected == 'connector') {
         // this.graphics.clear();
         // this.graphics.clear();
         // let graphics = this.add.graphics();

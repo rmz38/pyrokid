@@ -1,10 +1,13 @@
+import { GameScene } from '../scenes/game-scene';
 import CompoundCrate from './compoundCrate';
+import Connector from './connector';
 
 class Crate {
   sprite: Phaser.Physics.Matter.Sprite;
   onFire: boolean;
   fireSprite: Phaser.GameObjects.Sprite;
   owner: CompoundCrate;
+  connectors: Set<Connector>;
   // timeIgnite: number;
   constructor(x: integer, y: integer, id: integer, game: Phaser.Scene, frame = 0) {
     const rec = game.matter.bodies.rectangle(x, y, 50, 50, {
@@ -23,7 +26,7 @@ class Crate {
     this.sprite = crate;
     this.onFire = false;
     this.fireSprite = null;
-    console.log(this.sprite);
+    this.connectors = new Set<Connector>();
     // this.timeIgnite = null;
   }
   public syncFire() {
@@ -32,8 +35,11 @@ class Crate {
       this.fireSprite.y = this.sprite.y - 10;
     }
   }
-  public destroy() {
+  public destroy(game: GameScene) {
     this.sprite.destroy();
+    this.connectors.forEach((e) => {
+      e.destroy(game);
+    });
   }
 }
 export default Crate;

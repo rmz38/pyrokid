@@ -33,7 +33,6 @@ export class LevelSelect extends Phaser.Scene {
           () => {
             localStorage.setItem('useleveleditor', 'false');
             localStorage.setItem('level', num);
-            console.log(localStorage.getItem('level'));
             this.scene.start('Game');
           },
           20,

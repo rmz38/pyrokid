@@ -81,7 +81,7 @@ export const jointBlocks = (game: GameScene, blocks, data): void => {
     const left = blocks[e.x - 50 + ',' + e.y];
     if (sides[1] == 1 && !track.has(up)) {
       const up = blocks[e.x + ',' + (e.y - 50)];
-      game.matter.add.joint(sprite.body, up.sprite.body, 10, 1, {
+      game.matter.add.joint(sprite.body, up.sprite.body, 0, 1, {
         pointA: { x: 0, y: -25 },
         pointB: { x: 0, y: 25 },
         angularStiffness: 1,
