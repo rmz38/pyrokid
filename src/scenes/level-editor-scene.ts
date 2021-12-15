@@ -121,8 +121,8 @@ export class LevelEditor extends Phaser.Scene {
       const ec = aGrid.getRowOrCol(Math.max(sy, pointer.worldY));
       if (game.selected == 'clump') {
         aGrid.clump(sr, sc, er, ec);
-      } else if (game.selected == 'selected') {
-        //TODO
+      } else if (game.selected == 'connector') {
+        aGrid.connect(sr, sc, er, ec, game);
       }
     });
     this.input.on('pointermove', function (pointer) {
@@ -157,6 +157,7 @@ export class LevelEditor extends Phaser.Scene {
       crate: [],
       steel: [],
       exit: [],
+      connector: [],
     };
     const grid = aGrid.grid;
     for (let i = 0; i < grid.length; i++) {
@@ -170,6 +171,9 @@ export class LevelEditor extends Phaser.Scene {
           });
         }
       }
+    }
+    for (const [key, value] of Object.entries(aGrid.connectors)) {
+      json['connector'].push(key);
     }
     const download = JSON.stringify(json, null, 2);
 

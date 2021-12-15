@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 import { indexes } from '../helpers/clump';
+import Connector from '../objects/connector';
 import { GameScene } from '../scenes/game-scene';
 
 export const initAnims = (game: Phaser.Scene): void => {
@@ -69,6 +70,7 @@ export const jointBlocks = (game: GameScene, blocks, data): void => {
   const items = [];
   data.steel.forEach((e) => items.push(e));
   data.crate.forEach((e) => items.push(e));
+  data.lava.forEach((e) => items.push(e));
   items.forEach((e) => {
     track.add(blocks[e.x + ',' + e.y]);
     const sprite = blocks[e.x + ',' + e.y].sprite;
@@ -111,6 +113,19 @@ export const jointBlocks = (game: GameScene, blocks, data): void => {
         angularStiffness: 1,
       });
       track.add(left);
+    }
+  });
+};
+export const connectorBlocks = (game: GameScene, blocks, data): void => {
+  data.connector.forEach((e) => {
+    const x = parseInt(e.substring(0, e.indexOf(',')));
+    const y = parseInt(e.substring(e.indexOf(',') + 1));
+    console.log(blocks);
+    console.log(x + ',' + (y - 25));
+    if (x % 50 == 0) {
+      new Connector(blocks[x - 25 + ',' + y], blocks[x + 25 + ',' + y], game);
+    } else {
+      new Connector(blocks[x + ',' + (y - 25)], blocks[x + ',' + (y + 25)], game);
     }
   });
 };

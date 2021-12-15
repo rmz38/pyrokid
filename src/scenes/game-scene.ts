@@ -12,7 +12,7 @@ import Lava from '../objects/lava';
 import { MenuButton } from '../ui/menu-button';
 import { indexes } from '../helpers/clump';
 import Exit from '../objects/exit';
-import { initAnims, jointBlocks } from '../helpers/init';
+import { connectorBlocks, initAnims, jointBlocks } from '../helpers/init';
 import { createCollisions } from '../helpers/collision-controller';
 import Connector from '../objects/connector';
 
@@ -57,6 +57,7 @@ export class GameScene extends Phaser.Scene {
   public fireActive = false;
   public fireCooldown = false;
   public tiles = [];
+  public blocks = {};
   public player: Player;
   TILE_SIZE: integer = 50;
   xTiles: integer = Math.floor(world_bound_width / this.TILE_SIZE);
@@ -107,21 +108,20 @@ export class GameScene extends Phaser.Scene {
     data.dirt.forEach((e) => {
       new Dirt(e.x, e.y, this, e.frame);
     });
-
-    const blocks = {};
+    this.blocks = {};
     data.steel.forEach((e) => {
-      blocks[e.x + ',' + e.y] = new Steel(e.x, e.y, this, e.frame);
+      this.blocks[e.x + ',' + e.y] = new Steel(e.x, e.y, this, e.frame);
     });
 
     const crates = new Set<Crate>();
     let counter = 0;
     data.crate.forEach((e) => {
-      blocks[e.x + ',' + e.y] = new Crate(e.x, e.y, counter, this, e.frame);
-      crates.add(blocks[e.x + ',' + e.y]);
-      this.crates['crate' + counter] = blocks[e.x + ',' + e.y];
+      this.blocks[e.x + ',' + e.y] = new Crate(e.x, e.y, counter, this, e.frame);
+      crates.add(this.blocks[e.x + ',' + e.y]);
+      this.crates['crate' + counter] = this.blocks[e.x + ',' + e.y];
       counter += 1;
     });
-    new Connector(this.crates['crate' + 0], this.crates['crate' + 1], this);
+    // new Connector(this.crates['crate' + 0], this.crates['crate' + 1], this);
     data.exit.forEach((e) => {
       new Exit(e.x, e.y, this);
     });
@@ -135,33 +135,33 @@ export class GameScene extends Phaser.Scene {
         const toCompound = new Set<Crate>();
         while (curr.length != 0) {
           curr.forEach((i) => {
-            const id = indexes[parseInt(blocks[i].sprite.frame.name)];
+            const id = indexes[parseInt(this.blocks[i].sprite.frame.name)];
             // odd numbers are sides
             const sides = id.split('');
             trackCrates.add(i);
-            toCompound.add(blocks[i]);
-            const x = blocks[i].sprite.x;
-            const y = blocks[i].sprite.y;
+            toCompound.add(this.blocks[i]);
+            const x = this.blocks[i].sprite.x;
+            const y = this.blocks[i].sprite.y;
             const up = x + ',' + (y - 50);
             const right = x + 50 + ',' + y;
             const down = x + ',' + (y + 50);
             const left = x - 50 + ',' + y;
-            function compoundCrates(tile) {
+            function compoundCrates(tile, game) {
               next.push(tile);
               trackCrates.add(tile);
-              toCompound.add(blocks[tile]);
+              toCompound.add(game.blocks[tile]);
             }
             if (sides[1] == 1 && !trackCrates.has(up)) {
-              compoundCrates(up);
+              compoundCrates(up, this);
             }
             if (sides[3] == 1 && !trackCrates.has(right)) {
-              compoundCrates(right);
+              compoundCrates(right, this);
             }
             if (sides[5] == 1 && !trackCrates.has(down)) {
-              compoundCrates(down);
+              compoundCrates(down, this);
             }
             if (sides[7] == 1 && !trackCrates.has(left)) {
-              compoundCrates(left);
+              compoundCrates(left, this);
             }
           });
           curr = next;
@@ -172,14 +172,16 @@ export class GameScene extends Phaser.Scene {
     });
 
     // const compoundTest = new CompoundCrate(this, crates, 'test1');
-
-    jointBlocks(this, blocks, data);
     for (let i = 0; i < data.lava.length; i++) {
       const e = data.lava[i];
-      this.lavas['lava' + i] = new Lava(e.x, e.y, this, e.frame, i);
+      const temp = new Lava(e.x, e.y, this, e.frame, i);
+      this.lavas['lava' + i] = temp;
+      this.blocks[e.x + ',' + e.y] = temp;
     }
+    jointBlocks(this, this.blocks, data);
     initAnims(this);
     createCollisions(this);
+    connectorBlocks(this, this.blocks, data);
     cursors = this.input.keyboard.createCursorKeys();
 
     wasd = this.input.keyboard.addKeys('W,S,A,D');

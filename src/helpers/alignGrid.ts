@@ -2,6 +2,9 @@ import * as Phaser from 'phaser';
 import { tiles, indexes } from './clump';
 const TILE_SIZE = 50;
 const clumpables = new Set<string>(['dirt', 'lava', 'crate', 'steel']);
+interface ConnectorHash {
+  [details: string]: Phaser.GameObjects.Image;
+}
 class AlignGrid {
   h: integer;
   w: integer;
@@ -9,12 +12,12 @@ class AlignGrid {
   cols: integer;
   scene: any;
   graphics: any;
-  grid: Array<Array<Phaser.Physics.Matter.Image>>;
-  connectors: Set<string>;
+  grid: Array<Array<Phaser.GameObjects.Image>>;
+  connectors: ConnectorHash;
   selected: string;
   playerTile: Array<integer>;
   public counter: integer = 0;
-  public clumps = new Map<integer, Set<string>>();
+  // public clumps = new Map<integer, Set<string>>();
   constructor(config) {
     if (!config.scene) {
       console.log('missing scene!');
@@ -32,6 +35,7 @@ class AlignGrid {
     this.cols = config.cols;
     this.scene = config.scene;
     this.grid = new Array(this.rows);
+    this.connectors = {};
     this.selected = 'lavaTile';
     for (let i = 0; i < this.cols; i++) {
       this.grid[i] = new Array<any>(this.rows);
@@ -53,7 +57,6 @@ class AlignGrid {
   }
   placeAt(x1, y1, objName, game: Phaser.Scene): void {
     //converted centered coordinates in pixels to place in grid square
-    console.log(objName);
     const row = Math.floor(x1 / TILE_SIZE);
     const col = Math.floor(y1 / TILE_SIZE);
     const x2 = row * TILE_SIZE + TILE_SIZE / 2;
@@ -68,10 +71,12 @@ class AlignGrid {
         }
         this.grid[row][col].destroy();
         this.grid[row][col] = null;
+        //@ts-ignore
         if (clumpables.has(name) && frame != 0) {
           this.neighbors(row, col).forEach((e) => {
             const nx = this.unpack(e)[0];
             const ny = this.unpack(e)[1];
+            //@ts-ignore
             if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
               this.clump(nx, ny, nx, ny);
             }
@@ -79,7 +84,21 @@ class AlignGrid {
         }
       }
       this.grid[row][col] = null;
-
+      this.neighbors4(row, col).forEach((e) => {
+        const a = this.unpack(e)[0];
+        const b = this.unpack(e)[1];
+        const ip = this.getPixel(row);
+        const jp = this.getPixel(col);
+        const xp = ip + (a - row) * 25;
+        const yp = jp + (b - col) * 25;
+        const id = xp + ',' + yp;
+        console.log(id);
+        console.log(this.connectors);
+        if (id in this.connectors) {
+          this.connectors[id].destroy();
+          delete this.connectors[id];
+        }
+      });
       return;
     }
 
@@ -146,10 +165,12 @@ class AlignGrid {
         if (this.grid[i][j]) {
           curr.add(i + ',' + j);
           check.add(i + ',' + j);
+          //@ts-ignore
           if (this.grid[i][j].frame.name != 0) {
             this.neighbors(i, j).forEach((e) => {
               const nx = this.unpack(e)[0];
               const ny = this.unpack(e)[1];
+              //@ts-ignore
               if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
                 check.add(e);
               }
@@ -195,7 +216,7 @@ class AlignGrid {
       }
     });
   }
-  connect(sr, sc, er, ec): void {
+  connect(sr, sc, er, ec, game: Phaser.Scene): void {
     const curr = new Set<string>();
     const check = new Set<string>();
     // DO BFS and add tiles to initalized bfs
@@ -212,22 +233,51 @@ class AlignGrid {
       const i = this.unpack(e)[0];
       const j = this.unpack(e)[1];
       if (clumpables.has(this.grid[i][j].name)) {
-        const candidates = this.neighbors(i, j);
+        const candidates = this.neighbors4(i, j);
         // all sides of the tile grabbed from the tilesheets
         const id: Array<string> = indexes[parseInt(this.grid[i][j].frame.name)].split('');
         for (let x = 0; x < candidates.length; x++) {
           const coord = candidates[x];
-          const a = this.getPixel(this.unpack(coord)[0]);
-          const b = this.getPixel(this.unpack(coord)[1]);
-          const neighborId = indexes[parseInt(this.grid[a][b].frame.name)];
-          let ip = this.getPixel(i);
-          let jp = this.getPixel(j);
-          const coordId = ip + ',' + jp;
+          const a = this.unpack(coord)[0];
+          const b = this.unpack(coord)[1];
           // find the id of the frame to use and what sides are available to join
-          LEFTOFF HERE CHECK ALL SIDES
-          if (chec)
-          ip += (a - i) * 25;
-          jp += (b - j) * 25;
+          let flag = false;
+          let rotate = false;
+          if (curr.has(coord)) {
+            const neighborId = indexes[parseInt(this.grid[a][b].frame.name)];
+            const ip = this.getPixel(i);
+            const jp = this.getPixel(j);
+            const coordId = ip + ',' + jp;
+            if (a > i) {
+              if (neighborId[7] == '0' && id[3] == '0') {
+                flag = true;
+              }
+            } else if (a < i) {
+              if (neighborId[3] == '0' && id[7] == '0') {
+                flag = true;
+              }
+            } else if (b > j) {
+              if (neighborId[1] == '0' && id[5] == '0') {
+                flag = true;
+                rotate = true;
+              }
+            } else if (b < j) {
+              if (neighborId[5] == '0' && id[1] == '0') {
+                flag = true;
+                rotate = true;
+              }
+            }
+            if (flag) {
+              const xp = ip + (a - i) * 25;
+              const yp = jp + (b - j) * 25;
+              const id = xp + ',' + yp;
+              if (!(id in this.connectors)) {
+                this.connectors[id] = game.add.image(xp, yp, 'connector');
+                if (rotate) {
+                  this.connectors[id].angle = 90;
+                }
+              }
+            }
           }
         }
       }
