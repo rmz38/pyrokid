@@ -4,8 +4,8 @@ class Spider {
   collisionSensor: Phaser.Physics.Matter.Sprite;
   armored: boolean;
   constructor(x: integer, y: integer, game: Phaser.Scene, id: integer, armored: boolean) {
-    const spiderRight = game.matter.bodies.rectangle(37, 0, 10, 10, { isSensor: true, label: 'spider' + id });
-    const spiderLeft = game.matter.bodies.rectangle(-37, 0, 10, 10, { isSensor: true, label: 'spider' + id });
+    const spiderRight = game.matter.bodies.rectangle(20, 0, 10, 10, { isSensor: true, label: 'spider' + id });
+    const spiderLeft = game.matter.bodies.rectangle(-20, 0, 10, 10, { isSensor: true, label: 'spider' + id });
     const spiderTop = game.matter.bodies.rectangle(0, -25, 30, 2, { isSensor: true, label: 'spiTop,' + id });
     this.collisionSensor = game.matter.add.sprite(0, 0, 'spider', null, {
       isSensor: true,
@@ -16,7 +16,7 @@ class Spider {
     this.collisionSensor.setCollidesWith(0x1000);
     this.collisionSensor.alpha = 0;
     // spiderLeft.collisionFilter.category = 0x0100;
-    const spiderBody = game.matter.bodies.rectangle(0, 0, 77, 50, { label: 'spider' + id });
+    const spiderBody = game.matter.bodies.rectangle(0, 0, 40, 50, { label: 'spider' + id });
     const compound = game.matter.body.create({
       parts: [spiderBody, spiderRight, spiderLeft, spiderTop],
       inertia: Infinity,
@@ -24,10 +24,14 @@ class Spider {
     });
     this.velocity = 1;
     const spider = game.matter.add.sprite(0, 0, 'spider');
+    spider.scaleX = 0.7;
+    spider.scaleY = 0.9;
     spider.setCollisionCategory(0x0001);
     spider.setExistingBody(compound);
     spider.setPosition(x, y);
     spider.setCollidesWith(0x0100);
+    this.collisionSensor.scaleX = 0.7;
+    this.collisionSensor.scaleY = 0.8;
     this.sprite = spider;
     if (armored) {
       this.sprite.anims.play('spiderArmored', true);
@@ -47,14 +51,13 @@ class Spider {
       this.sprite.anims.play({ key: 'spider', startFrame: lastIndex - 1 });
       //change sprite
     } else {
-      this.sprite.destroy();
+      this.destroy();
     }
   }
   public hitLizard() {
     // just dies because fire lizard one shots
     this.armored = false;
-    this.sprite.destroy();
-    this.collisionSensor.destroy();
+    this.destroy();
     // this.collisionSensor.destroy();
   }
   public syncSensor() {

@@ -2,7 +2,7 @@ import * as Phaser from 'phaser';
 import CompoundCrate from '../objects/compoundCrate';
 import Crate from '../objects/crate';
 import { GameScene } from '../scenes/game-scene';
-const monsterCollisionLabels = new Set<string>(['lizard', 'spider', 'fire']);
+const monsterCollisionLabels = new Set<string>(['lizard', 'spider', 'fire', 'exit']);
 
 function isMonster(s: string) {
   return s.includes('spider') || s.includes('lizard');
@@ -44,14 +44,16 @@ function igniteCrate(game, currCrate: Crate) {
   currCrate.fireSprite.anims.play('squareFire', false);
   currCrate.fireSprite.alpha = 0.7;
   game.time.delayedCall(1000, () => {
-    if (currCrate.fireSprite.active) {
+    if (currCrate.fireSprite.active && !currCrate.isLava) {
       currCrate.fireSprite.destroy();
     }
-    const fireDisappear = game.add.sprite(currCrate.sprite.x, currCrate.sprite.y - 10, 'fireDisappear');
-    fireDisappear.anims.play('fireDisappear', false, true);
-    fireDisappear.once('animationcomplete', () => {
-      fireDisappear.destroy();
-    });
+    if (!currCrate.isLava) {
+      const fireDisappear = game.add.sprite(currCrate.sprite.x, currCrate.sprite.y - 10, 'fireDisappear');
+      fireDisappear.anims.play('fireDisappear', false, true);
+      fireDisappear.once('animationcomplete', () => {
+        fireDisappear.destroy();
+      });
+    }
     const pos = getTile(currCrate.sprite.x, currCrate.sprite.y);
     const x = pos[0];
     const y = pos[1];
@@ -66,11 +68,7 @@ function igniteCrate(game, currCrate: Crate) {
       const y = candidates[i][1];
       if (x >= 0 && x < game.xTiles && y >= 0 && y < game.yTiles) {
         game.tiles[x][y].forEach((e) => {
-          if (e instanceof Crate) {
-            igniteCompound(game, e.owner, false);
-          } else {
-            e.ignite(game, game.tiles, game.xTiles, game.yTiles);
-          }
+          igniteCompound(game, e.owner, false);
         });
       }
     }
@@ -100,6 +98,19 @@ export const createCollisions = (game: GameScene): void => {
         }
         game.scene.restart();
       }
+      if ((a == 'fire' && b.includes('bomb')) || (b == 'fire' && a.includes('bomb'))) {
+        const bomb = a.includes('bomb') ? a : b;
+        game.bombs[bomb].makeExit(game);
+        game.fire.destroy();
+        game.fireActive = false;
+      }
+      if ((a.includes('lizard') && b.includes('bomb')) || (b.includes('lizard') && a.includes('bomb'))) {
+        const bomb = a.includes('bomb') ? a : b;
+        const lizard = a.includes('lizard') ? a : b;
+        if (game.lizards[lizard].onFire) {
+          game.bombs[bomb].makeExit(game);
+        }
+      }
       if ((a.includes('lizard') && b == 'player') || (b.includes('lizard') && a == 'player')) {
         game.scene.restart();
       }
@@ -118,10 +129,18 @@ export const createCollisions = (game: GameScene): void => {
           game.scene.restart();
         }
       }
+      if ((a == 'playerRight' && isTerrain(b)) || (b == 'playerRight' && isTerrain(a))) {
+        game.player.hittingRight = true;
+      }
+      if ((a == 'playerLeft' && isTerrain(b)) || (b == 'playerLeft' && isTerrain(a))) {
+        game.player.hittingLeft = true;
+      }
       if (a == 'playerTop' || b == 'playerTop') {
         const otherBody = a !== 'playerTop' ? bodyA : bodyB;
         if (otherBody.velocity.y > 0) {
           game.scene.restart();
+        } else {
+          game.player.sprite.setVelocityY(0);
         }
       }
       if ((b.includes('spider') && a === 'fire') || (a.includes('spider') && b === 'fire')) {
@@ -194,7 +213,10 @@ export const createCollisions = (game: GameScene): void => {
         const spiId = spiLabel.substring(spiLabel.indexOf(',') + 1);
         game.spiders['spider' + spiId].destroy();
       }
-      if ((bodyA.isSensor && isMonster(a)) || (bodyB.isSensor && isMonster(b))) {
+      if (
+        (bodyA.isSensor && bodyA.ignoreGravity == false && isMonster(a)) ||
+        (bodyB.isSensor && bodyB.ignoreGravity == false && isMonster(b))
+      ) {
         const monsterBody = bodyA.isSensor ? bodyA : bodyB;
         const otherBody = bodyA.isSensor ? bodyB : bodyA;
         let turnFlag = true;
@@ -210,6 +232,36 @@ export const createCollisions = (game: GameScene): void => {
             game.spiders[monsterBody.label].flip();
           }
         }
+      }
+    }
+  });
+  game.matter.world.on('collisionend', function (event) {
+    const pairs = event.pairs;
+    for (let i = 0; i < pairs.length; i++) {
+      const bodyA = pairs[i].bodyA;
+      const bodyB = pairs[i].bodyB;
+      const a = bodyA.label;
+      const b = bodyB.label;
+      if (a == 'playerRight' || b == 'playerRight') {
+        game.player.hittingRight = false;
+      }
+      if (a == 'playerLeft' || b == 'playerLeft') {
+        game.player.hittingLeft = false;
+      }
+    }
+  });
+  game.matter.world.on('collisionactive', function (event) {
+    const pairs = event.pairs;
+    for (let i = 0; i < pairs.length; i++) {
+      const bodyA = pairs[i].bodyA;
+      const bodyB = pairs[i].bodyB;
+      const a = bodyA.label;
+      const b = bodyB.label;
+      if ((a == 'playerRight' && isTerrain(b)) || (b == 'playerRight' && isTerrain(b))) {
+        game.player.hittingRight = true;
+      }
+      if ((a == 'playerLeft' && isTerrain(b)) || (b == 'playerLeft' && isTerrain(b))) {
+        game.player.hittingLeft = true;
       }
     }
   });

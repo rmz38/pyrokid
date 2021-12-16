@@ -13,7 +13,7 @@ import FileSaver = require('file-saver');
 let cursors;
 let controls;
 let pointer;
-let aGrid;
+let aGrid: AlignGrid;
 // let menuPositions = [];
 // let menuNames = []
 // for (let i = 0; i < 8; i++) {
@@ -151,12 +151,13 @@ export class LevelEditor extends Phaser.Scene {
       player: [],
       lizard: [],
       spider: [],
-      armoredSpider: [],
+      spiderArmored: [],
       dirt: [],
       lava: [],
       crate: [],
       steel: [],
       exit: [],
+      bomb: [],
       connector: [],
     };
     const grid = aGrid.grid;

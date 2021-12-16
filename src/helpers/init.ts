@@ -87,6 +87,8 @@ export const jointBlocks = (game: GameScene, blocks, data): void => {
         pointA: { x: 0, y: -25 },
         pointB: { x: 0, y: 25 },
         angularStiffness: 1,
+        stiffness: 1,
+        damping: 1,
       });
       track.add(up);
     }
@@ -95,6 +97,8 @@ export const jointBlocks = (game: GameScene, blocks, data): void => {
         pointA: { x: 25, y: 0 },
         pointB: { x: -25, y: 0 },
         angularStiffness: 1,
+        stiffness: 1,
+        damping: 1,
       });
       track.add(right);
     }
@@ -103,6 +107,8 @@ export const jointBlocks = (game: GameScene, blocks, data): void => {
         pointA: { x: 0, y: 25 },
         pointB: { x: 0, y: -25 },
         angularStiffness: 1,
+        stiffness: 1,
+        damping: 1,
       });
       track.add(down);
     }
@@ -111,6 +117,8 @@ export const jointBlocks = (game: GameScene, blocks, data): void => {
         pointA: { x: -25, y: 0 },
         pointB: { x: 25, y: 0 },
         angularStiffness: 1,
+        stiffness: 1,
+        damping: 1,
       });
       track.add(left);
     }

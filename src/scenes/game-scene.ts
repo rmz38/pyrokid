@@ -15,6 +15,7 @@ import Exit from '../objects/exit';
 import { connectorBlocks, initAnims, jointBlocks } from '../helpers/init';
 import { createCollisions } from '../helpers/collision-controller';
 import Connector from '../objects/connector';
+import Bomb from '../objects/bomb';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -35,6 +36,12 @@ interface LizardHash {
 interface SpiderHash {
   [details: string]: Spider;
 }
+interface BombHash {
+  [details: string]: Bomb;
+}
+interface DirtHash {
+  [details: string]: Dirt;
+}
 const world_bound_width = 1200;
 const world_bound_height = 600;
 function getTile(x: number, y: number) {
@@ -53,6 +60,7 @@ export class GameScene extends Phaser.Scene {
   public spiders: SpiderHash = {};
   public lavas: LavaHash = {};
   public crates: CrateHash = {};
+  public bombs: BombHash = {};
   public fire: Phaser.Physics.Matter.Sprite;
   public fireActive = false;
   public fireCooldown = false;
@@ -69,6 +77,7 @@ export class GameScene extends Phaser.Scene {
     super(sceneConfig);
   }
   public create(): void {
+    initAnims(this);
     const background = this.add.image(world_bound_width / 2, world_bound_height / 2, 'background');
     background.setScale(world_bound_width / background.width);
     background.setDepth(-10);
@@ -101,22 +110,40 @@ export class GameScene extends Phaser.Scene {
     }
     // make spiders
     this.spiders = {};
-    for (let i = 0; i < data.spider.length; i++) {
-      const e = data.spider[i];
-      this.spiders['spider' + i] = new Spider(e.x, e.y, this, i, false);
-    }
-    data.dirt.forEach((e) => {
-      new Dirt(e.x, e.y, this, e.frame);
+    let spiderCounter = 0;
+    data.spider.forEach((e) => {
+      this.spiders['spider' + spiderCounter] = new Spider(e.x, e.y, this, spiderCounter, false);
+      spiderCounter += 1;
+    });
+    data.spiderArmored.forEach((e) => {
+      this.spiders['spider' + spiderCounter] = new Spider(e.x, e.y, this, spiderCounter, true);
+      spiderCounter += 1;
     });
     this.blocks = {};
+    // make steels
     data.steel.forEach((e) => {
       this.blocks[e.x + ',' + e.y] = new Steel(e.x, e.y, this, e.frame);
     });
-
+    // make dirts
+    data.dirt.forEach((e) => {
+      this.blocks[e.x + ',' + e.y] = new Dirt(e.x, e.y, this, e.frame);
+    });
+    //make bombs
+    for (let i = 0; i < data.bomb.length; i++) {
+      const e = data.bomb[i];
+      this.bombs['bomb' + i] = new Bomb(e.x, e.y, i, this);
+      this.blocks[e.x + ',' + e.y] = this.bombs['bomb' + i];
+    }
     const crates = new Set<Crate>();
     let counter = 0;
     data.crate.forEach((e) => {
-      this.blocks[e.x + ',' + e.y] = new Crate(e.x, e.y, counter, this, e.frame);
+      this.blocks[e.x + ',' + e.y] = new Crate(e.x, e.y, counter, this, e.frame, false);
+      crates.add(this.blocks[e.x + ',' + e.y]);
+      this.crates['crate' + counter] = this.blocks[e.x + ',' + e.y];
+      counter += 1;
+    });
+    data.lava.forEach((e) => {
+      this.blocks[e.x + ',' + e.y] = new Crate(e.x, e.y, counter, this, e.frame, true);
       crates.add(this.blocks[e.x + ',' + e.y]);
       this.crates['crate' + counter] = this.blocks[e.x + ',' + e.y];
       counter += 1;
@@ -125,9 +152,11 @@ export class GameScene extends Phaser.Scene {
     data.exit.forEach((e) => {
       new Exit(e.x, e.y, this);
     });
+
     // compound the crates
     const trackCrates = new Set<string>();
-    data.crate.forEach((e) => {
+    const crateAndLava = data.crate.concat(data.lava);
+    crateAndLava.forEach((e) => {
       const name = e.x + ',' + e.y;
       if (!trackCrates.has(name)) {
         let curr = [name];
@@ -172,14 +201,13 @@ export class GameScene extends Phaser.Scene {
     });
 
     // const compoundTest = new CompoundCrate(this, crates, 'test1');
-    for (let i = 0; i < data.lava.length; i++) {
-      const e = data.lava[i];
-      const temp = new Lava(e.x, e.y, this, e.frame, i);
-      this.lavas['lava' + i] = temp;
-      this.blocks[e.x + ',' + e.y] = temp;
-    }
+    // for (let i = 0; i < data.lava.length; i++) {
+    //   const e = data.lava[i];
+    //   const temp = new Lava(e.x, e.y, this, e.frame, i);
+    //   this.lavas['lava' + i] = temp;
+    //   this.blocks[e.x + ',' + e.y] = temp;
+    // }
     jointBlocks(this, this.blocks, data);
-    initAnims(this);
     createCollisions(this);
     connectorBlocks(this, this.blocks, data);
     cursors = this.input.keyboard.createCursorKeys();
@@ -190,7 +218,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
   public update(): void {
-    // add to tiles
+    // add crates to tiles
     clearTiles(this);
     Object.keys(this.crates).forEach((key) => {
       const curr = this.crates[key];
@@ -199,6 +227,8 @@ export class GameScene extends Phaser.Scene {
         this.tiles[pos[0]][pos[1]].add(curr);
       }
     });
+
+    // add lavas to tiles
     Object.keys(this.lavas).forEach((key) => {
       const curr = this.lavas[key];
       if (curr.sprite.active) {
@@ -222,6 +252,8 @@ export class GameScene extends Phaser.Scene {
     if (wasd.W.isDown && this.player.touchingGround) {
       this.player.jump();
     }
+
+    //shooting fire and setting the direction
     if (
       (cursors.right.isDown || cursors.down.isDown || cursors.up.isDown || cursors.left.isDown) &&
       !this.fireActive &&

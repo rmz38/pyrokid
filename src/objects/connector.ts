@@ -22,6 +22,8 @@ class Connector {
       pointA: { x: (x2 - x1) / 2, y: (y2 - y1) / 2 },
       pointB: { x: (x1 - x2) / 2, y: (y1 - y2) / 2 },
       angularStiffness: 1,
+      stiffness: 1,
+      damping: 1,
     });
     if (x2 - x1 == 0) {
       connector.angle = 90;
@@ -30,6 +32,8 @@ class Connector {
       pointA: { x: 0, y: 0 },
       pointB: { x: (x1 - x2) / 2, y: (y1 - y2) / 2 },
       angularStiffness: 1,
+      stiffness: 1,
+      damping: 1,
     });
     this.sprite = connector;
     if (obj1 instanceof Crate) {

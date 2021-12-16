@@ -55,6 +55,47 @@ class AlignGrid {
     }
     this.graphics.strokePath();
   }
+  clearConnector(row, col) {
+    this.neighbors4(row, col).forEach((e) => {
+      const a = this.unpack(e)[0];
+      const b = this.unpack(e)[1];
+      const ip = this.getPixel(row);
+      const jp = this.getPixel(col);
+      const xp = ip + (a - row) * 25;
+      const yp = jp + (b - col) * 25;
+      const id = xp + ',' + yp;
+      console.log(id);
+      console.log(this.connectors);
+      if (id in this.connectors) {
+        this.connectors[id].destroy();
+        delete this.connectors[id];
+      }
+    });
+  }
+  clearTile(row, col, game) {
+    if (this.grid[row][col]) {
+      const name = this.grid[row][col].name;
+      const frame = this.grid[row][col].frame.name;
+      if (name == 'player') {
+        return;
+      }
+      this.grid[row][col].destroy();
+      this.grid[row][col] = null;
+      //@ts-ignore
+      if (clumpables.has(name) && frame != 0) {
+        this.neighbors(row, col).forEach((e) => {
+          const nx = this.unpack(e)[0];
+          const ny = this.unpack(e)[1];
+          //@ts-ignore
+          if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
+            this.clump(nx, ny, nx, ny);
+          }
+        });
+      }
+    }
+    this.grid[row][col] = null;
+    this.clearConnector(row, col);
+  }
   placeAt(x1, y1, objName, game: Phaser.Scene): void {
     //converted centered coordinates in pixels to place in grid square
     const row = Math.floor(x1 / TILE_SIZE);
@@ -63,52 +104,23 @@ class AlignGrid {
     const y2 = col * TILE_SIZE + TILE_SIZE / 2;
     //if clearing instead
     if (objName == 'clear') {
-      if (this.grid[row][col]) {
-        const name = this.grid[row][col].name;
-        const frame = this.grid[row][col].frame.name;
-        if (name == 'player') {
-          return;
-        }
-        this.grid[row][col].destroy();
-        this.grid[row][col] = null;
-        //@ts-ignore
-        if (clumpables.has(name) && frame != 0) {
-          this.neighbors(row, col).forEach((e) => {
-            const nx = this.unpack(e)[0];
-            const ny = this.unpack(e)[1];
-            //@ts-ignore
-            if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
-              this.clump(nx, ny, nx, ny);
-            }
-          });
-        }
-      }
-      this.grid[row][col] = null;
-      this.neighbors4(row, col).forEach((e) => {
-        const a = this.unpack(e)[0];
-        const b = this.unpack(e)[1];
-        const ip = this.getPixel(row);
-        const jp = this.getPixel(col);
-        const xp = ip + (a - row) * 25;
-        const yp = jp + (b - col) * 25;
-        const id = xp + ',' + yp;
-        console.log(id);
-        console.log(this.connectors);
-        if (id in this.connectors) {
-          this.connectors[id].destroy();
-          delete this.connectors[id];
-        }
-      });
+      this.clearTile(row, col, game);
       return;
     }
 
     const obj = game.add.image(x2, y2, objName);
+    if (objName == 'lizard' || objName.includes('spider')) {
+      obj.scaleX = 0.7;
+      if (objName.includes('spider')) {
+        obj.scaleY = 0.9;
+      }
+    }
     obj.name = objName;
     if (this.grid[row][col]) {
       if (this.playerTile && this.playerTile[0] == row && this.playerTile[1] == col) {
         this.playerTile = null;
       }
-      this.grid[row][col].destroy();
+      this.clearTile(row, col, game);
     }
     if (objName == 'player') {
       if (this.playerTile) {
@@ -184,6 +196,7 @@ class AlignGrid {
     curr.forEach((e) => {
       const i = this.unpack(e)[0];
       const j = this.unpack(e)[1];
+      this.clearConnector(i, j);
       if (clumpables.has(this.grid[i][j].name)) {
         const candidates = this.neighbors(i, j);
         // all sides of the tile grabbed from the tilesheets
@@ -207,7 +220,6 @@ class AlignGrid {
               }
             }
           }
-          // console.log(pointer);
           if (x % 2 == 1) {
             pointer += 2;
           }

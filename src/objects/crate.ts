@@ -8,13 +8,15 @@ class Crate {
   fireSprite: Phaser.GameObjects.Sprite;
   owner: CompoundCrate;
   connectors: Set<Connector>;
+  isLava: boolean;
   // timeIgnite: number;
-  constructor(x: integer, y: integer, id: integer, game: Phaser.Scene, frame = 0) {
+  constructor(x: integer, y: integer, id: integer, game: Phaser.Scene, frame = 0, isLava: boolean) {
     const rec = game.matter.bodies.rectangle(x, y, 50, 50, {
       label: 'crate' + id,
       inertia: Infinity,
     });
-    const crate = game.matter.add.sprite(x, y, 'crate', frame);
+    const imageString = isLava ? 'lava' : 'crate';
+    const crate = game.matter.add.sprite(x, y, imageString, frame);
     crate.setExistingBody(rec);
     // this.crate.setRectangle(100, 50, {
     //   render: { sprite: { xOffset: 0, yOffset: 0.15 } },
@@ -23,10 +25,13 @@ class Crate {
     // });
     crate.setCollisionCategory(0x0100);
     crate.setBounce(0);
+    crate.setFriction(1);
+    crate.setFrictionStatic(100);
     this.sprite = crate;
     this.onFire = false;
     this.fireSprite = null;
     this.connectors = new Set<Connector>();
+    this.isLava = isLava;
     // this.timeIgnite = null;
   }
   public syncFire() {
@@ -36,10 +41,12 @@ class Crate {
     }
   }
   public destroy(game: GameScene) {
-    this.sprite.destroy();
-    this.connectors.forEach((e) => {
-      e.destroy(game);
-    });
+    if (!this.isLava) {
+      this.sprite.destroy();
+      this.connectors.forEach((e) => {
+        e.destroy(game);
+      });
+    }
   }
 }
 export default Crate;

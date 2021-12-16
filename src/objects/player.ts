@@ -5,10 +5,10 @@ class Player {
   hittingLeft: boolean;
   constructor(x: integer, y: integer, game: any) {
     const rec = game.matter.bodies.rectangle(0, 21, 10, 1, { isSensor: true, label: 'groundSensor' });
-    const recRight = game.matter.bodies.rectangle(16, 0, 10, 42, { isSensor: true, label: 'playerRight' });
-    const recLeft = game.matter.bodies.rectangle(-16, 0, 10, 42, { isSensor: true, label: 'playerLeft' });
-    const recTop = game.matter.bodies.rectangle(0, -21, 10, 2, { isSensor: true, label: 'playerTop' });
-    const playerBody = game.matter.bodies.rectangle(0, 0, 32, 42, { label: 'player' });
+    const recRight = game.matter.bodies.rectangle(16, 0, 15, 36, { isSensor: true, label: 'playerRight' });
+    const recLeft = game.matter.bodies.rectangle(-16, 0, 15, 36, { isSensor: true, label: 'playerLeft' });
+    const recTop = game.matter.bodies.rectangle(0, -21, 10, 5, { isSensor: true, label: 'playerTop' });
+    const playerBody = game.matter.bodies.rectangle(0, 0, 20, 40, { label: 'player' });
     const compound = game.matter.body.create({
       parts: [playerBody, rec, recRight, recLeft, recTop],
       inertia: Infinity,
@@ -21,12 +21,19 @@ class Player {
     player.body.render.sprite.xOffset = 0;
     player.body.render.sprite.yOffset = 0;
     player.setPosition(x, y);
-    player.setCollisionCategory(0x0100);
+    player.setCollisionCategory(0x1000);
+    player.setCollidesWith(0x1100);
     player.label = 'player';
     this.sprite = player;
+    this.hittingLeft = false;
+    this.hittingRight = false;
   }
   public moveLeft() {
-    this.sprite.setVelocityX(-3);
+    if (this.hittingLeft) {
+      this.sprite.setVelocityX(0);
+    } else {
+      this.sprite.setVelocityX(-3);
+    }
     this.sprite.anims.play('left', true);
   }
   public moveRight() {

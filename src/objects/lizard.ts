@@ -18,12 +18,6 @@ class Lizard {
       label: 'lizard' + id,
       ignoreGravity: true,
     });
-    // this.collisionSensor.setExistingBody(collisionBody);
-    // this.collisionSensor = game.matter.add.sprite(0, 0, 'lizard', null, {
-    //   isSensor: true,
-    //   label: 'lizard' + id,
-    //   ignoreGravity: true,
-    // });
     this.collisionSensor.alpha = 0;
 
     // const spiderSensor = game.matter.bodies.rectangle(0, 0, 70, 50, { label: 'lizard' });
@@ -34,19 +28,19 @@ class Lizard {
     });
     this.velocity = 1;
     const lizard = game.matter.add.sprite(0, 0, 'lizard');
+    lizard.scaleX = 0.7;
     lizard.setExistingBody(compound);
     lizard.setPosition(x, y);
     lizard.setCollisionCategory(0x001);
     lizard.setCollidesWith(0x0100);
     this.collisionSensor.setCollisionCategory(0x1000);
-    this.collisionSensor.setCollidesWith(0x1000);
-    console.log(lizard);
-    console.log(lizLeft);
+    this.collisionSensor.setCollidesWith(0x101000);
+    this.collisionSensor.scaleX = 0.7;
     // lizLeft.collisionFilter.category = 0x0100;
     this.sprite = lizard;
-    this.sprite.anims.play('lizard', true);
     this.onFire = false;
     this.fireSprite = null;
+    this.sprite.anims.play('lizard', true);
   }
   public flip() {
     this.sprite.flipX = !this.sprite.flipX;

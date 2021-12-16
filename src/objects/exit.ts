@@ -7,6 +7,7 @@ class Exit {
       ignoreGravity: true,
     });
     this.sprite.setDepth(-1);
+    this.sprite.setCollisionCategory(0x0100);
   }
   public getX() {
     return this.sprite.body.position.x;

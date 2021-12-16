@@ -5,13 +5,16 @@ class Bomb {
     this.sprite = game.matter.add.sprite(x, y, 'bomb', null, {
       label: 'bomb' + id,
     });
-    this.sprite.setCollisionCategory(0x10000);
-    this.sprite.setCollidesWith(0x0100);
+    //collides with lizardcollisionsensors and normal blocks
+    this.sprite.setCollisionCategory(0x100000);
+    this.sprite.setCollidesWith(0x1100);
+    this.sprite.setFixedRotation();
+    this.sprite.setBounce(0);
   }
   public makeExit(game) {
     if (this.sprite.active) {
-      this.sprite.destroy;
       new Exit(this.sprite.x, this.sprite.y, game);
+      this.sprite.destroy();
     }
     //TODO: PLAY EXPLOSION ANIMATION
   }
