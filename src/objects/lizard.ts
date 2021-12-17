@@ -7,11 +7,15 @@ class Lizard {
   velocity: integer;
   collisionSensor: Phaser.Physics.Matter.Sprite;
   id: integer;
+  rightEdge: boolean;
+  leftEdge: boolean;
   constructor(x: integer, y: integer, game: Phaser.Scene, id: integer) {
-    const lizRight = game.matter.bodies.rectangle(20, 0, 10, 10, { isSensor: true, label: 'lizard' + id });
-    const lizLeft = game.matter.bodies.rectangle(-20, 0, 10, 10, { isSensor: true, label: 'lizard' + id });
-    const lizTop = game.matter.bodies.rectangle(0, -25, 30, 2, { isSensor: true, label: 'lizTop,' + id });
-    const lizardBody = game.matter.bodies.rectangle(0, 0, 40, 50, { label: 'lizard' + id });
+    const lizRight = game.matter.bodies.rectangle(15, 0, 10, 10, { isSensor: true, label: 'lizard' + id });
+    const lizRightEdge = game.matter.bodies.rectangle(17, 25, 3, 10, { isSensor: true, label: 'rightEdgeL,' + id });
+    const lizLeft = game.matter.bodies.rectangle(-15, 0, 10, 10, { isSensor: true, label: 'lizard' + id });
+    const lizLeftEdge = game.matter.bodies.rectangle(-17, 25, 3, 10, { isSensor: true, label: 'leftEdgeL,' + id });
+    const lizTop = game.matter.bodies.rectangle(0, -20, 30, 2, { isSensor: true, label: 'lizTop,' + id });
+    const lizardBody = game.matter.bodies.rectangle(0, 0, 35, 40, { label: 'lizard' + id });
     // const collisionBody = game.matter.bodies.rectangle(0, 0, 1, 40, { isSensor: true, label: 'lizard' + id });
     this.collisionSensor = game.matter.add.sprite(0, 0, 'lizard', null, {
       isSensor: true,
@@ -19,10 +23,9 @@ class Lizard {
       ignoreGravity: true,
     });
     this.collisionSensor.alpha = 0;
-
     // const spiderSensor = game.matter.bodies.rectangle(0, 0, 70, 50, { label: 'lizard' });
     const compound = game.matter.body.create({
-      parts: [lizardBody, lizRight, lizLeft, lizTop],
+      parts: [lizardBody, lizRight, lizLeftEdge, lizRightEdge, lizLeft, lizTop],
       inertia: Infinity,
       render: { sprite: { xOffset: 0.5, yOffset: 0.5 } },
     });
@@ -41,6 +44,8 @@ class Lizard {
     this.onFire = false;
     this.fireSprite = null;
     this.sprite.anims.play('lizard', true);
+    this.rightEdge = false;
+    this.leftEdge = false;
   }
   public flip() {
     this.sprite.flipX = !this.sprite.flipX;

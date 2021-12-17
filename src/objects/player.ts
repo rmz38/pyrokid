@@ -1,5 +1,5 @@
 class Player {
-  sprite: any;
+  sprite: Phaser.Physics.Matter.Sprite;
   touchingGround: boolean;
   hittingRight: boolean;
   hittingLeft: boolean;

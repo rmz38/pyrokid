@@ -120,7 +120,7 @@ export class LevelEditor extends Phaser.Scene {
       const er = aGrid.getRowOrCol(Math.max(sx, pointer.worldX));
       const ec = aGrid.getRowOrCol(Math.max(sy, pointer.worldY));
       if (game.selected == 'clump') {
-        aGrid.clump(sr, sc, er, ec);
+        aGrid.clumpBox(sr, sc, er, ec);
       } else if (game.selected == 'connector') {
         aGrid.connect(sr, sc, er, ec, game);
       }

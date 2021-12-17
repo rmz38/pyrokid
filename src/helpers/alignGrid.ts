@@ -88,7 +88,7 @@ class AlignGrid {
           const ny = this.unpack(e)[1];
           //@ts-ignore
           if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
-            this.clump(nx, ny, nx, ny);
+            this.clumpBox(nx, ny, nx, ny);
           }
         });
       }
@@ -160,15 +160,7 @@ class AlignGrid {
     const j = parseInt(coord.substring(split + 1));
     return [i, j];
   }
-  /**
-   * start and end of rectangle drawn by mouse to clump selected tiles
-   * FIX TO TAKE SET OF TILES INSTEAD OF RECTANGLE? TODO
-   * @param sx start x pixel coordinate
-   * @param sy start y pixel coordinate
-   * @param ex end x pixel coordinate
-   * @param ey end y pixel coordinate
-   */
-  clump(sr, sc, er, ec): void {
+  clumpBox(sr, sc, er, ec) {
     const curr = new Set<string>();
     const check = new Set<string>();
     // DO BFS
@@ -177,20 +169,28 @@ class AlignGrid {
         if (this.grid[i][j]) {
           curr.add(i + ',' + j);
           check.add(i + ',' + j);
-          //@ts-ignore
-          if (this.grid[i][j].frame.name != 0) {
-            this.neighbors(i, j).forEach((e) => {
-              const nx = this.unpack(e)[0];
-              const ny = this.unpack(e)[1];
-              //@ts-ignore
-              if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
-                check.add(e);
-              }
-            });
-          }
+          this.neighbors(i, j).forEach((e) => {
+            const nx = this.unpack(e)[0];
+            const ny = this.unpack(e)[1];
+            //@ts-ignore fix later or investigage issues
+            if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
+              check.add(e);
+            }
+          });
         }
       }
     }
+    this.clump(curr, check);
+  }
+  /**
+   * start and end of rectangle drawn by mouse to clump selected tiles
+   * FIX TO TAKE SET OF TILES INSTEAD OF RECTANGLE? TODO
+   * @param sx start x pixel coordinate
+   * @param sy start y pixel coordinate
+   * @param ex end x pixel coordinate
+   * @param ey end y pixel coordinate
+   */
+  clump(curr: Set<string>, check: Set<string>): void {
     // figure out which tile texture to use based on spritesheet
     // ensured that none are null in curr
     curr.forEach((e) => {
