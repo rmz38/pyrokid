@@ -7,8 +7,8 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   visible: false,
   key: 'LevelEditor',
 };
-const W_WIDTH = 1200;
-const W_HEIGHT = 700;
+const world_bound_width = 1200;
+const world_bound_height = 700;
 import FileSaver = require('file-saver');
 let cursors;
 let controls;
@@ -35,11 +35,16 @@ export class LevelEditor extends Phaser.Scene {
     let sy = 0;
     let draw = false;
     pointer = this.input.activePointer;
-    const background = this.add.image(W_WIDTH / 2, W_HEIGHT / 2, 'backgroundDirt');
-    background.setScale(W_WIDTH / background.width);
+    const background = this.add.tileSprite(
+      world_bound_width / 2,
+      world_bound_height / 2,
+      world_bound_width,
+      world_bound_height,
+      'backgroundDirt',
+    );
     cursors = this.input.keyboard.createCursorKeys();
-    this.matter.world.setBounds(0, 0, W_WIDTH, W_HEIGHT, 32, true, true, false, true);
-    this.cameras.main.setBounds(0, 0, W_WIDTH, W_HEIGHT);
+    this.matter.world.setBounds(0, 0, world_bound_width, world_bound_height, 32, true, true, false, true);
+    this.cameras.main.setBounds(0, 0, world_bound_width, world_bound_height);
 
     const controlConfig = {
       camera: this.cameras.main,
@@ -54,8 +59,8 @@ export class LevelEditor extends Phaser.Scene {
 
     const gridConfig = {
       scene: this,
-      cols: W_WIDTH / 50,
-      rows: W_HEIGHT / 50,
+      cols: world_bound_width / 50,
+      rows: world_bound_height / 50,
     };
     aGrid = new AlignGrid(gridConfig);
     controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
@@ -142,6 +147,7 @@ export class LevelEditor extends Phaser.Scene {
     preset.dirt.forEach((e) => {
       aGrid.placeAt(e.x, e.y, 'dirt', this);
     });
+    aGrid.clumpBox(0, 0, aGrid.getRowOrCol(world_bound_width - 1), aGrid.getRowOrCol(world_bound_height - 1));
     new MenuButton(this, 10, 10, 'Back to Menu', () => {
       this.scene.start('MainMenu');
     });

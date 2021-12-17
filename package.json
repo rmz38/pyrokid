@@ -7,7 +7,8 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "build": "yarn build:dev",
+    "start": "node server.js",
+    "build": "yarn build:prod",
     "build:dev": "NODE_ENV=development webpack",
     "build:prod": "NODE_ENV=production webpack",
     "dev": "NODE_ENV=development webpack-dev-server --hot --inline",
@@ -15,6 +16,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
+    "express": "^4.17.2",
     "file-saver": "^2.0.5",
     "fs": "^0.0.1-security",
     "phaser": "^3.50.0"

@@ -13,7 +13,10 @@ export class MainMenuScene extends Phaser.Scene {
   constructor() {
     super(sceneConfig);
   }
-  // public preload() {}
+  public preload() {
+    this.load.json('leveleditorlevel', 'assets/levels/leveleditor.json');
+    // this.load.json('level' + localStorage.getItem('level'), 'assets/levels/' + localStorage.getItem('level') + '.json');
+  }
   public create(): void {
     this.add
       .text(100, 50, 'Pyrokid', {

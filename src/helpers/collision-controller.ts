@@ -288,6 +288,13 @@ export const createCollisions = (game: GameScene): void => {
           game.player.sprite.setVelocityY(0);
         }
       }
+      if ((b.includes('spider') && a.includes('lizard')) || a.includes('spider' && b.includes('lizard)'))) {
+        const spider = b.includes('spider') ? b : a;
+        const lizard = b.includes('lizard') ? b : a;
+        if (game.lizards[lizard].onFire && game.lizards[lizard].sprite.active) {
+          game.spiders[spider].destroy();
+        }
+      }
       if ((a.includes('crate') && b.includes('player')) || (b.includes('crate') && a.includes('player'))) {
         const crate = a.includes('crate') ? a : b;
         if (game.crates[crate].onFire) {

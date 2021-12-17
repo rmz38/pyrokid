@@ -76,10 +76,19 @@ export class GameScene extends Phaser.Scene {
   constructor() {
     super(sceneConfig);
   }
+  public preload() {
+    this.load.json('level' + localStorage.getItem('level'), 'assets/levels/' + localStorage.getItem('level') + '.json');
+  }
   public create(): void {
     initAnims(this);
-    const background = this.add.image(world_bound_width / 2, world_bound_height / 2, 'background');
-    background.setScale(world_bound_width / background.width);
+    const background = this.add.tileSprite(
+      world_bound_width / 2,
+      world_bound_height / 2,
+      world_bound_width,
+      world_bound_height,
+      'backgroundDirt',
+    );
+    // background.setScale(world_bound_width / background.width);
     background.setDepth(-10);
     this.matter.world.setBounds(0, 0, world_bound_width, world_bound_height, 32, true, true, false, true);
     this.cameras.main.setBounds(0, 0, world_bound_width, world_bound_height).setName('main');

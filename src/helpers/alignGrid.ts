@@ -5,6 +5,9 @@ const clumpables = new Set<string>(['dirt', 'lava', 'crate', 'steel']);
 interface ConnectorHash {
   [details: string]: Phaser.GameObjects.Image;
 }
+function isTerrain(s: string) {
+  return s.includes('crate') || s.includes('steel') || s.includes('lava') || s.includes('dirt');
+}
 class AlignGrid {
   h: integer;
   w: integer;
@@ -34,12 +37,13 @@ class AlignGrid {
     this.rows = config.rows;
     this.cols = config.cols;
     this.scene = config.scene;
-    this.grid = new Array(this.rows);
+    this.grid = new Array(this.cols);
     this.connectors = {};
     this.selected = 'lavaTile';
     for (let i = 0; i < this.cols; i++) {
       this.grid[i] = new Array<any>(this.rows);
     }
+    console.log(this.grid);
     this.playerTile = null;
   }
   show(a = 0.7): void {
@@ -64,8 +68,6 @@ class AlignGrid {
       const xp = ip + (a - row) * 25;
       const yp = jp + (b - col) * 25;
       const id = xp + ',' + yp;
-      console.log(id);
-      console.log(this.connectors);
       if (id in this.connectors) {
         this.connectors[id].destroy();
         delete this.connectors[id];
@@ -164,6 +166,7 @@ class AlignGrid {
     const curr = new Set<string>();
     const check = new Set<string>();
     // DO BFS
+    console.log(ec);
     for (let i = sr; i <= er; i++) {
       for (let j = sc; j <= ec; j++) {
         if (this.grid[i][j]) {
@@ -172,9 +175,11 @@ class AlignGrid {
           this.neighbors(i, j).forEach((e) => {
             const nx = this.unpack(e)[0];
             const ny = this.unpack(e)[1];
-            //@ts-ignore fix later or investigage issues
-            if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
-              check.add(e);
+            if (nx > 0 && nx < this.cols && ny > 0 && ny < this.rows) {
+              //@ts-ignore fix later or investigage issues
+              if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
+                check.add(e);
+              }
             }
           });
         }
@@ -255,7 +260,7 @@ class AlignGrid {
           // find the id of the frame to use and what sides are available to join
           let flag = false;
           let rotate = false;
-          if (curr.has(coord)) {
+          if (curr.has(coord) && isTerrain(this.grid[a][b].name)) {
             const neighborId = indexes[parseInt(this.grid[a][b].frame.name)];
             const ip = this.getPixel(i);
             const jp = this.getPixel(j);
