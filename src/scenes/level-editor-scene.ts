@@ -106,7 +106,7 @@ export class LevelEditor extends Phaser.Scene {
     ];
     const menuButtons = [];
     for (let i = 0; i < menuNames.length; i++) {
-      if (i < 4) {
+      if (i < 5) {
         menuButtons.push(new LevelEditorButton(700, 50 + i * 30, menuNames[i], '#fff', menuSelects[i], this));
       } else {
         menuButtons.push(new LevelEditorButton(700, 70 + i * 30, menuNames[i], '#fff', menuSelects[i], this));
