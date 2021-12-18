@@ -27,6 +27,7 @@ export class LevelEditor extends Phaser.Scene {
   public graphics: Phaser.GameObjects.Graphics;
   public sx;
   public sy;
+  public buttons;
   constructor() {
     super(sceneConfig);
   }
@@ -103,8 +104,13 @@ export class LevelEditor extends Phaser.Scene {
     ];
     const menuButtons = [];
     for (let i = 0; i < menuNames.length; i++) {
-      menuButtons.push(new LevelEditorButton(700, 50 + i * 30, menuNames[i], '#fff', menuSelects[i], this));
+      if (i < 4) {
+        menuButtons.push(new LevelEditorButton(700, 50 + i * 30, menuNames[i], '#fff', menuSelects[i], this));
+      } else {
+        menuButtons.push(new LevelEditorButton(700, 70 + i * 30, menuNames[i], '#fff', menuSelects[i], this));
+      }
     }
+    this.buttons = menuButtons;
     this.input.on('pointerdown', function (pointer) {
       sx = pointer.worldX;
       sy = pointer.worldY;

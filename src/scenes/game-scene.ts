@@ -138,6 +138,7 @@ export class GameScene extends Phaser.Scene {
       this.blocks[e.x + ',' + e.y] = new Dirt(e.x, e.y, this, e.frame);
     });
     //make bombs
+    this.bombs = {};
     for (let i = 0; i < data.bomb.length; i++) {
       const e = data.bomb[i];
       this.bombs['bomb' + i] = new Bomb(e.x, e.y, i, this);
@@ -145,6 +146,7 @@ export class GameScene extends Phaser.Scene {
     }
     const crates = new Set<Crate>();
     let counter = 0;
+    this.crates = {};
     data.crate.forEach((e) => {
       this.blocks[e.x + ',' + e.y] = new Crate(e.x, e.y, counter, this, e.frame, false);
       crates.add(this.blocks[e.x + ',' + e.y]);

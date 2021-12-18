@@ -5,7 +5,7 @@ import Crate from './crate';
 
 class Connector {
   sprite: Phaser.Physics.Matter.Image;
-  constraint: MatterJS.Constraint;
+  constraints: Array<MatterJS.Constraint>;
   connectorPin: MatterJS.Constraint;
   constructor(obj1: any, obj2: any, game: GameScene) {
     const x1 = obj1.sprite.x;
@@ -18,13 +18,21 @@ class Connector {
       isSensor: true,
       ignoreGravity: true,
     });
-    this.constraint = game.matter.add.joint(obj1.sprite.body, obj2.sprite.body, 0, 1, {
-      pointA: { x: (x2 - x1) / 2, y: (y2 - y1) / 2 },
-      pointB: { x: (x1 - x2) / 2, y: (y1 - y2) / 2 },
-      angularStiffness: 1,
-      stiffness: 1,
-      damping: 1,
-    });
+    const constraints = [];
+    const px = x2 - x1 == 0;
+    const py = y2 - y1 == 0;
+    for (let p = -24; p < 25; p += 4) {
+      constraints.push(
+        game.matter.add.joint(obj1.sprite.body, obj2.sprite.body, 0, 1, {
+          pointA: { x: px ? p : (x2 - x1) / 2, y: py ? p : (y2 - y1) / 2 },
+          pointB: { x: px ? p : (x1 - x2) / 2, y: py ? p : (y1 - y2) / 2 },
+          angularStiffness: 1,
+          stiffness: 1,
+          damping: 1,
+        }),
+      );
+    }
+    this.constraints = constraints;
     if (x2 - x1 == 0) {
       connector.angle = 90;
     }
@@ -45,7 +53,10 @@ class Connector {
   }
   public destroy(game: GameScene): void {
     this.sprite.destroy();
-    game.matter.world.removeConstraint(this.constraint as ConstraintType);
+    this.constraints.forEach((e) => {
+      console.log(e);
+      game.matter.world.removeConstraint(e as ConstraintType);
+    });
     game.matter.world.removeConstraint(this.connectorPin as ConstraintType);
   }
 }

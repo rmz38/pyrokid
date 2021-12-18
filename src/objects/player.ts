@@ -5,10 +5,10 @@ class Player {
   hittingLeft: boolean;
   constructor(x: integer, y: integer, game: any) {
     const rec = game.matter.bodies.rectangle(0, 21, 10, 1, { isSensor: true, label: 'groundSensor' });
-    const recRight = game.matter.bodies.rectangle(16, 0, 15, 36, { isSensor: true, label: 'playerRight' });
-    const recLeft = game.matter.bodies.rectangle(-16, 0, 15, 36, { isSensor: true, label: 'playerLeft' });
-    const recTop = game.matter.bodies.rectangle(0, -21, 10, 5, { isSensor: true, label: 'playerTop' });
-    const playerBody = game.matter.bodies.rectangle(0, 0, 20, 40, { label: 'player' });
+    const recRight = game.matter.bodies.rectangle(16, 0, 15, 27, { isSensor: true, label: 'playerRight' });
+    const recLeft = game.matter.bodies.rectangle(-16, 0, 15, 27, { isSensor: true, label: 'playerLeft' });
+    const recTop = game.matter.bodies.rectangle(0, -15, 10, 5, { isSensor: true, label: 'playerTop' });
+    const playerBody = game.matter.bodies.rectangle(0, 0, 20, 30, { label: 'player' });
     const compound = game.matter.body.create({
       parts: [playerBody, rec, recRight, recLeft, recTop],
       inertia: Infinity,
@@ -49,7 +49,7 @@ class Player {
     this.sprite.anims.play('turn');
   }
   public jump() {
-    this.sprite.setVelocityY(-7);
+    this.sprite.setVelocityY(-9);
     this.touchingGround = false;
   }
   public getX() {

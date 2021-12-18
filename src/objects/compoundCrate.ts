@@ -7,9 +7,11 @@ class CompoundCrate {
     // this.sprite = game.matter.add.sprite(0, 0, image, 0, { label: label });
     this.crates = crates;
     // const crateBodies = [];
+    const test = [];
     crates.forEach((e) => {
       // crateBodies.push(e.sprite);
       e.owner = this;
+      test.push(e.sprite.body);
     });
     // const yOffset = image == 'crate' ? 0.15 : 0;
     // const compoundBody = game.matter.body.create({

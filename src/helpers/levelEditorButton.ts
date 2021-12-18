@@ -16,6 +16,12 @@ class LevelEditorButton {
         } else {
           game.selected = select;
         }
+        game.buttons.forEach((e: LevelEditorButton) => {
+          e.button.pressed = false;
+          e.button.enterMenuButtonRestState();
+        });
+        this.button.pressed = true;
+        this.button.enterMenuButtonActiveState();
       },
       75,
       10,

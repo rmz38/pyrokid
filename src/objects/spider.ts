@@ -26,7 +26,7 @@ class Spider {
       inertia: Infinity,
       render: { sprite: { xOffset: 0.5, yOffset: 0.5 } },
     });
-    this.velocity = 1;
+    this.velocity = 1.5;
     const spider = game.matter.add.sprite(0, 0, 'spider');
     spider.scaleX = 0.7;
     spider.scaleY = 0.9;
