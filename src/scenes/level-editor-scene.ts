@@ -182,6 +182,7 @@ export class LevelEditor extends Phaser.Scene {
         aGrid.connectors[e].angle = 90;
       }
     });
+    aGrid.placeAt(preset.player[0].x, preset.player[0].y, 'player', this);
     // aGrid.clumpBox(0, 0, aGrid.getRowOrCol(world_bound_width - 1), aGrid.getRowOrCol(world_bound_height - 1));
     new MenuButton(this, 10, 10, 'Back to Menu', () => {
       this.scene.start('MainMenu');
@@ -217,7 +218,7 @@ export class LevelEditor extends Phaser.Scene {
     for (const [key, value] of Object.entries(aGrid.connectors)) {
       json['connector'].push(key);
     }
-    const download = JSON.stringify(json, null, 2);
+    const download = JSON.stringify(json);
 
     // start level immediately instead of download
     if (start) {

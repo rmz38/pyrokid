@@ -116,6 +116,20 @@ class AlignGrid {
       return;
     }
 
+    if (this.grid[row][col]) {
+      if (this.playerTile && this.playerTile[0] == row && this.playerTile[1] == col) {
+        return;
+      }
+    }
+    this.clearTile(row, col, game);
+    if (objName == 'player') {
+      if (this.playerTile) {
+        const [a, b] = this.playerTile;
+        this.grid[a][b].destroy();
+        this.grid[a][b] = null;
+      }
+      this.playerTile = [row, col];
+    }
     const obj = game.add.image(x2, y2, objName);
     if (objName == 'lizard' || objName.includes('spider')) {
       obj.scaleX = 0.7;
@@ -124,18 +138,6 @@ class AlignGrid {
       }
     }
     obj.name = objName;
-    if (this.grid[row][col]) {
-      if (this.playerTile && this.playerTile[0] == row && this.playerTile[1] == col) {
-        this.playerTile = null;
-      }
-      this.clearTile(row, col, game);
-    }
-    if (objName == 'player') {
-      if (this.playerTile) {
-        this.grid[this.playerTile[0]][this.playerTile[1]].destroy();
-      }
-      this.playerTile = [row, col];
-    }
     this.grid[row][col] = obj;
     obj.x = x2;
     obj.y = y2;
@@ -179,8 +181,7 @@ class AlignGrid {
           curr.add(i + ',' + j);
           check.add(i + ',' + j);
           this.neighbors(i, j).forEach((e) => {
-            const nx = this.unpack(e)[0];
-            const ny = this.unpack(e)[1];
+            const [nx, ny] = this.unpack(e);
             if (nx > 0 && nx < this.cols && ny > 0 && ny < this.rows) {
               //@ts-ignore fix later or investigage issues
               if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
@@ -205,8 +206,7 @@ class AlignGrid {
     // figure out which tile texture to use based on spritesheet
     // ensured that none are null in curr
     curr.forEach((e) => {
-      const i = this.unpack(e)[0];
-      const j = this.unpack(e)[1];
+      const [i, j] = this.unpack(e);
       this.clearConnector(i, j);
       if (clumpables.has(this.grid[i][j].name)) {
         const candidates = this.neighbors(i, j);
