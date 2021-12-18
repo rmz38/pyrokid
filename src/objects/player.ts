@@ -27,6 +27,7 @@ class Player {
     this.sprite = player;
     this.hittingLeft = false;
     this.hittingRight = false;
+    console.log(player);
   }
   public moveLeft() {
     if (this.hittingLeft) {

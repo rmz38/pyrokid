@@ -1,8 +1,29 @@
 import * as Phaser from 'phaser';
+import { game } from '../main';
 import { MenuButton } from '../ui/menu-button';
+// function handleUpload(e) {
+//   const reader = new FileReader();
+//   reader.readAsText(e.target.files[0]);
+//   reader.onload = function (json) {
+//     localStorage.set('leveleditorlevel', JSON.parse(JSON.stringify(json)));
+//   };
+// }
+// const loader = document.getElementById('levelLoader');
+// loader.addEventListener('change', handleUpload, false);
 class LevelEditorButton {
   button: any;
   constructor(x: integer, y: integer, text: string, color: string, select: string, game) {
+    function handleUpload(e) {
+      localStorage.setItem('upload', 'true');
+      const reader = new FileReader();
+      reader.readAsText(e.target.files[0]);
+      reader.onload = function (json) {
+        localStorage.setItem('leveleditorlevel', JSON.stringify(json.target.result));
+        game.scene.restart();
+      };
+    }
+    const loader = document.getElementById('levelLoader');
+    loader.addEventListener('change', handleUpload, false);
     const button = new MenuButton(
       game,
       x,
@@ -13,6 +34,8 @@ class LevelEditorButton {
           game.generateJson(true);
         } else if (select == 'download') {
           game.generateJson(false);
+        } else if (select == 'upload') {
+          loader.click();
         } else {
           game.selected = select;
         }

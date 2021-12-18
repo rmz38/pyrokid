@@ -71,6 +71,7 @@ export class LevelEditor extends Phaser.Scene {
     const menuNames = [
       'Start Level',
       'Download',
+      'Upload',
       'Clump',
       'Connect',
       'Exit',
@@ -88,6 +89,7 @@ export class LevelEditor extends Phaser.Scene {
     const menuSelects = [
       'start',
       'download',
+      'upload',
       'clump',
       'connector',
       'exit',
@@ -148,12 +150,39 @@ export class LevelEditor extends Phaser.Scene {
       }
     });
     aGrid.show();
-    const preset = this.cache.json.get('leveleditorlevel');
+    // const preset = JSON.parse(JSON.stringify(localStorage.getItem('leveleditorlevel')));
+    const preset =
+      localStorage.getItem('upload') == 'true'
+        ? JSON.parse(JSON.parse(localStorage.getItem('leveleditorlevel')))
+        : this.cache.json.get('leveleditorlevel');
     aGrid.placeAt(preset.player[0].x, preset.player[0].y, 'player', this);
     preset.dirt.forEach((e) => {
-      aGrid.placeAt(e.x, e.y, 'dirt', this);
+      aGrid.placeAtPreset(e.x, e.y, 'dirt', e.frame, this);
     });
-    aGrid.clumpBox(0, 0, aGrid.getRowOrCol(world_bound_width - 1), aGrid.getRowOrCol(world_bound_height - 1));
+    preset.steel.forEach((e) => {
+      aGrid.placeAtPreset(e.x, e.y, 'steel', e.frame, this);
+    });
+    preset.crate.forEach((e) => {
+      aGrid.placeAtPreset(e.x, e.y, 'crate', e.frame, this);
+    });
+    preset.lava.forEach((e) => {
+      aGrid.placeAtPreset(e.x, e.y, 'lava', e.frame, this);
+    });
+    preset.lizard.forEach((e) => {
+      aGrid.placeAtPreset(e.x, e.y, 'lizard', '0', this);
+    });
+    preset.spider.forEach((e) => {
+      aGrid.placeAtPreset(e.x, e.y, 'spider', '0', this);
+    });
+    preset.connector.forEach((e) => {
+      const xp = parseInt(e.substring(0, e.indexOf(',')));
+      const yp = parseInt(e.substring(e.indexOf(',') + 1));
+      aGrid.connectors[e] = game.add.image(xp, yp, 'connector');
+      if (yp % 50 == 0) {
+        aGrid.connectors[e].angle = 90;
+      }
+    });
+    // aGrid.clumpBox(0, 0, aGrid.getRowOrCol(world_bound_width - 1), aGrid.getRowOrCol(world_bound_height - 1));
     new MenuButton(this, 10, 10, 'Back to Menu', () => {
       this.scene.start('MainMenu');
     });

@@ -98,6 +98,12 @@ class AlignGrid {
     this.grid[row][col] = null;
     this.clearConnector(row, col);
   }
+  placeAtPreset(x1, y1, objName, frame: string, game) {
+    this.placeAt(x1, y1, objName, game);
+    const row = Math.floor(x1 / TILE_SIZE);
+    const col = Math.floor(y1 / TILE_SIZE);
+    this.grid[row][col].setFrame(frame);
+  }
   placeAt(x1, y1, objName, game: Phaser.Scene): void {
     //converted centered coordinates in pixels to place in grid square
     const row = Math.floor(x1 / TILE_SIZE);

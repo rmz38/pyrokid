@@ -95,42 +95,42 @@ export const jointBlocks = (game: GameScene, blocks, data): void => {
     const leftJId = e.x - 25 + ',' + e.y;
     if (sides[1] == 1 && !track.has(upJId)) {
       const up = blocks[upId];
-      for (let p = -24; p < 25; p += 4) {
-        makeJoint(game, p, -25, p, 25, sprite.body, up.sprite.body);
-      }
-      // makeJoint(game, 20, -25, 20, 25, sprite.body, up.sprite.body);
-      // makeJoint(game, 0, -25, 0, 25, sprite.body, up.sprite.body);
-      // makeJoint(game, -20, -25, -20, 25, sprite.body, up.sprite.body);
+      // for (let p = -24; p < 25; p += 4) {
+      //   makeJoint(game, p, -25, p, 25, sprite.body, up.sprite.body);
+      // }
+      makeJoint(game, 20, -25, 20, 25, sprite.body, up.sprite.body);
+      makeJoint(game, 0, -25, 0, 25, sprite.body, up.sprite.body);
+      makeJoint(game, -20, -25, -20, 25, sprite.body, up.sprite.body);
       track.add(upJId);
     }
     if (sides[3] == 1 && !track.has(rightJId)) {
       const right = blocks[rightId];
-      for (let p = -24; p < 25; p += 4) {
-        makeJoint(game, 25, p, -25, p, sprite.body, right.sprite.body);
-      }
-      // makeJoint(game, 25, 20, -25, 20, sprite.body, right.sprite.body);
-      // makeJoint(game, 25, 0, -25, 0, sprite.body, right.sprite.body);
-      // makeJoint(game, 25, -20, -25, -20, sprite.body, right.sprite.body);
+      // for (let p = -24; p < 25; p += 4) {
+      //   makeJoint(game, 25, p, -25, p, sprite.body, right.sprite.body);
+      // }
+      makeJoint(game, 25, 20, -25, 20, sprite.body, right.sprite.body);
+      makeJoint(game, 25, 0, -25, 0, sprite.body, right.sprite.body);
+      makeJoint(game, 25, -20, -25, -20, sprite.body, right.sprite.body);
       track.add(rightJId);
     }
     if (sides[5] == 1 && !track.has(downJId)) {
       const down = blocks[downId];
-      for (let p = -24; p < 25; p += 4) {
-        makeJoint(game, p, 25, p, -25, sprite.body, down.sprite.body);
-      }
-      // makeJoint(game, -20, 25, -20, -25, sprite.body, down.sprite.body);
-      // makeJoint(game, 0, 25, 0, -25, sprite.body, down.sprite.body);
-      // makeJoint(game, 20, 25, 20, -25, sprite.body, down.sprite.body);
+      // for (let p = -24; p < 25; p += 4) {
+      //   makeJoint(game, p, 25, p, -25, sprite.body, down.sprite.body);
+      // }
+      makeJoint(game, -20, 25, -20, -25, sprite.body, down.sprite.body);
+      makeJoint(game, 0, 25, 0, -25, sprite.body, down.sprite.body);
+      makeJoint(game, 20, 25, 20, -25, sprite.body, down.sprite.body);
       track.add(downJId);
     }
     if (sides[7] == 1 && !track.has(leftJId)) {
       const left = blocks[leftId];
-      for (let p = -24; p < 25; p += 4) {
-        makeJoint(game, -25, p, 25, p, sprite.body, left.sprite.body);
-      }
-      // makeJoint(game, -25, 20, 25, 20, sprite.body, left.sprite.body);
-      // makeJoint(game, -25, 0, 25, 0, sprite.body, left.sprite.body);
-      // makeJoint(game, -25, -20, 25, -20, sprite.body, left.sprite.body);
+      // for (let p = -24; p < 25; p += 4) {
+      //   makeJoint(game, -25, p, 25, p, sprite.body, left.sprite.body);
+      // }
+      makeJoint(game, -25, 20, 25, 20, sprite.body, left.sprite.body);
+      makeJoint(game, -25, 0, 25, 0, sprite.body, left.sprite.body);
+      makeJoint(game, -25, -20, 25, -20, sprite.body, left.sprite.body);
       track.add(leftJId);
     }
   });

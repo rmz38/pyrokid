@@ -12,6 +12,7 @@ class Steel {
     steel.setPosition(x, y);
     steel.setBounce(0);
     this.sprite = steel;
+    console.log(steel);
   }
 }
 export default Steel;

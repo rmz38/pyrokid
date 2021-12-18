@@ -21,7 +21,7 @@ class Connector {
     const constraints = [];
     const px = x2 - x1 == 0;
     const py = y2 - y1 == 0;
-    for (let p = -24; p < 25; p += 4) {
+    for (let p = 0; p < 1; p += 4) {
       constraints.push(
         game.matter.add.joint(obj1.sprite.body, obj2.sprite.body, 0, 1, {
           pointA: { x: px ? p : (x2 - x1) / 2, y: py ? p : (y2 - y1) / 2 },
