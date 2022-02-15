@@ -1,11 +1,10 @@
 import * as Phaser from 'phaser';
 
-const padding = 10;
 const minimumWidth = 10;
 const minimumHeight = 50;
 
 export class MenuButton extends Phaser.GameObjects.Rectangle {
-  private label: Phaser.GameObjects.Text;
+  public label: Phaser.GameObjects.Text;
   public pressed: boolean;
   constructor(
     scene: Phaser.Scene,
@@ -16,13 +15,14 @@ export class MenuButton extends Phaser.GameObjects.Rectangle {
     w?: integer,
     h?: integer,
     fontSize = 18,
+    haveTopPadding = true,
   ) {
     super(scene, x, y);
     scene.add.existing(this);
     this.setOrigin(0, 0);
-
+    const padding = haveTopPadding ? 10 : 0;
     this.label = scene.add
-      .text(x + padding, y + padding, text)
+      .text(x + 10, y + padding, text)
       .setFontSize(fontSize)
       .setAlign('center')
       .setDepth(2);

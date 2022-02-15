@@ -171,6 +171,10 @@ class AlignGrid {
     return [i, j];
   }
   clumpBox(sr, sc, er, ec) {
+    sr = sr < er ? sr : er;
+    er = sr < er ? sr : er;
+    sc = sc < ec ? sc : ec;
+    ec = sc < ec ? sc : ec;
     const curr = new Set<string>();
     const check = new Set<string>();
     // DO BFS
@@ -240,6 +244,13 @@ class AlignGrid {
     });
   }
   connect(sr, sc, er, ec, game: Phaser.Scene): void {
+    sr = sr < er ? sr : er;
+    er = sr < er ? sr : er;
+    sc = sc < ec ? sc : ec;
+    ec = sc < ec ? sc : ec;
+    if (er >= this.grid.length || ec > this.grid[0].length) {
+      return;
+    }
     const curr = new Set<string>();
     const check = new Set<string>();
     // DO BFS and add tiles to initalized bfs
@@ -253,8 +264,7 @@ class AlignGrid {
     // figure out which tile texture to use based on spritesheet
     // ensured that none are null in curr
     curr.forEach((e) => {
-      const i = this.unpack(e)[0];
-      const j = this.unpack(e)[1];
+      const [i, j] = this.unpack(e);
       if (clumpables.has(this.grid[i][j].name)) {
         const candidates = this.neighbors4(i, j);
         // all sides of the tile grabbed from the tilesheets

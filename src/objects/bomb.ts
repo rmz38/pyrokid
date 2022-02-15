@@ -1,3 +1,4 @@
+import { GameScene } from '../scenes/game-scene';
 import Exit from './exit';
 class Bomb {
   sprite: Phaser.Physics.Matter.Sprite;
@@ -24,9 +25,11 @@ class Bomb {
     this.sprite.setFixedRotation();
     this.sprite.setBounce(0);
   }
-  public makeExit(game) {
+  public makeExit(game: GameScene) {
     if (this.sprite.active) {
       new Exit(this.sprite.x, this.sprite.y, game);
+      const explosion = game.add.sprite(this.sprite.x, this.sprite.y, 'explosion');
+      explosion.anims.play('explosion');
       this.sprite.destroy();
     }
     //TODO: PLAY EXPLOSION ANIMATION

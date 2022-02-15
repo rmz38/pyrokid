@@ -63,6 +63,12 @@ export const initAnims = (game: Phaser.Scene): void => {
     frameRate: 20,
     repeat: -1,
   });
+  game.anims.create({
+    key: 'explosion',
+    frames: game.anims.generateFrameNumbers('explosion', { start: 0, end: 8 }),
+    frameRate: 30,
+    hideOnComplete: true,
+  });
 };
 function makeJoint(game: GameScene, ax, ay, bx, by, body1: MatterJS.BodyType, body2: MatterJS.BodyType) {
   game.matter.add.joint(body1, body2, 0, 1, {

@@ -7,9 +7,8 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   visible: false,
   key: 'LevelEditor',
 };
-const world_bound_width = 1200;
-const world_bound_height = 700;
 import FileSaver = require('file-saver');
+import LevelSizeButton from '../helpers/levelSizeButton';
 let cursors;
 let controls;
 let pointer;
@@ -28,6 +27,8 @@ export class LevelEditor extends Phaser.Scene {
   public sx;
   public sy;
   public buttons;
+  public width = 24;
+  public height = 12;
   constructor() {
     super(sceneConfig);
   }
@@ -36,6 +37,14 @@ export class LevelEditor extends Phaser.Scene {
     let sy = 0;
     let draw = false;
     pointer = this.input.activePointer;
+    const preset =
+      localStorage.getItem('upload') == 'true'
+        ? JSON.parse(localStorage.getItem('leveleditorlevel'))
+        : this.cache.json.get('leveleditorlevel');
+    this.width = preset.width;
+    this.height = preset.height;
+    const world_bound_width = preset.width * 50;
+    const world_bound_height = preset.height * 50;
     const background = this.add.tileSprite(
       world_bound_width / 2,
       world_bound_height / 2,
@@ -107,11 +116,13 @@ export class LevelEditor extends Phaser.Scene {
     const menuButtons = [];
     for (let i = 0; i < menuNames.length; i++) {
       if (i < 5) {
-        menuButtons.push(new LevelEditorButton(700, 50 + i * 30, menuNames[i], '#fff', menuSelects[i], this));
+        menuButtons.push(new LevelEditorButton(700, 20 + i * 30, menuNames[i], '#fff', menuSelects[i], this));
       } else {
-        menuButtons.push(new LevelEditorButton(700, 70 + i * 30, menuNames[i], '#fff', menuSelects[i], this));
+        menuButtons.push(new LevelEditorButton(700, 40 + i * 30, menuNames[i], '#fff', menuSelects[i], this));
       }
     }
+    menuButtons.push(new LevelSizeButton(700, 40 + menuNames.length * 30, 'width', this));
+    menuButtons.push(new LevelSizeButton(700, 40 + (menuNames.length + 1) * 30, 'height', this));
     this.buttons = menuButtons;
     this.input.on('pointerdown', function (pointer) {
       sx = pointer.worldX;
@@ -151,10 +162,7 @@ export class LevelEditor extends Phaser.Scene {
     });
     aGrid.show();
     // const preset = JSON.parse(JSON.stringify(localStorage.getItem('leveleditorlevel')));
-    const preset =
-      localStorage.getItem('upload') == 'true'
-        ? JSON.parse(JSON.parse(localStorage.getItem('leveleditorlevel')))
-        : this.cache.json.get('leveleditorlevel');
+    console.log(JSON.parse(localStorage.getItem('leveleditorlevel')));
     aGrid.placeAt(preset.player[0].x, preset.player[0].y, 'player', this);
     preset.dirt.forEach((e) => {
       aGrid.placeAtPreset(e.x, e.y, 'dirt', e.frame, this);
@@ -188,8 +196,10 @@ export class LevelEditor extends Phaser.Scene {
       this.scene.start('MainMenu');
     });
   }
-  public generateJson(start = true): void {
+  public generateJson(start = true, resize = false): void {
     const json = {
+      width: this.width,
+      height: this.height,
       player: [],
       lizard: [],
       spider: [],
@@ -207,11 +217,14 @@ export class LevelEditor extends Phaser.Scene {
       for (let j = 0; j < grid[0].length; j++) {
         if (grid[i][j]) {
           const obj = grid[i][j];
-          json[obj.name].push({
-            x: obj.x,
-            y: obj.y,
-            frame: obj.frame.name,
-          });
+          if ((i < this.width && j < this.height) || obj.name == 'player') {
+            // check min in case new world size cuts off player location
+            json[obj.name].push({
+              x: Math.min(obj.x, (this.width - 1) * 50),
+              y: Math.min(obj.y, (this.height - 1) * 50),
+              frame: obj.frame.name,
+            });
+          }
         }
       }
     }
@@ -225,9 +238,13 @@ export class LevelEditor extends Phaser.Scene {
       localStorage.setItem('leveleditorlevel', download);
       localStorage.setItem('useleveleditor', 'true');
       this.scene.start('Game');
+    } else if (resize) {
+      localStorage.setItem('upload', 'true');
+      localStorage.setItem('leveleditorlevel', download);
+      this.scene.restart();
     } else {
       // for downloads
-      const fileToSave = new Blob([JSON.stringify(json, null, 4)], {
+      const fileToSave = new Blob([JSON.stringify(json, null)], {
         type: 'application/json',
         // name: 'level.json',
       });

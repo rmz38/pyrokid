@@ -42,8 +42,7 @@ interface BombHash {
 interface DirtHash {
   [details: string]: Dirt;
 }
-const world_bound_width = 1200;
-const world_bound_height = 600;
+
 function getTile(x: number, y: number) {
   return [Math.floor(x / 50), Math.floor(y / 50)];
 }
@@ -67,9 +66,9 @@ export class GameScene extends Phaser.Scene {
   public tiles = [];
   public blocks = {};
   public player: Player;
-  TILE_SIZE: integer = 50;
-  xTiles: integer = Math.floor(world_bound_width / this.TILE_SIZE);
-  yTiles: integer = Math.floor(world_bound_height / this.TILE_SIZE);
+  public TILE_SIZE: integer = 50;
+  public xTiles: integer = 0;
+  public yTiles: integer = 0;
 
   // public compounds = {};
   public level = 'level' + localStorage.getItem('level');
@@ -81,6 +80,12 @@ export class GameScene extends Phaser.Scene {
   }
   public create(): void {
     initAnims(this);
+    const data =
+      localStorage.getItem('useleveleditor') == 'true'
+        ? JSON.parse(localStorage.getItem('leveleditorlevel'))
+        : this.cache.json.get('level' + localStorage.getItem('level'));
+    const world_bound_width = data.width * this.TILE_SIZE;
+    const world_bound_height = data.height * this.TILE_SIZE;
     const background = this.add.tileSprite(
       world_bound_width / 2,
       world_bound_height / 2,
@@ -92,10 +97,6 @@ export class GameScene extends Phaser.Scene {
     background.setDepth(-10);
     this.matter.world.setBounds(0, 0, world_bound_width, world_bound_height, 32, true, true, false, true);
     this.cameras.main.setBounds(0, 0, world_bound_width, world_bound_height).setName('main');
-    const data =
-      localStorage.getItem('useleveleditor') == 'true'
-        ? JSON.parse(localStorage.getItem('leveleditorlevel'))
-        : this.cache.json.get('level' + localStorage.getItem('level'));
     this.xTiles = Math.floor(world_bound_width / this.TILE_SIZE);
     this.yTiles = Math.floor(world_bound_height / this.TILE_SIZE);
     this.fire = null;
@@ -230,6 +231,9 @@ export class GameScene extends Phaser.Scene {
   }
   public update(): void {
     // add crates to tiles
+    if (this.player.getY() > this.yTiles * this.TILE_SIZE) {
+      this.scene.restart();
+    }
     clearTiles(this);
     Object.keys(this.crates).forEach((key) => {
       const curr = this.crates[key];
