@@ -1,5 +1,8 @@
 import { MenuButton } from '../ui/menu-button';
+import LevelEditorButton from './levelEditorButton';
 class LevelSizeButton {
+  up: any;
+  down: any;
   button: any;
   value: number;
   constructor(x: integer, y: integer, type: 'width' | 'height', game) {
@@ -34,6 +37,11 @@ class LevelSizeButton {
       () => {
         game[type] += 1;
         button.label.text = type + ':' + game[type];
+        game.buttons.forEach((e: LevelEditorButton | LevelSizeButton) => {
+          e.reset();
+        });
+        up.pressed = true;
+        up.enterMenuButtonActiveState();
       },
       20,
       20,
@@ -48,6 +56,11 @@ class LevelSizeButton {
       () => {
         game[type] -= 1;
         button.label.text = type + ':' + game[type];
+        game.buttons.forEach((e: LevelEditorButton | LevelSizeButton) => {
+          e.reset();
+        });
+        down.pressed = true;
+        down.enterMenuButtonActiveState();
       },
       20,
       20,
@@ -76,6 +89,16 @@ class LevelSizeButton {
     down.setDepth(1);
     button.setDepth(1);
     this.button = button;
+    this.up = up;
+    this.down = down;
+  }
+  public reset(): void {
+    this.button.pressed = false;
+    this.button.enterMenuButtonRestState();
+    this.up.pressed = false;
+    this.up.enterMenuButtonRestState();
+    this.down.pressed = false;
+    this.down.enterMenuButtonRestState();
   }
 }
 

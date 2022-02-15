@@ -47,11 +47,39 @@ class Player {
   }
   public turn() {
     this.sprite.setVelocityX(0);
-    this.sprite.anims.play('turn');
+    const currAnim = this.sprite.anims.getName().toLowerCase();
+    if (currAnim.includes('jump')) {
+      return;
+    } else if (currAnim.includes('left')) {
+      this.sprite.anims.play('turnLeft');
+    } else {
+      this.sprite.anims.play('turnRight');
+    }
   }
+  public shoot(direction: 'right' | 'left' | 'none') {
+    const currAnim = this.sprite.anims.getName().toLowerCase();
+    if (direction == 'left') {
+      this.sprite.anims.play('shootLeft');
+    } else if (direction == 'right') {
+      this.sprite.anims.play('shootRight');
+    } else {
+      if (currAnim.includes('left')) {
+        this.sprite.anims.play('shootLeft');
+      } else {
+        this.sprite.anims.play('shootRight');
+      }
+    }
+  }
+
   public jump() {
     this.sprite.setVelocityY(-9);
     this.touchingGround = false;
+    // const currAnim = this.sprite.anims.getName().toLowerCase();
+    // if (currAnim.includes('left')) {
+    //   this.sprite.anims.play('jumpLeft', true);
+    // } else {
+    //   this.sprite.anims.play('jumpRight', true);
+    // }
   }
   public getX() {
     return this.sprite.body.position.x;

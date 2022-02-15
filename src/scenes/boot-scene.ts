@@ -82,7 +82,10 @@ export class BootScene extends Phaser.Scene {
     this.load.spritesheet('steel', 'assets/clumpables/steelTiles.png', { frameWidth: 50, frameHeight: 50 });
     this.load.spritesheet('lava', 'assets/clumpables/lavaTiles.png', { frameWidth: 50, frameHeight: 50 });
     this.load.spritesheet('fireball', 'assets/fireball.png', { frameWidth: 38, frameHeight: 19 });
-    this.load.spritesheet('player', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.spritesheet('screenfireball', 'assets/player/fireball.png', { frameWidth: 59, frameHeight: 59 });
+    this.load.spritesheet('player', 'assets/player/player.png', { frameWidth: 60, frameHeight: 60 });
+    this.load.spritesheet('shoot', 'assets/player/shoot.png', { frameWidth: 59, frameHeight: 59 });
+    this.load.spritesheet('jump', 'assets/player/jump.png', { frameWidth: 59, frameHeight: 59 });
     this.load.spritesheet('lizard', 'assets/monsters/lizard.png', { frameWidth: 70, frameHeight: 50 });
     this.load.spritesheet('spider', 'assets/monsters/spider.png', { frameWidth: 77, frameHeight: 61 });
     this.load.spritesheet('spiderArmored', 'assets/monsters/spiderArmored.png', { frameWidth: 77, frameHeight: 61 });

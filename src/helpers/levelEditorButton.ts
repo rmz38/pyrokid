@@ -42,8 +42,7 @@ class LevelEditorButton {
           game.selected = select;
         }
         game.buttons.forEach((e: LevelEditorButton) => {
-          e.button.pressed = false;
-          e.button.enterMenuButtonRestState();
+          e.reset();
         });
         this.button.pressed = true;
         this.button.enterMenuButtonActiveState();
@@ -67,6 +66,10 @@ class LevelEditorButton {
     });
     button.setDepth(1);
     this.button = button;
+  }
+  public reset() {
+    this.button.pressed = false;
+    this.button.enterMenuButtonRestState();
   }
 }
 

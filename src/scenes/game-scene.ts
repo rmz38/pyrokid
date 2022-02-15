@@ -23,7 +23,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   key: 'Game',
 };
 let cursors;
-let wasd;
+let wasdr;
 interface CrateHash {
   [details: string]: Crate;
 }
@@ -224,13 +224,16 @@ export class GameScene extends Phaser.Scene {
     connectorBlocks(this, this.blocks, data);
     cursors = this.input.keyboard.createCursorKeys();
 
-    wasd = this.input.keyboard.addKeys('W,S,A,D');
+    wasdr = this.input.keyboard.addKeys('W,S,A,D,R');
     new MenuButton(this, 10, 10, 'Back to Menu', () => {
       this.scene.start('MainMenu');
     });
   }
   public update(): void {
     // add crates to tiles
+    if (wasdr.R.isDown) {
+      this.scene.restart();
+    }
     if (this.player.getY() > this.yTiles * this.TILE_SIZE) {
       this.scene.restart();
     }
@@ -257,14 +260,14 @@ export class GameScene extends Phaser.Scene {
     for (const [key, spider] of Object.entries(this.spiders)) {
       spider.update();
     }
-    if (wasd.A.isDown) {
+    if (wasdr.A.isDown) {
       this.player.moveLeft();
-    } else if (wasd.D.isDown) {
+    } else if (wasdr.D.isDown) {
       this.player.moveRight();
     } else {
       this.player.turn();
     }
-    if (wasd.W.isDown && this.player.touchingGround) {
+    if (wasdr.W.isDown && this.player.touchingGround) {
       this.player.jump();
     }
 
@@ -279,16 +282,23 @@ export class GameScene extends Phaser.Scene {
         isSensor: true,
         label: 'fire',
       });
+      let direction = 'right';
       this.fire.setCollisionCategory(0x0100);
       if (cursors.left.isDown) {
         this.fire.setRotation(Math.PI);
+        direction = 'left';
       }
       if (cursors.down.isDown) {
         this.fire.setRotation(Math.PI / 2);
+        direction = 'none';
       }
       if (cursors.up.isDown) {
         this.fire.setRotation((3 * Math.PI) / 2);
+        direction = 'none';
       }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      this.player.shoot(direction);
       this.fire.anims.play('fireball', true);
       this.fire.setIgnoreGravity(true);
       const xDir = cursors.right.isDown ? 1 : -1;

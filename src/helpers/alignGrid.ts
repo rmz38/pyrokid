@@ -171,10 +171,10 @@ class AlignGrid {
     return [i, j];
   }
   clumpBox(sr, sc, er, ec) {
-    sr = sr < er ? sr : er;
-    er = sr < er ? sr : er;
-    sc = sc < ec ? sc : ec;
-    ec = sc < ec ? sc : ec;
+    // sr = sr < er ? sr : er;
+    // er = sr < er ? sr : er;
+    // sc = sc < ec ? sc : ec;
+    // ec = sc < ec ? sc : ec;
     const curr = new Set<string>();
     const check = new Set<string>();
     // DO BFS
@@ -244,10 +244,10 @@ class AlignGrid {
     });
   }
   connect(sr, sc, er, ec, game: Phaser.Scene): void {
-    sr = sr < er ? sr : er;
-    er = sr < er ? sr : er;
-    sc = sc < ec ? sc : ec;
-    ec = sc < ec ? sc : ec;
+    // sr = sr < er ? sr : er;
+    // er = sr < er ? sr : er;
+    // sc = sc < ec ? sc : ec;
+    // ec = sc < ec ? sc : ec;
     if (er >= this.grid.length || ec > this.grid[0].length) {
       return;
     }

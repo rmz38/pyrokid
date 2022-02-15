@@ -33,20 +33,60 @@ export const initAnims = (game: Phaser.Scene): void => {
 
   game.anims.create({
     key: 'left',
-    frames: game.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
+    frames: game.anims.generateFrameNumbers('player', { start: 0, end: 6 }),
     frameRate: 10,
     repeat: -1,
   });
 
   game.anims.create({
-    key: 'turn',
-    frames: [{ key: 'player', frame: 4 }],
-    frameRate: 20,
+    key: 'turnLeft',
+    frames: [{ key: 'player', frame: 6 }],
+  });
+
+  game.anims.create({
+    key: 'shootLeft',
+    frames: game.anims.generateFrameNumbers('shoot', { start: 0, end: 4 }),
+    frameRate: 10,
+  });
+
+  game.anims.create({
+    key: 'shootRight',
+    frames: game.anims.generateFrameNumbers('shoot', { start: 6, end: 9 }),
+    frameRate: 10,
+  });
+
+  game.anims.create({
+    key: 'jumpLeft',
+    frames: [{ key: 'jump', frame: 4 }],
+    frameRate: 30,
+  });
+
+  game.anims.create({
+    key: 'jumpRight',
+    frames: [{ key: 'jump', frame: 5 }],
+    frameRate: 30,
+  });
+
+  game.anims.create({
+    key: 'fallLeft',
+    frames: game.anims.generateFrameNumbers('jump', { start: 3, end: 0 }),
+    frameRate: 30,
+  });
+
+  game.anims.create({
+    key: 'fallRight',
+    frames: game.anims.generateFrameNumbers('jump', { start: 4, end: 7 }),
+    frameRate: 30,
+  });
+
+  game.anims.create({
+    key: 'turnRight',
+    frames: [{ key: 'player', frame: 7 }],
   });
 
   game.anims.create({
     key: 'right',
-    frames: game.anims.generateFrameNumbers('player', { start: 5, end: 8 }),
+    frames: game.anims.generateFrameNumbers('player', { start: 7, end: 12 }),
     frameRate: 10,
     repeat: -1,
   });
