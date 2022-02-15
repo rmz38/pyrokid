@@ -46,7 +46,7 @@ function igniteNeighbors(game, x, y, currCrate) {
   for (let i = 0; i < candidates.length; i++) {
     const x = candidates[i][0];
     const y = candidates[i][1];
-    if (x >= 0 && x < game.xTiles && y >= 0 && y < game.yTiles) {
+    if (x >= 0 && x < game.xTiles && y >= 0 && y < game.yTiles && game.tiles[x][y]) {
       game.tiles[x][y].forEach((e) => {
         igniteCompound(game, e.owner, false);
       });
