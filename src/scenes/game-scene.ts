@@ -63,7 +63,7 @@ export class GameScene extends Phaser.Scene {
   public fire: Phaser.Physics.Matter.Sprite;
   public fireActive = false;
   public fireCooldown = false;
-  public tiles = [];
+  public tiles = [[]];
   public blocks = {};
   public player: Player;
   public TILE_SIZE: integer = 50;

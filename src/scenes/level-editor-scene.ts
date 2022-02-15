@@ -185,6 +185,9 @@ export class LevelEditor extends Phaser.Scene {
     preset.exit.forEach((e) => {
       aGrid.placeAtPreset(e.x, e.y, 'exit', '0', this);
     });
+    preset.bomb.forEach((e) => {
+      aGrid.placeAtPreset(e.x, e.y, 'bomb', '0', this);
+    });
     preset.connector.forEach((e) => {
       const xp = parseInt(e.substring(0, e.indexOf(',')));
       const yp = parseInt(e.substring(e.indexOf(',') + 1));
