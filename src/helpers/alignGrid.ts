@@ -43,7 +43,6 @@ class AlignGrid {
     for (let i = 0; i < this.cols; i++) {
       this.grid[i] = new Array<any>(this.rows);
     }
-    console.log(this.grid);
     this.playerTile = null;
   }
   show(a = 0.7): void {
@@ -178,7 +177,6 @@ class AlignGrid {
     const curr = new Set<string>();
     const check = new Set<string>();
     // DO BFS
-    console.log(ec);
     for (let i = sr; i <= er; i++) {
       for (let j = sc; j <= ec; j++) {
         if (this.grid[i][j]) {

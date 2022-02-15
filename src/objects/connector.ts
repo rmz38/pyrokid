@@ -54,7 +54,6 @@ class Connector {
   public destroy(game: GameScene): void {
     this.sprite.destroy();
     this.constraints.forEach((e) => {
-      console.log(e);
       game.matter.world.removeConstraint(e as ConstraintType);
     });
     game.matter.world.removeConstraint(this.connectorPin as ConstraintType);

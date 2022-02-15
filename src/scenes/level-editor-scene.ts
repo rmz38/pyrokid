@@ -37,10 +37,11 @@ export class LevelEditor extends Phaser.Scene {
     let sy = 0;
     let draw = false;
     pointer = this.input.activePointer;
-    const preset =
+    let preset =
       localStorage.getItem('upload') == 'true'
         ? JSON.parse(localStorage.getItem('leveleditorlevel'))
         : this.cache.json.get('leveleditorlevel');
+    preset = preset.width == null ? JSON.parse(preset) : preset;
     this.width = preset.width;
     this.height = preset.height;
     const world_bound_width = preset.width * 50;
@@ -162,7 +163,6 @@ export class LevelEditor extends Phaser.Scene {
     });
     aGrid.show();
     // const preset = JSON.parse(JSON.stringify(localStorage.getItem('leveleditorlevel')));
-    console.log(JSON.parse(localStorage.getItem('leveleditorlevel')));
     aGrid.placeAt(preset.player[0].x, preset.player[0].y, 'player', this);
     preset.dirt.forEach((e) => {
       aGrid.placeAtPreset(e.x, e.y, 'dirt', e.frame, this);
@@ -182,6 +182,9 @@ export class LevelEditor extends Phaser.Scene {
     preset.spider.forEach((e) => {
       aGrid.placeAtPreset(e.x, e.y, 'spider', '0', this);
     });
+    preset.exit.forEach((e) => {
+      aGrid.placeAtPreset(e.x, e.y, 'exit', '0', this);
+    });
     preset.connector.forEach((e) => {
       const xp = parseInt(e.substring(0, e.indexOf(',')));
       const yp = parseInt(e.substring(e.indexOf(',') + 1));
@@ -199,7 +202,7 @@ export class LevelEditor extends Phaser.Scene {
   public generateJson(start = true, resize = false): void {
     const json = {
       width: this.width,
-      height: this.height,
+      height: this.height + 1,
       player: [],
       lizard: [],
       spider: [],
@@ -220,8 +223,8 @@ export class LevelEditor extends Phaser.Scene {
           if ((i < this.width && j < this.height) || obj.name == 'player') {
             // check min in case new world size cuts off player location
             json[obj.name].push({
-              x: Math.min(obj.x, (this.width - 1) * 50),
-              y: Math.min(obj.y, (this.height - 1) * 50),
+              x: obj.x,
+              y: obj.y,
               frame: obj.frame.name,
             });
           }
@@ -244,7 +247,7 @@ export class LevelEditor extends Phaser.Scene {
       this.scene.restart();
     } else {
       // for downloads
-      const fileToSave = new Blob([JSON.stringify(json, null)], {
+      const fileToSave = new Blob([JSON.stringify(json, null, 2)], {
         type: 'application/json',
         // name: 'level.json',
       });

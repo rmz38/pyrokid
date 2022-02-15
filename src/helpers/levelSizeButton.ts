@@ -5,6 +5,8 @@ class LevelSizeButton {
   down: any;
   button: any;
   value: number;
+  upPressed = false;
+  downPressed = false;
   constructor(x: integer, y: integer, type: 'width' | 'height', game) {
     function handleUpload(e) {
       localStorage.setItem('upload', 'true');
@@ -67,6 +69,7 @@ class LevelSizeButton {
       10,
       false,
     );
+    // game.input.setPollAlways();
     button.on('pointerover', () => {
       game.onButton = true;
     });
@@ -79,11 +82,35 @@ class LevelSizeButton {
     up.on('pointerout', () => {
       game.onButton = false;
     });
+    // up.on('pointerdown', () => {
+    //   this.upPressed = true;
+    //   while (this.upPressed) {
+    //     setTimeout(() => {
+    //       game[type] += 1;
+    //       button.label.text = type + ':' + game[type];
+    //     }, 1000);
+    //   }
+    // });
+    up.on('pointerup', () => {
+      up.enterMenuButtonRestState();
+      this.upPressed = false;
+    });
     down.on('pointerover', () => {
       game.onButton = true;
     });
     down.on('pointerout', () => {
       game.onButton = false;
+    });
+    // down.on('pointerdown', () => {
+    //   this.downPressed = true;
+    //   while (this.downPressed) {
+    //     game[type] -= 1;
+    //     button.label.text = type + ':' + game[type];
+    //   }
+    // });
+    down.on('pointerup', () => {
+      down.enterMenuButtonRestState();
+      this.downPressed = false;
     });
     up.setDepth(1);
     down.setDepth(1);

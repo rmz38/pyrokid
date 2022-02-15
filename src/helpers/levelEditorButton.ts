@@ -19,7 +19,6 @@ class LevelEditorButton {
       const reader = new FileReader();
       reader.readAsText(e.target.files[0]);
       reader.onload = function (json) {
-        console.log(JSON.parse(JSON.stringify(json.target.result)));
         localStorage.setItem('leveleditorlevel', JSON.parse(JSON.stringify(json.target.result)));
         game.scene.restart();
       };
