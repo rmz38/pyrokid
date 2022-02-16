@@ -109,6 +109,7 @@ export class GameScene extends Phaser.Scene {
       }
       this.tiles.push(row);
     }
+    console.log(data);
     this.player = new Player(data.player[0].x, data.player[0].y, this);
     this.cameras.main.startFollow(this.player.sprite, false, 0.2, 0.2);
     this.cameras.main.fadeIn(100, 0, 0, 0);
@@ -242,6 +243,7 @@ export class GameScene extends Phaser.Scene {
       const curr = this.crates[key];
       if (curr.sprite.active) {
         const pos = getTile(curr.sprite.x, curr.sprite.y);
+        console.log(curr);
         this.tiles[pos[0]][pos[1]].add(curr);
       }
     });

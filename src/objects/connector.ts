@@ -28,7 +28,7 @@ class Connector {
           pointB: { x: px ? p : (x1 - x2) / 2, y: py ? p : (y1 - y2) / 2 },
           angularStiffness: 1,
           stiffness: 1,
-          // damping: 1,
+          damping: .2,
         }),
       );
     }

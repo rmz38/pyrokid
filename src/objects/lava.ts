@@ -15,6 +15,8 @@ class Lava {
     const lava = game.matter.add.sprite(x, y, 'lava', frame, { label: 'lava' + id });
     lava.setExistingBody(rec);
     lava.setCollisionCategory(0x0100);
+    lava.setBounce(0);
+    lava.setFriction(0.1);
     lava.setPosition(x, y);
     this.sprite = lava;
   }

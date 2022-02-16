@@ -11,6 +11,8 @@ class Steel {
     steel.setCollisionCategory(0x0100);
     steel.setPosition(x, y);
     steel.setBounce(0);
+    steel.setFriction(0.3);
+    steel.setDensity(0.0001);
     this.sprite = steel;
   }
 }

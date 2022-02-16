@@ -10,6 +10,15 @@ function isMonster(s: string) {
 function isTerrain(s: string) {
   return s.includes('crate') || s.includes('steel') || s.includes('lava') || s.includes('dirt');
 }
+function terrainType(s: string) {
+  const section4 = s.substring(0, 4);
+  const id = s.substring(0, s.indexOf('bottom'));
+  if (section4 == 'lava' || s == 'dirt') {
+    return [section4 + 's', id];
+  } else {
+    return [s.substring(0, 5) + 's', id];
+  }
+}
 function isNonBurn(s: string) {
   return s.includes('steel') || s.includes('dirt');
 }
@@ -208,13 +217,12 @@ export const createCollisions = (game: GameScene): void => {
         }
       }
       // fire collision
-      if (a === 'fire' && b.includes('crate')) {
+      if (a === 'fire' && b.includes('crate') && !b.includes('bottom')) {
         igniteCompound(game, game.crates[b].owner, true);
       }
-      if (b === 'fire' && a.includes('crate')) {
+      if (b === 'fire' && a.includes('crate') && !a.includes('bottom')) {
         igniteCompound(game, game.crates[a].owner, true);
       }
-      // update above section to comply with format
       if ((a === 'fire' && b.includes('lava')) || (b === 'fire' && a.includes('lava'))) {
         const lava = a.includes('lava') ? a : b;
         game.lavas[lava].ignite(game, game.tiles, game.xTiles, game.yTiles);
@@ -272,6 +280,11 @@ export const createCollisions = (game: GameScene): void => {
       if (a == 'playerLeft' || b == 'playerLeft') {
         game.player.hittingLeft = false;
       }
+      if (a.includes('bottom') || b.includes('bottom')) {
+        const block = a.includes('bottom') ? a : b;
+        const [type, id] = terrainType(block);
+        game[type][id].owner.setStatic(false);
+      }
     }
   });
   game.matter.world.on('collisionactive', function (event) {
@@ -303,7 +316,7 @@ export const createCollisions = (game: GameScene): void => {
       }
       if (a == 'playerTop' || b == 'playerTop') {
         const otherBody = a !== 'playerTop' ? bodyA : bodyB;
-        if (otherBody.velocity.y >= 0 && game.player.sprite.body.velocity.y == 0) {
+        if (otherBody.velocity.y >= 0 && game.player.touchingGround) {
           game.scene.restart();
         } else {
           game.player.sprite.setVelocityY(0);
@@ -353,6 +366,13 @@ export const createCollisions = (game: GameScene): void => {
         //grab id number
         const id = parseInt(spider.substring(spider.indexOf(',') + 1));
         game.spiders['spider' + id].leftEdge = true;
+      }
+      if (a.includes('bottom') || b.includes('bottom')) {
+        const block = a.includes('bottom') ? a : b;
+        const [type, id] = terrainType(block);
+        console.log(game);
+        console.log(type);
+        game[type][id].owner.setStatic(true);
       }
     }
     // can probably condense the below section or combine lizard and spider object type

@@ -36,6 +36,8 @@ class Lizard {
     lizard.setPosition(x, y);
     lizard.setCollisionCategory(0x001);
     lizard.setCollidesWith(0x0100);
+    lizard.setFriction(0);
+    lizard.setDensity(0.00001);
     this.collisionSensor.setCollisionCategory(0x1000);
     this.collisionSensor.setCollidesWith(0x101000);
     this.collisionSensor.scaleX = 0.7;

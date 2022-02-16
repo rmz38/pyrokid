@@ -10,7 +10,7 @@ class CompoundCrate {
     crates.forEach((e) => {
       // crateBodies.push(e.sprite);
       e.owner = this;
-      test.push(e.sprite.body);
+      // test.push(e.sprite.body);
     });
     // const yOffset = image == 'crate' ? 0.15 : 0;
 

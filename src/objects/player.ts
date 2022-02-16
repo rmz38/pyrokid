@@ -5,8 +5,8 @@ class Player {
   hittingLeft: boolean;
   constructor(x: integer, y: integer, game: any) {
     const rec = game.matter.bodies.rectangle(0, 21, 10, 1, { isSensor: true, label: 'groundSensor' });
-    const recRight = game.matter.bodies.rectangle(16, 0, 15, 27, { isSensor: true, label: 'playerRight' });
-    const recLeft = game.matter.bodies.rectangle(-16, 0, 15, 27, { isSensor: true, label: 'playerLeft' });
+    const recRight = game.matter.bodies.rectangle(16, -2, 15, 25, { isSensor: true, label: 'playerRight' });
+    const recLeft = game.matter.bodies.rectangle(-16, -2, 15, 25, { isSensor: true, label: 'playerLeft' });
     const recTop = game.matter.bodies.rectangle(0, -15, 10, 5, { isSensor: true, label: 'playerTop' });
     const playerBody = game.matter.bodies.rectangle(0, 0, 20, 30, { label: 'player' });
     const compound = game.matter.body.create({

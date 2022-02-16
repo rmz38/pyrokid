@@ -116,7 +116,7 @@ function makeJoint(game: GameScene, ax, ay, bx, by, body1: MatterJS.BodyType, bo
     pointB: { x: bx, y: by },
     angularStiffness: 1,
     stiffness: 1,
-    damping: 1,
+    damping: 0.2,
   });
 }
 export const jointBlocks = (game: GameScene, blocks, data): void => {
