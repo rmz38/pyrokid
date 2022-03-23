@@ -144,9 +144,7 @@ export const jointBlocks = (game: GameScene, blocks, data): void => {
       // for (let p = -24; p < 25; p += 4) {
       //   makeJoint(game, p, -25, p, 25, sprite.body, up.sprite.body);
       // }
-      makeJoint(game, 20, -25, 20, 25, sprite.body, up.sprite.body);
       makeJoint(game, 0, -25, 0, 25, sprite.body, up.sprite.body);
-      makeJoint(game, -20, -25, -20, 25, sprite.body, up.sprite.body);
       track.add(upJId);
     }
     if (sides[3] == 1 && !track.has(rightJId)) {
@@ -154,9 +152,7 @@ export const jointBlocks = (game: GameScene, blocks, data): void => {
       // for (let p = -24; p < 25; p += 4) {
       //   makeJoint(game, 25, p, -25, p, sprite.body, right.sprite.body);
       // }
-      makeJoint(game, 25, 20, -25, 20, sprite.body, right.sprite.body);
       makeJoint(game, 25, 0, -25, 0, sprite.body, right.sprite.body);
-      makeJoint(game, 25, -20, -25, -20, sprite.body, right.sprite.body);
       track.add(rightJId);
     }
     if (sides[5] == 1 && !track.has(downJId)) {
@@ -164,9 +160,7 @@ export const jointBlocks = (game: GameScene, blocks, data): void => {
       // for (let p = -24; p < 25; p += 4) {
       //   makeJoint(game, p, 25, p, -25, sprite.body, down.sprite.body);
       // }
-      makeJoint(game, -20, 25, -20, -25, sprite.body, down.sprite.body);
       makeJoint(game, 0, 25, 0, -25, sprite.body, down.sprite.body);
-      makeJoint(game, 20, 25, 20, -25, sprite.body, down.sprite.body);
       track.add(downJId);
     }
     if (sides[7] == 1 && !track.has(leftJId)) {
@@ -174,9 +168,7 @@ export const jointBlocks = (game: GameScene, blocks, data): void => {
       // for (let p = -24; p < 25; p += 4) {
       //   makeJoint(game, -25, p, 25, p, sprite.body, left.sprite.body);
       // }
-      makeJoint(game, -25, 20, 25, 20, sprite.body, left.sprite.body);
       makeJoint(game, -25, 0, 25, 0, sprite.body, left.sprite.body);
-      makeJoint(game, -25, -20, 25, -20, sprite.body, left.sprite.body);
       track.add(leftJId);
     }
   });
@@ -186,9 +178,17 @@ export const connectorBlocks = (game: GameScene, blocks, data): void => {
     const x = parseInt(e.substring(0, e.indexOf(',')));
     const y = parseInt(e.substring(e.indexOf(',') + 1));
     if (x % 50 == 0) {
-      new Connector(blocks[x - 25 + ',' + y], blocks[x + 25 + ',' + y], game);
+      const leftBlock = blocks[x - 25 + ',' + y];
+      const rightBlock = blocks[x + 25 + ',' + y];
+      new Connector(leftBlock, rightBlock, game);
+      leftBlock.right = rightBlock;
+      rightBlock.left = leftBlock;
     } else {
-      new Connector(blocks[x + ',' + (y - 25)], blocks[x + ',' + (y + 25)], game);
+      const upBlock = blocks[x + ',' + (y - 25)];
+      const downBlock = blocks[x + ',' + (y + 25)];
+      new Connector(upBlock, downBlock, game);
+      downBlock.up = upBlock;
+      upBlock.down = downBlock;
     }
   });
 };

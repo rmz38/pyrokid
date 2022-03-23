@@ -1,6 +1,6 @@
 import Player from '../objects/player';
 import Crate from '../objects/crate';
-import CompoundCrate from '../objects/compound';
+import Compound from '../objects/compound';
 import Lizard from '../objects/lizard';
 import Spider from '../objects/spider';
 import Dirt from '../objects/dirt';
@@ -13,6 +13,7 @@ import { connectorBlocks, initAnims, jointBlocks } from '../helpers/init';
 import { createCollisions } from '../helpers/collision-controller';
 import Connector from '../objects/connector';
 import Bomb from '../objects/bomb';
+import Terrain from '../objects/terrain';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -50,16 +51,16 @@ function clearTiles(game: GameScene) {
     }
   }
 }
-function igniteCompound(game, curr: CompoundCrate) {
+function igniteCompound(game, curr: Compound) {
   if (curr.onFire) {
     return;
   }
   curr.onFire = true;
-  curr.crates.forEach((e) => {
+  curr.blocks.forEach((e: Crate) => {
     igniteCrate(game, e);
   });
   game.time.delayedCall(1000, () => {
-    curr.crates.forEach((e) => {
+    curr.blocks.forEach((e: Crate) => {
       e.destroy(game);
     });
   });
@@ -118,6 +119,53 @@ function igniteCrate(game, currCrate: Crate) {
     igniteNeighbors(game, x, y, currCrate);
   });
 }
+// assumes valid set of blocks given eg only crates or only steel blocks
+function compoundBlocks(game, blocks) {
+  const trackBlocks = new Set<string>();
+  blocks.forEach((e) => {
+    const name = e.x + ',' + e.y;
+    if (!trackBlocks.has(name)) {
+      let curr = [name];
+      let next = [];
+      const toCompound = new Set<Terrain>();
+      while (curr.length != 0) {
+        curr.forEach((i) => {
+          const id = indexes[parseInt(game.blocks[i].sprite.frame.name)];
+          // odd numbers are sides
+          const sides = id.split('');
+          trackBlocks.add(i);
+          toCompound.add(game.blocks[i]);
+          const x = game.blocks[i].sprite.x;
+          const y = game.blocks[i].sprite.y;
+          const up = x + ',' + (y - 50);
+          const right = x + 50 + ',' + y;
+          const down = x + ',' + (y + 50);
+          const left = x - 50 + ',' + y;
+          function compoundCrates(tile, game) {
+            next.push(tile);
+            trackBlocks.add(tile);
+            toCompound.add(game.blocks[tile]);
+          }
+          if (sides[1] == 1 && !trackBlocks.has(up)) {
+            compoundCrates(up, game);
+          }
+          if (sides[3] == 1 && !trackBlocks.has(right)) {
+            compoundCrates(right, game);
+          }
+          if (sides[5] == 1 && !trackBlocks.has(down)) {
+            compoundCrates(down, game);
+          }
+          if (sides[7] == 1 && !trackBlocks.has(left)) {
+            compoundCrates(left, game);
+          }
+        });
+        curr = next;
+        next = [];
+      }
+      new Compound(game, toCompound);
+    }
+  });
+}
 export class GameScene extends Phaser.Scene {
   public speed = 200;
   public lizards: LizardHash = {};
@@ -134,7 +182,7 @@ export class GameScene extends Phaser.Scene {
   public TILE_SIZE: integer = 50;
   public xTiles: integer = 0;
   public yTiles: integer = 0;
-  public burnQueue: Set<CompoundCrate> = new Set<CompoundCrate>();
+  public burnQueue: Set<Compound> = new Set<Compound>();
   public destroyQueue: Set<Crate> = new Set<Crate>();
   public dynamicBlockQueue: Set<Crate | Dirt | Steel> = new Set<Crate>();
 
@@ -233,60 +281,13 @@ export class GameScene extends Phaser.Scene {
       new Exit(e.x, e.y, this);
     });
 
-    // compound the crates
-    const trackCrates = new Set<string>();
     const crateAndLava = data.crate.concat(data.lava);
-    crateAndLava.forEach((e) => {
-      const name = e.x + ',' + e.y;
-      if (!trackCrates.has(name)) {
-        let curr = [name];
-        let next = [];
-        const toCompound = new Set<Crate>();
-        while (curr.length != 0) {
-          curr.forEach((i) => {
-            const id = indexes[parseInt(this.blocks[i].sprite.frame.name)];
-            // odd numbers are sides
-            const sides = id.split('');
-            trackCrates.add(i);
-            toCompound.add(this.blocks[i]);
-            const x = this.blocks[i].sprite.x;
-            const y = this.blocks[i].sprite.y;
-            const up = x + ',' + (y - 50);
-            const right = x + 50 + ',' + y;
-            const down = x + ',' + (y + 50);
-            const left = x - 50 + ',' + y;
-            function compoundCrates(tile, game) {
-              next.push(tile);
-              trackCrates.add(tile);
-              toCompound.add(game.blocks[tile]);
-            }
-            if (sides[1] == 1 && !trackCrates.has(up)) {
-              compoundCrates(up, this);
-            }
-            if (sides[3] == 1 && !trackCrates.has(right)) {
-              compoundCrates(right, this);
-            }
-            if (sides[5] == 1 && !trackCrates.has(down)) {
-              compoundCrates(down, this);
-            }
-            if (sides[7] == 1 && !trackCrates.has(left)) {
-              compoundCrates(left, this);
-            }
-          });
-          curr = next;
-          next = [];
-        }
-        new CompoundCrate(this, toCompound);
-      }
+    compoundBlocks(this, crateAndLava);
+    const steel = data.steel;
+    compoundBlocks(this, steel);
+    data.steel.forEach((e) => {
+      console.log(this.blocks[e.x + ',' + e.y]);
     });
-
-    // const compoundTest = new CompoundCrate(this, crates, 'test1');
-    // for (let i = 0; i < data.lava.length; i++) {
-    //   const e = data.lava[i];
-    //   const temp = new Lava(e.x, e.y, this, e.frame, i);
-    //   this.lavas['lava' + i] = temp;
-    //   this.blocks[e.x + ',' + e.y] = temp;
-    // }
     jointBlocks(this, this.blocks, data);
     createCollisions(this);
     connectorBlocks(this, this.blocks, data);
@@ -339,7 +340,7 @@ export class GameScene extends Phaser.Scene {
       this.player.jump();
     }
 
-    this.burnQueue.forEach((owner: CompoundCrate) => {
+    this.burnQueue.forEach((owner: Compound) => {
       igniteCompound(this, owner);
       this.burnQueue.delete(owner);
     });

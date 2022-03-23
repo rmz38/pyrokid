@@ -1,4 +1,3 @@
-import Crate from './crate';
 import Terrain from './terrain';
 class Compound {
   blocks: Set<Terrain>;
