@@ -1,3 +1,4 @@
+//no longer used?
 function getTile(x: number, y: number) {
   return [Math.floor(x / 50), Math.floor(y / 50)];
 }

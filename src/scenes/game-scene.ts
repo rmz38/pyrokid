@@ -1,9 +1,6 @@
-import { BodyType } from 'matter';
-import { Input, NONE } from 'phaser';
-import { getGameWidth, getGameHeight } from '../helpers';
 import Player from '../objects/player';
 import Crate from '../objects/crate';
-import CompoundCrate from '../objects/compoundCrate';
+import CompoundCrate from '../objects/compound';
 import Lizard from '../objects/lizard';
 import Spider from '../objects/spider';
 import Dirt from '../objects/dirt';
@@ -53,6 +50,74 @@ function clearTiles(game: GameScene) {
     }
   }
 }
+function igniteCompound(game, curr: CompoundCrate) {
+  if (curr.onFire) {
+    return;
+  }
+  curr.onFire = true;
+  curr.crates.forEach((e) => {
+    igniteCrate(game, e);
+  });
+  game.time.delayedCall(1000, () => {
+    curr.crates.forEach((e) => {
+      e.destroy(game);
+    });
+  });
+}
+// function igniteLava(game, currLava: Lava) {
+
+// }
+function igniteNeighbors(game, x, y, currCrate) {
+  const candidates = [
+    [x - 1, y],
+    [x + 1, y],
+    [x, y + 1],
+    [x, y - 1],
+  ];
+  for (let i = 0; i < candidates.length; i++) {
+    const x = candidates[i][0];
+    const y = candidates[i][1];
+    if (x >= 0 && x < game.xTiles && y >= 0 && y < game.yTiles && game.tiles[x][y]) {
+      game.tiles[x][y].forEach((e) => {
+        game.burnQueue.add(e.owner);
+      });
+    }
+  }
+  if (currCrate.isLava) {
+    game.time.delayedCall(1000, () => {
+      const pos = getTile(currCrate.sprite.x, currCrate.sprite.y);
+      const xi = pos[0];
+      const yi = pos[1];
+      igniteNeighbors(game, xi, yi, currCrate);
+    });
+  }
+}
+//TODO: MOVE TO CRATE CLASS OR UTILS
+function igniteCrate(game, currCrate: Crate) {
+  if (currCrate.onFire) {
+    return;
+  }
+  currCrate.onFire = true;
+  currCrate.fireSprite = game.add.sprite(currCrate.sprite.x, currCrate.sprite.y - 10, 'squareFire');
+  currCrate.fireSprite.anims.play('squareFire', false);
+  currCrate.fireSprite.alpha = 0.7;
+  game.time.delayedCall(1000, () => {
+    if (currCrate.fireSprite.active && !currCrate.isLava) {
+      currCrate.fireSprite.alpha = 0;
+    }
+    if (!currCrate.isLava) {
+      const fireDisappear = game.add.sprite(currCrate.sprite.x, currCrate.sprite.y - 10, 'fireDisappear');
+      fireDisappear.anims.play('fireDisappear', false, true);
+      fireDisappear.once('animationcomplete', () => {
+        fireDisappear.alpha = 0;
+      });
+    }
+    const pos = getTile(currCrate.sprite.x, currCrate.sprite.y);
+    const x = pos[0];
+    const y = pos[1];
+    igniteNeighbors(game, x, y, currCrate);
+  });
+}
 export class GameScene extends Phaser.Scene {
   public speed = 200;
   public lizards: LizardHash = {};
@@ -69,6 +134,9 @@ export class GameScene extends Phaser.Scene {
   public TILE_SIZE: integer = 50;
   public xTiles: integer = 0;
   public yTiles: integer = 0;
+  public burnQueue: Set<CompoundCrate> = new Set<CompoundCrate>();
+  public destroyQueue: Set<Crate> = new Set<Crate>();
+  public dynamicBlockQueue: Set<Crate | Dirt | Steel> = new Set<Crate>();
 
   // public compounds = {};
   public level = 'level' + localStorage.getItem('level');
@@ -208,7 +276,7 @@ export class GameScene extends Phaser.Scene {
           curr = next;
           next = [];
         }
-        new CompoundCrate(this, toCompound, 'compound');
+        new CompoundCrate(this, toCompound);
       }
     });
 
@@ -271,6 +339,14 @@ export class GameScene extends Phaser.Scene {
       this.player.jump();
     }
 
+    this.burnQueue.forEach((owner: CompoundCrate) => {
+      igniteCompound(this, owner);
+      this.burnQueue.delete(owner);
+    });
+    this.destroyQueue.forEach((crate: Crate) => {
+      crate.destroy(this);
+      this.destroyQueue.delete(crate);
+    });
     //shooting fire and setting the direction
     if (
       (cursors.right.isDown || cursors.down.isDown || cursors.up.isDown || cursors.left.isDown) &&

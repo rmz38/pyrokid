@@ -1,16 +1,16 @@
 import { GameScene } from '../scenes/game-scene';
-import CompoundCrate from './compoundCrate';
 import Connector from './connector';
+import Terrain from './terrain';
 
-class Crate {
-  sprite: Phaser.Physics.Matter.Sprite;
+class Crate extends Terrain {
+  // sprite: Phaser.Physics.Matter.Sprite;
   onFire: boolean;
   fireSprite: Phaser.GameObjects.Sprite;
-  owner: CompoundCrate;
   connectors: Set<Connector>;
   isLava: boolean;
   // timeIgnite: number;
   constructor(x: integer, y: integer, id: integer, game: Phaser.Scene, frame = 0, isLava: boolean) {
+    super();
     const rec = game.matter.bodies.rectangle(x, y, 50, 50, {
       label: 'crate' + id,
       inertia: Infinity,
@@ -41,7 +41,7 @@ class Crate {
     }
   }
   public destroy(game: GameScene) {
-    if (!this.isLava) {
+    if (!this.isLava && this.sprite.active) {
       this.sprite.destroy();
       this.connectors.forEach((e) => {
         e.destroy(game);

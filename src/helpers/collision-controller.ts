@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import CompoundCrate from '../objects/compoundCrate';
+import CompoundCrate from '../objects/compound';
 import Crate from '../objects/crate';
 import { GameScene } from '../scenes/game-scene';
 const monsterCollisionLabels = new Set<string>(['lizard', 'spider', 'fire', 'exit']);
@@ -15,77 +15,6 @@ function isNonBurn(s: string) {
 }
 function getTile(x: number, y: number) {
   return [Math.floor(x / 50), Math.floor(y / 50)];
-}
-function igniteCompound(game, curr: CompoundCrate, destroyFire) {
-  if (destroyFire) {
-    game.fire.destroy();
-  }
-  if (curr.onFire) {
-    return;
-  }
-  curr.onFire = true;
-  curr.crates.forEach((e) => {
-    igniteCrate(game, e);
-  });
-  game.time.delayedCall(1000, () => {
-    curr.crates.forEach((e) => {
-      e.destroy(game);
-    });
-  });
-}
-// function igniteLava(game, currLava: Lava) {
-
-// }
-function igniteNeighbors(game, x, y, currCrate) {
-  const candidates = [
-    [x - 1, y],
-    [x + 1, y],
-    [x, y + 1],
-    [x, y - 1],
-  ];
-  for (let i = 0; i < candidates.length; i++) {
-    const x = candidates[i][0];
-    const y = candidates[i][1];
-    if (x >= 0 && x < game.xTiles && y >= 0 && y < game.yTiles && game.tiles[x][y]) {
-      game.tiles[x][y].forEach((e) => {
-        igniteCompound(game, e.owner, false);
-      });
-    }
-  }
-  if (currCrate.isLava) {
-    game.time.delayedCall(1000, () => {
-      const pos = getTile(currCrate.sprite.x, currCrate.sprite.y);
-      const xi = pos[0];
-      const yi = pos[1];
-      igniteNeighbors(game, xi, yi, currCrate);
-    });
-  }
-}
-//TODO: MOVE TO CRATE CLASS OR UTILS
-function igniteCrate(game, currCrate: Crate) {
-  if (currCrate.onFire) {
-    return;
-  }
-  currCrate.onFire = true;
-  currCrate.fireSprite = game.add.sprite(currCrate.sprite.x, currCrate.sprite.y - 10, 'squareFire');
-  currCrate.fireSprite.anims.play('squareFire', false);
-  currCrate.fireSprite.alpha = 0.7;
-  game.time.delayedCall(1000, () => {
-    if (currCrate.fireSprite.active && !currCrate.isLava) {
-      currCrate.fireSprite.alpha = 0;
-    }
-    if (!currCrate.isLava) {
-      const fireDisappear = game.add.sprite(currCrate.sprite.x, currCrate.sprite.y - 10, 'fireDisappear');
-      fireDisappear.anims.play('fireDisappear', false, true);
-      fireDisappear.once('animationcomplete', () => {
-        fireDisappear.alpha = 0;
-      });
-    }
-    const pos = getTile(currCrate.sprite.x, currCrate.sprite.y);
-    const x = pos[0];
-    const y = pos[1];
-    igniteNeighbors(game, x, y, currCrate);
-  });
 }
 export const createCollisions = (game: GameScene): void => {
   game.matter.world.on('collisionstart', function (event) {
@@ -115,7 +44,7 @@ export const createCollisions = (game: GameScene): void => {
         game.fire.destroy();
         game.fireActive = false;
       }
-      if ((a == 'fire' && isNonBurn(b)) || (b == 'fire' && isNonBurn(a))) {
+      if ((a == 'fire' && isTerrain(b)) || (b == 'fire' && isTerrain(a))) {
         game.fire.destroy();
         game.fireActive = false;
       }
@@ -177,7 +106,7 @@ export const createCollisions = (game: GameScene): void => {
         const crate = a.includes('crate') ? a : b;
         const lizard = a.includes('crate') ? b : a;
         if (game.lizards[lizard].onFire) {
-          igniteCompound(game, game.crates[crate].owner, false);
+          game.burnQueue.add(game.crates[crate].owner);
         }
         if (game.crates[crate].onFire) {
           game.lizards[lizard].ignite(game);
@@ -209,16 +138,19 @@ export const createCollisions = (game: GameScene): void => {
       }
       // fire collision
       if (a === 'fire' && b.includes('crate')) {
-        igniteCompound(game, game.crates[b].owner, true);
+        game.fire.destroy();
+        game.fireActive = false;
+        game.burnQueue.add(game.crates[b].owner);
       }
       if (b === 'fire' && a.includes('crate')) {
-        igniteCompound(game, game.crates[a].owner, true);
+        game.burnQueue.add(game.crates[a].owner);
       }
       // update above section to comply with format
       if ((a === 'fire' && b.includes('lava')) || (b === 'fire' && a.includes('lava'))) {
         const lava = a.includes('lava') ? a : b;
         game.lavas[lava].ignite(game, game.tiles, game.xTiles, game.yTiles);
         game.fire.destroy();
+        game.fireActive = false;
       }
       if ((b.includes('spider') && a.includes('lizard')) || a.includes('spider' && b.includes('lizard)'))) {
         const spider = b.includes('spider') ? b : a;
