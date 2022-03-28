@@ -71,18 +71,19 @@ export class GameScene extends Phaser.Scene {
     background.setDepth(-10);
     this.matter.world.setBounds(0, 0, world_bound_width, world_bound_height, 32, true, true, false, true);
     this.cameras.main.setBounds(0, 0, world_bound_width, world_bound_height).setName('main');
-    this.xTiles = Math.floor(world_bound_width / this.TILE_SIZE);
-    this.yTiles = Math.floor(world_bound_height / this.TILE_SIZE);
+    this.xTiles = data.height;
+    this.yTiles = data.width;
     this.fire = null;
     this.fireActive = false;
     this.fireCooldown = false;
-    for (let i = 0; i < this.xTiles; i++) {
+    for (let i = 0; i < this.yTiles; i++) {
       const row = [];
-      for (let j = 0; j < this.yTiles; j++) {
+      for (let j = 0; j < this.xTiles; j++) {
         row.push(new Set());
       }
       this.tiles.push(row);
     }
+    console.log(this.tiles);
     this.player = new Player(data.player[0].x, data.player[0].y, this);
     this.cameras.main.startFollow(this.player.sprite, false, 0.2, 0.2);
     this.cameras.main.fadeIn(100, 0, 0, 0);
@@ -172,19 +173,12 @@ export class GameScene extends Phaser.Scene {
     Object.keys(this.crates).forEach((key) => {
       const curr = this.crates[key];
       if (curr.sprite.active) {
+        //TODO optimize later
         const pos = Helpers.getTile(curr.sprite.x, curr.sprite.y);
         this.tiles[pos[0]][pos[1]].add(curr);
       }
     });
 
-    // add lavas to tiles
-    // Object.keys(this.lavas).forEach((key) => {
-    //   const curr = this.lavas[key];
-    //   if (curr.sprite.active) {
-    //     const pos = Helpers.getTile(curr.sprite.x, curr.sprite.y);
-    //     this.tiles[pos[0]][pos[1]].add(curr);
-    //   }
-    // });
     for (const [key, lizard] of Object.entries(this.lizards)) {
       lizard.update();
     }
@@ -202,6 +196,8 @@ export class GameScene extends Phaser.Scene {
       this.player.jump();
     }
     Helpers.updateStatic(this);
+
+    // process crates to be burned and make above blocks dynamic when destroyed
     this.burnQueue.forEach((owner: Compound) => {
       Helpers.igniteCompound(this, owner);
       this.burnQueue.delete(owner);
@@ -221,7 +217,7 @@ export class GameScene extends Phaser.Scene {
         isSensor: true,
         label: 'fire',
       });
-      let direction = 'right';
+      let direction: 'right' | 'left' | 'none' = 'right';
       this.fire.setCollisionCategory(0x0100);
       if (cursors.left.isDown) {
         this.fire.setRotation(Math.PI);
@@ -235,8 +231,6 @@ export class GameScene extends Phaser.Scene {
         this.fire.setRotation((3 * Math.PI) / 2);
         direction = 'none';
       }
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
       this.player.shoot(direction);
       this.fire.anims.play('fireball', true);
       this.fire.setIgnoreGravity(true);

@@ -193,26 +193,20 @@ export function updateStatic(game: GameScene) {
   const toAddToMap = {};
   const nextQueue = new Set<string>();
   game.dynamicBlockQueue.forEach((blockPos: string) => {
+    //ACTUALLY JUST ADD THE BLOCK ITSELF CAUSE STRING AINT WORKING
     const block: Terrain = game.blocks[blockPos];
-    console.log(blockPos);
-    console.log(game.blocks);
+    //console.log(blockPos);
+    //console.log(game.blocks);
     const [dx, dy] = getDiffFromTileCenter(block.sprite.x, block.sprite.y);
-    //const [tx, ty] = getTile(block.sprite.x, block.sprite.y);
     const [px, py] = getTileCenter(block.sprite.x, block.sprite.y);
     const downId = px + ',' + (py + 50);
-    //console.log('downid ' + downId);
-    //console.log(game.dynamicBlockQueue);
-    // console.log(game.blocks);
     if (dy < 5 && game.blocks[downId] && game.blocks[downId].sprite.isStatic()) {
       block.owner.setAllGrounded();
-      //game.dynamicBlockQueue.delete(blockPos);
       toDeleteInMap.add(blockPos);
       toAddToMap[px + ',' + py] = block;
-      // LEFT OFF HERE
     } else if (!block.sprite.isStatic()) {
       toDeleteInMap.add(blockPos);
       toAddToMap[px + ',' + py] = block;
-      //game.dynamicBlockQueue.delete(blockPos);
       nextQueue.add(px + ',' + py);
     }
   });
@@ -223,4 +217,7 @@ export function updateStatic(game: GameScene) {
     game.blocks[key] = value;
   }
   game.dynamicBlockQueue = nextQueue;
+  //ultimate test, single crates and lots of clumped up crates
 }
+
+export function updateDyanmic(game: GameScene) {}
