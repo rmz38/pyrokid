@@ -14,5 +14,10 @@ class Compound {
     });
     this.onFire = false;
   }
+  public setAllGrounded() {
+    this.blocks.forEach((block) => {
+      block.setGrounded();
+    });
+  }
 }
 export default Compound;

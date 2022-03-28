@@ -1,3 +1,4 @@
+import { getTileCenter } from '../helpers';
 import Compound from './compound';
 
 class Terrain {
@@ -8,5 +9,13 @@ class Terrain {
   left: Terrain;
   right: Terrain;
   owner: Compound;
+  public setGrounded(): void {
+    if (this.sprite.active) {
+      this.sprite.setStatic(true);
+      const [px, py] = getTileCenter(this.sprite.x, this.sprite.y);
+      this.sprite.setPosition(px, py);
+      this.sprite.setTint(0xff0000);
+    }
+  }
 }
 export default Terrain;
