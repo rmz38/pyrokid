@@ -38,7 +38,7 @@ export class GameScene extends Phaser.Scene {
   public yTiles: integer = 0;
   public burnQueue: Set<Compound> = new Set<Compound>();
   public destroyQueue: Set<Crate> = new Set<Crate>();
-  public dynamicBlockQueue: Set<string> = new Set<string>();
+  public dynamicBlockQueue: Set<Terrain> = new Set<Terrain>();
   public mover;
 
   // public compounds = {};

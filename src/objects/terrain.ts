@@ -14,7 +14,8 @@ class Terrain {
       this.sprite.setStatic(true);
       const [px, py] = getTileCenter(this.sprite.x, this.sprite.y);
       this.sprite.setPosition(px, py);
-      this.sprite.setTint(0xff0000);
+      //to debug
+      // this.sprite.setTint(0xff0000);
     }
   }
 }

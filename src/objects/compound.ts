@@ -1,3 +1,4 @@
+import { GameScene } from '../scenes/game-scene';
 import Terrain from './terrain';
 class Compound {
   blocks: Set<Terrain>;
@@ -15,6 +16,11 @@ class Compound {
     this.onFire = false;
   }
   public setAllGrounded() {
+    this.blocks.forEach((block) => {
+      block.setGrounded();
+    });
+  }
+  public setAboveDynamic(game: GameScene) {
     this.blocks.forEach((block) => {
       block.setGrounded();
     });

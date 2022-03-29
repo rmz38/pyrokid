@@ -177,41 +177,50 @@ function unpack(coord: string): Array<integer> {
   const j = parseInt(coord.substring(split + 1));
   return [i, j];
 }
+
+//CALL AFTER ALL COMPOUNDING IS DONE SINCE GAME.BLOCKS IS USED THERE TOO
 export function initDynamicAndStaticQueues(game: GameScene) {
   game.dynamicBlockQueue.clear();
   for (const [pos, block] of Object.entries(game.blocks)) {
     //const [x, y] = unpack(pos);
     if (!(block as Terrain).sprite.isStatic()) {
-      game.dynamicBlockQueue.add(pos);
+      game.dynamicBlockQueue.add(block as Terrain);
+      delete game.blocks[pos];
     }
   }
 }
 export function updateStatic(game: GameScene) {
   //HAVE TO MAKE COPY OF BLOCK MAP OR ELSE OLD POSITION GETS ERASED BY NEW THINGS?
   //OTHER BLOCKS CONFLICT ATM
-  const toDeleteInMap = new Set<string>();
+  const toDeleteInMap = new Set<Terrain>();
   const toAddToMap = {};
-  const nextQueue = new Set<string>();
-  game.dynamicBlockQueue.forEach((blockPos: string) => {
+  const nextQueue = new Set<Terrain>();
+  game.dynamicBlockQueue.forEach((block: Terrain) => {
     //ACTUALLY JUST ADD THE BLOCK ITSELF CAUSE STRING AINT WORKING
-    const block: Terrain = game.blocks[blockPos];
+    //HAVE BLOCKPOS ONLY CONTAIN BLOCKS THAT ARE STATIC
+    //MAKE BLOCKS HOMELESS LELELELEL
     //console.log(blockPos);
     //console.log(game.blocks);
     const [dx, dy] = getDiffFromTileCenter(block.sprite.x, block.sprite.y);
     const [px, py] = getTileCenter(block.sprite.x, block.sprite.y);
     const downId = px + ',' + (py + 50);
-    if (dy < 5 && game.blocks[downId] && game.blocks[downId].sprite.isStatic()) {
-      block.owner.setAllGrounded();
-      toDeleteInMap.add(blockPos);
-      toAddToMap[px + ',' + py] = block;
-    } else if (!block.sprite.isStatic()) {
-      toDeleteInMap.add(blockPos);
-      toAddToMap[px + ',' + py] = block;
-      nextQueue.add(px + ',' + py);
+    console.log(game.blocks);
+    if (block.sprite.active) {
+      if (block.sprite.body.velocity.y > 3) {
+        block.sprite.body.velocity.y = 3;
+      }
+      if (dy < 5 && game.blocks[downId] && game.blocks[downId].sprite.isStatic()) {
+        block.owner.setAllGrounded();
+        // toDeleteInMap.add(block);
+        toAddToMap[px + ',' + py] = block;
+      } else if (!block.sprite.isStatic()) {
+        // toDeleteInMap.add(block);
+        // toAddToMap[px + ',' + py] = block;
+        nextQueue.add(block);
+      } else if (block.sprite.isStatic()) {
+        toAddToMap[px + ',' + py] = block;
+      }
     }
-  });
-  toDeleteInMap.forEach((blockPos) => {
-    delete game.blocks[blockPos];
   });
   for (const [key, value] of Object.entries(toAddToMap)) {
     game.blocks[key] = value;

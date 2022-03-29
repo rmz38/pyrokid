@@ -44,7 +44,6 @@ export class LevelEditor extends Phaser.Scene {
     preset = preset.width == null ? JSON.parse(preset) : preset;
     this.width = preset.width;
     this.height = preset.height;
-    console.log(preset.width);
     const world_bound_width = this.width * 50;
     const world_bound_height = this.height * 50;
     const background = this.add.tileSprite(
