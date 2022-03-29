@@ -73,6 +73,7 @@ export function igniteCompound(game, curr: Compound) {
 // function igniteLava(game, currLava: Lava) {
 
 // }
+// TODO ADD ABOVE BLOCKS TO DYNAMIC QUEUE WHEN CONNECTED CRATE IS DESTROYED
 export function igniteNeighbors(game, x, y, currCrate) {
   const candidates = [
     [x - 1, y],
@@ -206,16 +207,14 @@ export function updateStatic(game: GameScene) {
     const downId = px + ',' + (py + 50);
     console.log(game.blocks);
     if (block.sprite.active) {
-      if (block.sprite.body.velocity.y > 3) {
-        block.sprite.body.velocity.y = 3;
-      }
-      if (dy < 5 && game.blocks[downId] && game.blocks[downId].sprite.isStatic()) {
+      if (dy < 17 && game.blocks[downId] && game.blocks[downId].sprite.isStatic()) {
         block.owner.setAllGrounded();
         // toDeleteInMap.add(block);
         toAddToMap[px + ',' + py] = block;
       } else if (!block.sprite.isStatic()) {
         // toDeleteInMap.add(block);
         // toAddToMap[px + ',' + py] = block;
+        if (block.sprite.body.velocity.y > 12) block.sprite.setVelocityY(12);
         nextQueue.add(block);
       } else if (block.sprite.isStatic()) {
         toAddToMap[px + ',' + py] = block;
