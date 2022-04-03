@@ -9,6 +9,7 @@ class Dirt extends Terrain {
     sprite.setBounce(0);
     sprite.setFriction(1);
     sprite.setFrictionStatic(1);
+    sprite.setName('dirt');
     this.sprite = sprite;
   }
 }

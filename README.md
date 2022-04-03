@@ -10,3 +10,5 @@ Running `yarn dev` runs the game in development mode, which produces larger bund
 
 TODO:
 kill player and other objects that fall down holes and hit world bounds.
+
+Credits to Sh'yee Meng and Lucien Eckert for creating animations!

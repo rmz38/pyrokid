@@ -10,6 +10,8 @@ import Spider from './objects/spider';
 import Terrain from './objects/terrain';
 import { GameScene } from './scenes/game-scene';
 
+// lots of these functions are really for helping with block movement or burning
+
 export const getGameWidth = (scene: Phaser.Scene): number => {
   return scene.game.scale.width;
 };
@@ -44,7 +46,11 @@ export function getDiffFromTileCenter(x: number, y: number) {
   const [i, j] = getTile(x, y);
   return [Math.abs(i * 50 + 25 - x), Math.abs(j * 50 + 25 - y)];
 }
-//center of tile in pixels, to set crate position
+export function blockId(block: Terrain) {
+  const [i, j] = getTileCenter(block.sprite.x, block.sprite.y);
+  return i + ',' + j;
+}
+//center of tile in pixels, to set crate position, takes in pixel position
 export function getTileCenter(x: number, y: number) {
   const [i, j] = getTile(x, y);
   return [i * 50 + 25, j * 50 + 25];
@@ -63,11 +69,6 @@ export function igniteCompound(game, curr: Compound) {
   curr.onFire = true;
   curr.blocks.forEach((e: Crate) => {
     igniteCrate(game, e);
-  });
-  game.time.delayedCall(1000, () => {
-    curr.blocks.forEach((e: Crate) => {
-      e.destroy(game);
-    });
   });
 }
 // function igniteLava(game, currLava: Lava) {
@@ -99,6 +100,41 @@ export function igniteNeighbors(game, x, y, currCrate) {
     });
   }
 }
+// export function updateDynamic(game: GameScene) {
+//   //TODO: FIX THIS CRAP AND MAKE SURE BLOCKS ABOVE A DESTROYED BLOCK WILL BE CHECKED IF ALSO BURNING OR NOT, PLUS CORRECTLY SET STATIC OR NOT
+//   const nextQueue: Array<Terrain> = [];
+//   game.staticBlockQueue.forEach((block: Terrain) => {
+//     let cont = true;
+//     let counter = 0;
+//     while (cont) {
+//       //the above block
+//       const [px, py] = getTileCenter(block.sprite.x, block.sprite.y - counter * 50);
+//       const aboveBlock = game.blocks[px + ',' + py];
+//       if (
+//         aboveBlock &&
+//         aboveBlock.sprite.active &&
+//         aboveBlock.name != 'dirt' &&
+//         !checkBlockGrounded(game, aboveBlock)
+//       ) {
+//         //add all blocks to dynamicqueue until u hit a dirt?
+//         //TODO make queue to set dynamic in order to sync
+//         game.staticBlockQueue.push(aboveBlock);
+//       } else {
+//         // if a block is supported by something else
+//         //TODO still need to consider connectors, only using compounds rn
+//         cont = false;
+//       }
+//       counter += 1;
+//     }
+
+//     block.sprite.setStatic(false);
+//     block.sprite.tint = 0xffffff;
+//     game.dynamicBlockQueue.add(block);
+//     //remove block from static blocks map
+//     const [px, py] = getTileCenter(block.sprite.x, block.sprite.y);
+//     delete game.blocks[px + ',' + py];
+//   });
+// }
 //TODO: MOVE TO CRATE CLASS OR UTILS
 export function igniteCrate(game, currCrate: Crate) {
   if (currCrate.onFire) {
@@ -109,19 +145,55 @@ export function igniteCrate(game, currCrate: Crate) {
   currCrate.fireSprite.anims.play('squareFire', false);
   currCrate.fireSprite.alpha = 0.7;
   game.time.delayedCall(1000, () => {
+    // TODO: move this fire stuff to the crate class
     if (currCrate.fireSprite.active && !currCrate.isLava) {
       currCrate.fireSprite.alpha = 0;
     }
+    const pos = getTile(currCrate.sprite.x, currCrate.sprite.y);
+    const x = pos[0];
+    const y = pos[1];
     if (!currCrate.isLava) {
       const fireDisappear = game.add.sprite(currCrate.sprite.x, currCrate.sprite.y - 10, 'fireDisappear');
       fireDisappear.anims.play('fireDisappear', false, true);
       fireDisappear.once('animationcomplete', () => {
         fireDisappear.alpha = 0;
       });
+      //remove destroyed crate
+      delete game.blocks[blockId(currCrate)];
+      ///////////////////////////////
+      let cont = true;
+      let counter = 1;
+      while (cont) {
+        //the above block
+        const [px, py] = getTileCenter(currCrate.sprite.x, currCrate.sprite.y - counter * 50);
+        const aboveBlock = game.blocks[px + ',' + py];
+        if (
+          aboveBlock &&
+          aboveBlock.sprite.active &&
+          aboveBlock.name != 'dirt' &&
+          !checkBlockGrounded(game, aboveBlock)
+        ) {
+          //add all blocks to dynamicqueue until u hit a dirt?
+          //TODO make queue to set dynamic in order to sync?
+          // game.staticBlockQueue.add(aboveBlock);
+          aboveBlock.owner.blocks.forEach((block: Terrain) => {
+            const [bx, by] = getTileCenter(block.sprite.x, block.sprite.y);
+            //remove block from static blocks map
+            delete game.blocks[bx + ',' + by];
+            block.sprite.setStatic(false);
+            block.sprite.tint = 0xffffff;
+            game.dynamicBlockQueue.add(block);
+          });
+        } else {
+          // if a block is supported by something else
+          //TODO still need to consider connectors, only using compounds rn
+          cont = false;
+        }
+        counter += 1;
+      }
+      ////////////////////////////////
+      game.destroyQueue.add(currCrate);
     }
-    const pos = getTile(currCrate.sprite.x, currCrate.sprite.y);
-    const x = pos[0];
-    const y = pos[1];
     igniteNeighbors(game, x, y, currCrate);
   });
 }
@@ -199,21 +271,22 @@ export function updateStatic(game: GameScene) {
   game.dynamicBlockQueue.forEach((block: Terrain) => {
     //ACTUALLY JUST ADD THE BLOCK ITSELF CAUSE STRING AINT WORKING
     //HAVE BLOCKPOS ONLY CONTAIN BLOCKS THAT ARE STATIC
-    //MAKE BLOCKS HOMELESS LELELELEL
-    //console.log(blockPos);
-    //console.log(game.blocks);
     const [dx, dy] = getDiffFromTileCenter(block.sprite.x, block.sprite.y);
     const [px, py] = getTileCenter(block.sprite.x, block.sprite.y);
     const downId = px + ',' + (py + 50);
-    console.log(game.blocks);
+    // console.log(game.blocks);
     if (block.sprite.active) {
-      if (dy < 17 && game.blocks[downId] && game.blocks[downId].sprite.isStatic()) {
+      //TODO MAYBE CHECK IF IN MAP ALREADY, add both curr and already in map block back into the queue to guarantee no bugs if slot is already occupied
+      if (
+        dy < 17 &&
+        game.blocks[downId] &&
+        game.blocks[downId].sprite.active &&
+        game.blocks[downId].sprite.isStatic()
+      ) {
         block.owner.setAllGrounded();
-        // toDeleteInMap.add(block);
+        //TODO add all blocks in compound instead of just this, to enforce precondition of all blocks being dynamic in queue
         toAddToMap[px + ',' + py] = block;
       } else if (!block.sprite.isStatic()) {
-        // toDeleteInMap.add(block);
-        // toAddToMap[px + ',' + py] = block;
         if (block.sprite.body.velocity.y > 12) block.sprite.setVelocityY(12);
         nextQueue.add(block);
       } else if (block.sprite.isStatic()) {
@@ -227,5 +300,27 @@ export function updateStatic(game: GameScene) {
   game.dynamicBlockQueue = nextQueue;
   //ultimate test, single crates and lots of clumped up crates
 }
+// check if to make block non static in case blocks are destroyed
+function checkBlockGrounded(game: GameScene, block: Terrain): boolean {
+  //const [dx, dy] = getDiffFromTileCenter(block.sprite.x, block.sprite.y);
+  const [px, py] = getTileCenter(block.sprite.x, block.sprite.y);
+  const downId = px + ',' + (py + 50);
+  if (block.sprite.active) {
+    if (game.blocks[downId] && game.blocks[downId].sprite.isStatic()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
 
-export function updateDyanmic(game: GameScene) {}
+function checkOwnerGrounded(game: GameScene, owner: Compound): boolean {
+  let result = false;
+  owner.blocks.forEach((block: Terrain) => {
+    //if any blocks are grounded in a compound, the whole compound is grounded
+    if (checkBlockGrounded(game, block)) {
+      result = true;
+    }
+  });
+  return result;
+}

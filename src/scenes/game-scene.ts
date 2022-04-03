@@ -39,7 +39,8 @@ export class GameScene extends Phaser.Scene {
   public burnQueue: Set<Compound> = new Set<Compound>();
   public destroyQueue: Set<Crate> = new Set<Crate>();
   public dynamicBlockQueue: Set<Terrain> = new Set<Terrain>();
-  public mover;
+  // static block queue must preserve order due to checking lower blocks before higher blocks
+  public staticBlockQueue: Array<Terrain> = new Array<Terrain>();
 
   // public compounds = {};
   public level = 'level' + localStorage.getItem('level');
@@ -53,6 +54,8 @@ export class GameScene extends Phaser.Scene {
     //this.mover = this.matter.add.sprite(300, 500, 'lizard');
     this.burnQueue.clear();
     this.destroyQueue.clear();
+    this.dynamicBlockQueue.clear();
+    this.staticBlockQueue = [];
     initAnims(this);
     const data =
       localStorage.getItem('useleveleditor') == 'true'
@@ -151,6 +154,7 @@ export class GameScene extends Phaser.Scene {
     createCollisions(this);
     connectorBlocks(this, this.blocks, data);
     Helpers.initDynamicAndStaticQueues(this);
+    // Helpers.updateDynamic(this);
     Helpers.updateStatic(this);
     cursors = this.input.keyboard.createCursorKeys();
 
@@ -174,8 +178,9 @@ export class GameScene extends Phaser.Scene {
       const curr = this.crates[key];
       if (curr.sprite.active) {
         //TODO optimize later
-        const pos = Helpers.getTile(curr.sprite.x, curr.sprite.y);
-        this.tiles[pos[0]][pos[1]].add(curr);
+        const [x, y] = Helpers.getTile(curr.sprite.x, curr.sprite.y);
+        console.log(curr);
+        this.tiles[x][y].add(curr);
       }
     });
 
@@ -195,6 +200,7 @@ export class GameScene extends Phaser.Scene {
     if (wasdr.W.isDown && this.player.touchingGround) {
       this.player.jump();
     }
+    // Helpers.updateDynamic(this);
     Helpers.updateStatic(this);
 
     // process crates to be burned and make above blocks dynamic when destroyed
@@ -203,8 +209,12 @@ export class GameScene extends Phaser.Scene {
       this.burnQueue.delete(owner);
     });
     this.destroyQueue.forEach((crate: Crate) => {
-      crate.destroy(this);
+      const id = Helpers.blockId(crate);
+      if (this.blocks[id] == crate) {
+        delete this.blocks[id];
+      }
       this.destroyQueue.delete(crate);
+      crate.destroy(this);
     });
     //shooting fire and setting the direction
     if (
