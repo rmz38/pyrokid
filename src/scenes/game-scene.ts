@@ -73,6 +73,7 @@ export class GameScene extends Phaser.Scene {
     // background.setScale(world_bound_width / background.width);
     background.setDepth(-10);
     this.matter.world.setBounds(0, 0, world_bound_width, world_bound_height, 32, true, true, false, true);
+    this.matter.world.updateWall(false, 'bottom');
     this.cameras.main.setBounds(0, 0, world_bound_width, world_bound_height).setName('main');
     this.xTiles = data.height;
     this.yTiles = data.width;
@@ -86,7 +87,6 @@ export class GameScene extends Phaser.Scene {
       }
       this.tiles.push(row);
     }
-    console.log(this.tiles);
     this.player = new Player(data.player[0].x, data.player[0].y, this);
     this.cameras.main.startFollow(this.player.sprite, false, 0.2, 0.2);
     this.cameras.main.fadeIn(100, 0, 0, 0);
@@ -147,9 +147,6 @@ export class GameScene extends Phaser.Scene {
     Helpers.compoundBlocks(this, crateAndLava);
     const steel = data.steel;
     Helpers.compoundBlocks(this, steel);
-    data.steel.forEach((e) => {
-      console.log(this.blocks[e.x + ',' + e.y]);
-    });
     jointBlocks(this, this.blocks, data);
     createCollisions(this);
     connectorBlocks(this, this.blocks, data);
@@ -179,8 +176,13 @@ export class GameScene extends Phaser.Scene {
       if (curr.sprite.active) {
         //TODO optimize later
         const [x, y] = Helpers.getTile(curr.sprite.x, curr.sprite.y);
-        console.log(curr);
-        this.tiles[x][y].add(curr);
+        //TODO CHECK IF IN BOUNDS OF WORLD
+        if (y > 0 && y < this.xTiles) {
+          this.tiles[x][y].add(curr);
+        } else {
+          this.destroyQueue.add(curr);
+          this.dynamicBlockQueue.delete(curr);
+        }
       }
     });
 
@@ -200,9 +202,8 @@ export class GameScene extends Phaser.Scene {
     if (wasdr.W.isDown && this.player.touchingGround) {
       this.player.jump();
     }
-    // Helpers.updateDynamic(this);
+    Helpers.updateDynamic(this);
     Helpers.updateStatic(this);
-
     // process crates to be burned and make above blocks dynamic when destroyed
     this.burnQueue.forEach((owner: Compound) => {
       Helpers.igniteCompound(this, owner);
