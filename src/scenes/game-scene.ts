@@ -40,7 +40,7 @@ export class GameScene extends Phaser.Scene {
   public destroyQueue: Set<Crate> = new Set<Crate>();
   public dynamicBlockQueue: Set<Terrain> = new Set<Terrain>();
   // static block queue must preserve order due to checking lower blocks before higher blocks
-  public staticBlockQueue: Array<Terrain> = new Array<Terrain>();
+  public staticBlockQueue: Set<Terrain> = new Set<Terrain>();
 
   // public compounds = {};
   public level = 'level' + localStorage.getItem('level');
@@ -55,7 +55,7 @@ export class GameScene extends Phaser.Scene {
     this.burnQueue.clear();
     this.destroyQueue.clear();
     this.dynamicBlockQueue.clear();
-    this.staticBlockQueue = [];
+    this.staticBlockQueue.clear();
     initAnims(this);
     const data =
       localStorage.getItem('useleveleditor') == 'true'
@@ -211,6 +211,7 @@ export class GameScene extends Phaser.Scene {
     });
     this.destroyQueue.forEach((crate: Crate) => {
       const id = Helpers.blockId(crate);
+      console.log('gameadfasdf ' + this.blocks[id]);
       if (this.blocks[id] == crate) {
         delete this.blocks[id];
       }
