@@ -226,6 +226,7 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
                 !checkOwnerGrounded(game, aboveBlock)
               ) {
                 //SEEMS TO HAVE ISSUE WITH COMPOUNDS BURNING, compounds get destroyed? Issues with vertical compounds which might mean double checking
+
                 aboveBlock.owner.blocks.forEach((block: Terrain) => {
                   if (!seen.has(block)) {
                     next.add(block);
@@ -233,6 +234,11 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
                     game.staticBlockQueue.add(block);
                   }
                 });
+
+                // next.add(aboveBlock);
+                // seen.add(aboveBlock);
+                // game.staticBlockQueue.add(aboveBlock);
+
                 //CHANGE TO SET SINCE LIST NOT CASH MONEY, REVISE THIS GARBAGE
                 // game.staticBlockQueue.add(aboveBlock);
               }
