@@ -17,6 +17,7 @@ class Lava {
     lava.setExistingBody(rec);
     lava.setCollisionCategory(0x0100);
     lava.setPosition(x, y);
+    lava.setName('lava' + id);
     this.sprite = lava;
   }
   public ignite(game, tiles, xTiles, yTiles) {

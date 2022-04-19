@@ -109,8 +109,11 @@ export class GameScene extends Phaser.Scene {
     });
     this.blocks = {};
     // make steels
+    let steelcounter = 0;
     data.steel.forEach((e) => {
       this.blocks[e.x + ',' + e.y] = new Steel(e.x, e.y, this, e.frame);
+      this.blocks[e.x + ',' + e.y].sprite.setName('steeltemp' + steelcounter);
+      steelcounter += 1;
     });
     // make dirts
     data.dirt.forEach((e) => {
@@ -211,11 +214,12 @@ export class GameScene extends Phaser.Scene {
     });
     this.destroyQueue.forEach((crate: Crate) => {
       const id = Helpers.blockId(crate);
-      console.log('gameadfasdf ' + this.blocks[id]);
       if (this.blocks[id] == crate) {
         delete this.blocks[id];
       }
       this.destroyQueue.delete(crate);
+      this.dynamicBlockQueue.delete(crate);
+      this.staticBlockQueue.delete(crate);
       crate.destroy(this);
     });
     //shooting fire and setting the direction

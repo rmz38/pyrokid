@@ -203,12 +203,12 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
         ///////////////////////////////
         let curr = new Set<Terrain>();
         let next = new Set<Terrain>();
-        const seen = new Set<Terrain>();
-        // const tempQueue = new Set<Terrain>();
+        const seen = new Set<string>();
+        const tempQueue = new Set<Terrain>();
         // const [px, py] = getTileCenter(currCrate.sprite.x, currCrate.sprite.y - 50);
         // const aboveBlock = game.blocks[px + ',' + py];
         next.add(currCrate);
-        seen.add(currCrate);
+        seen.add(currCrate.sprite.name);
         while (next.size > 0) {
           curr = next;
           next = new Set<Terrain>();
@@ -216,21 +216,21 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
             //the above block
             if (currBlock && currBlock.sprite.active) {
               const [px, py] = getTileCenter(currBlock.sprite.x, currBlock.sprite.y - 50);
-              const aboveBlock = game.blocks[px + ',' + py];
+              const aboveBlock: Terrain = game.blocks[px + ',' + py];
               if (
                 aboveBlock &&
-                !seen.has(aboveBlock) &&
+                !seen.has(aboveBlock.sprite.name) &&
                 aboveBlock.sprite.active &&
-                aboveBlock.name != 'dirt' &&
+                aboveBlock.sprite.name != 'dirt' &&
                 !currBlock.owner.blocks.has(aboveBlock) &&
-                !checkOwnerGrounded(game, aboveBlock)
+                !checkOwnerGrounded(game, aboveBlock, tempQueue)
               ) {
                 //SEEMS TO HAVE ISSUE WITH COMPOUNDS BURNING, compounds get destroyed? Issues with vertical compounds which might mean double checking
 
                 aboveBlock.owner.blocks.forEach((block: Terrain) => {
-                  if (!seen.has(block)) {
+                  if (!seen.has(block.sprite.name)) {
                     next.add(block);
-                    seen.add(block);
+                    seen.add(block.sprite.name);
                     game.staticBlockQueue.add(block);
                   }
                 });
@@ -245,6 +245,7 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
             }
           });
         }
+        tempQueue.forEach((elem: Terrain) => game.staticBlockQueue.add(elem));
         ////////////////////////////////
       }
       igniteNeighbors(game, x, y, currCrate);
@@ -328,13 +329,15 @@ export function updateStatic(game: GameScene) {
     const [dx, dy] = getDiffFromTileCenter(block.sprite.x, block.sprite.y);
     const [px, py] = getTileCenter(block.sprite.x, block.sprite.y);
     const downId = px + ',' + (py + 50);
+    console.log('updatestatic');
     // console.log(game.blocks);
     if (block.sprite.active) {
-      //TODO MAYBE CHECK IF IN MAP ALREADY, add both curr and already in map block back into the queue to guarantee no bugs if slot is already occupied
+      //TODO MAYBE CHECK IF IN MAP ALREADY, add both curr and already in map block back into the queue to guarantee no bugs if slot is already occupied, or replace with grounded check
       if (
         dy < 17 &&
         game.blocks[downId] &&
         game.blocks[downId].sprite.active &&
+        !game.blocks[downId].owner.blocks.has(block) &&
         game.blocks[downId].sprite.isStatic()
       ) {
         block.owner.setAllGrounded();
@@ -355,7 +358,7 @@ export function updateStatic(game: GameScene) {
   //ultimate test, single crates and lots of clumped up crates
 }
 // check if to make block non static in case blocks are destroyed
-function checkBlockGrounded(game: GameScene, block: Terrain): boolean {
+function checkBlockGrounded(game: GameScene, block: Terrain, tempQueue: Set<Terrain>): boolean {
   //const [dx, dy] = getDiffFromTileCenter(block.sprite.x, block.sprite.y);
   // TODO EDGE CASE OF OTHER BLOCKS ABOVE ONE THAT FELL DOWN IF A SPECIAL LONG SHAPE
   // TODO ALSO IF [][][]
@@ -370,6 +373,7 @@ function checkBlockGrounded(game: GameScene, block: Terrain): boolean {
       downBlock &&
       downBlock.sprite.isStatic() &&
       !game.staticBlockQueue.has(downBlock) && // not in queue to become unstatic
+      !tempQueue.has(downBlock) &&
       !game.destroyQueue.has(downBlock) && // not about to be destroyed
       downBlock.sprite.name != 'dirt' && // can't become unstatic if is dirt
       !block.owner.blocks.has(downBlock)
@@ -379,14 +383,14 @@ function checkBlockGrounded(game: GameScene, block: Terrain): boolean {
 
 // since this checks if all blocks except the ones above the one destroyed (given in parameters),
 // we remove that block. and check the other blocks in its compound
-function checkOwnerGrounded(game: GameScene, block: Terrain): boolean {
+function checkOwnerGrounded(game: GameScene, block: Terrain, tempQueue: Set<Terrain>): boolean {
   let result = false;
   const owner = block.owner;
   const blocks = new Set(owner.blocks);
   blocks.delete(block);
   blocks.forEach((block: Terrain) => {
     //if any blocks are grounded in a compound, the whole compound is grounded
-    if (checkBlockGrounded(game, block)) {
+    if (checkBlockGrounded(game, block, tempQueue)) {
       result = true;
     }
   });

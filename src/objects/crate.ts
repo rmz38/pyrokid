@@ -27,6 +27,7 @@ class Crate extends Terrain {
     crate.setBounce(0);
     crate.setFriction(1);
     crate.setFrictionStatic(100);
+    crate.setName('crate' + id);
     this.sprite = crate;
     this.onFire = false;
     this.fireSprite = null;

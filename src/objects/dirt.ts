@@ -1,3 +1,4 @@
+import Compound from './compound';
 import Terrain from './terrain';
 class Dirt extends Terrain {
   constructor(x: integer, y: integer, game: Phaser.Scene, frame: integer) {
@@ -11,6 +12,7 @@ class Dirt extends Terrain {
     sprite.setFrictionStatic(1);
     sprite.setName('dirt');
     this.sprite = sprite;
+    this.owner = new Compound(game, new Set<Terrain>()); // doesnt have anything in it bc its just dirt
   }
 }
 export default Dirt;
