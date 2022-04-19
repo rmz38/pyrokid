@@ -10,7 +10,7 @@ class Terrain {
   right: Terrain;
   owner: Compound;
   public setGrounded(): void {
-    if (this.sprite.active) {
+    if (this.sprite.active && !this.sprite.isStatic()) {
       this.sprite.setStatic(true);
       const [px, py] = getTileCenter(this.sprite.x, this.sprite.y);
       this.sprite.setPosition(px, py);

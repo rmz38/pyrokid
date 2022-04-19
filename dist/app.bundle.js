@@ -113,7 +113,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "e5d9f72269dc454fed1d";
+/******/ 	var hotCurrentHash = "722192b7da9d82060acf";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -1162,7 +1162,7 @@ eval("\nvar __extends = (this && this.__extends) || (function () {\n    var exte
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nvar __read = (this && this.__read) || function (o, n) {\n    var m = typeof Symbol === \"function\" && o[Symbol.iterator];\n    if (!m) return o;\n    var i = m.call(o), r, ar = [], e;\n    try {\n        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);\n    }\n    catch (error) { e = { error: error }; }\n    finally {\n        try {\n            if (r && !r.done && (m = i[\"return\"])) m.call(i);\n        }\n        finally { if (e) throw e.error; }\n    }\n    return ar;\n};\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar helpers_1 = __webpack_require__(/*! ../helpers */ \"./src/helpers.ts\");\nvar Terrain = /** @class */ (function () {\n    function Terrain() {\n    }\n    Terrain.prototype.setGrounded = function () {\n        if (this.sprite.active) {\n            this.sprite.setStatic(true);\n            var _a = __read(helpers_1.getTileCenter(this.sprite.x, this.sprite.y), 2), px = _a[0], py = _a[1];\n            this.sprite.setPosition(px, py);\n            //to debug\n            this.sprite.setTint(0xff0000);\n        }\n    };\n    return Terrain;\n}());\nexports.default = Terrain;\n\n\n//# sourceURL=webpack:///./src/objects/terrain.ts?");
+eval("\nvar __read = (this && this.__read) || function (o, n) {\n    var m = typeof Symbol === \"function\" && o[Symbol.iterator];\n    if (!m) return o;\n    var i = m.call(o), r, ar = [], e;\n    try {\n        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);\n    }\n    catch (error) { e = { error: error }; }\n    finally {\n        try {\n            if (r && !r.done && (m = i[\"return\"])) m.call(i);\n        }\n        finally { if (e) throw e.error; }\n    }\n    return ar;\n};\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar helpers_1 = __webpack_require__(/*! ../helpers */ \"./src/helpers.ts\");\nvar Terrain = /** @class */ (function () {\n    function Terrain() {\n    }\n    Terrain.prototype.setGrounded = function () {\n        if (this.sprite.active && !this.sprite.isStatic()) {\n            this.sprite.setStatic(true);\n            var _a = __read(helpers_1.getTileCenter(this.sprite.x, this.sprite.y), 2), px = _a[0], py = _a[1];\n            this.sprite.setPosition(px, py);\n            //to debug\n            this.sprite.setTint(0xff0000);\n        }\n    };\n    return Terrain;\n}());\nexports.default = Terrain;\n\n\n//# sourceURL=webpack:///./src/objects/terrain.ts?");
 
 /***/ }),
 
