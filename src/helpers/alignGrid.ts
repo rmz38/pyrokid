@@ -85,10 +85,11 @@ class AlignGrid {
       //@ts-ignore
       if (clumpables.has(name) && frame != 0) {
         this.neighbors(row, col).forEach((e) => {
-          const nx = this.unpack(e)[0];
-          const ny = this.unpack(e)[1];
+          const [nx, ny] = this.unpack(e);
+          console.log(nx);
+          console.log(ny);
           //@ts-ignore
-          if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
+          if (nx >= 0 && ny >= 0 && this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
             this.clumpBox(nx, ny, nx, ny);
           }
         });

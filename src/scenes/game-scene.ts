@@ -109,11 +109,9 @@ export class GameScene extends Phaser.Scene {
     });
     this.blocks = {};
     // make steels
-    let steelcounter = 0;
     data.steel.forEach((e) => {
       this.blocks[e.x + ',' + e.y] = new Steel(e.x, e.y, this, e.frame);
-      this.blocks[e.x + ',' + e.y].sprite.setName('steeltemp' + steelcounter);
-      steelcounter += 1;
+      this.blocks[e.x + ',' + e.y].sprite.setName('steeltemp');
     });
     // make dirts
     data.dirt.forEach((e) => {

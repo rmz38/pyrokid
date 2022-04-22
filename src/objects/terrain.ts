@@ -1,4 +1,5 @@
 import { getTileCenter } from '../helpers';
+import { connectorBlocks } from '../helpers/init';
 import Compound from './compound';
 
 class Terrain {
@@ -17,6 +18,26 @@ class Terrain {
       //to debug
       this.sprite.setTint(0xff0000);
     }
+  }
+  public getConnected(connectedBlocks: Set<Terrain>) {
+    const directions = ['left', 'right', 'up', 'down'];
+    // const connected: Set<Terrain> = new Set<Terrain>();
+    for (let i = 0; i < directions.length; i++) {
+      const dir = directions[i];
+      if (
+        this[dir] &&
+        this[dir].sprite.active &&
+        !connectedBlocks.has(this[dir]) &&
+        !this.owner.blocks.has(this[dir])
+      ) {
+        console.log(this[dir]);
+        this[dir].owner.blocks.forEach((ownedBlock: Terrain) => {
+          connectedBlocks.add(ownedBlock);
+          ownedBlock.getConnected(connectedBlocks);
+        });
+      }
+    }
+    return connectedBlocks;
   }
 }
 export default Terrain;

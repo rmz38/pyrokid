@@ -29,7 +29,7 @@ class Lizard {
       inertia: Infinity,
       render: { sprite: { xOffset: 0.5, yOffset: 0.5 } },
     });
-    this.velocity = 1.5;
+    this.velocity = 0.5;
     const lizard = game.matter.add.sprite(0, 0, 'lizard');
     lizard.scaleX = 0.7;
     lizard.setExistingBody(compound);

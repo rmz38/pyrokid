@@ -104,7 +104,6 @@ export function updateDynamic(game: GameScene) {
   //TODO: FIX THIS CRAP AND MAKE SURE BLOCKS ABOVE A DESTROYED BLOCK WILL BE CHECKED IF ALSO BURNING OR NOT, PLUS CORRECTLY SET STATIC OR NOT
   const seen = new Set<Terrain>();
   game.staticBlockQueue.forEach((block: Terrain) => {
-    console.log(game.staticBlockQueue);
     seen.add(block);
     const [bx, by] = getTileCenter(block.sprite.x, block.sprite.y);
     //remove block from static blocks map
@@ -116,7 +115,7 @@ export function updateDynamic(game: GameScene) {
     console.log(block);
     // ownedBlock.sprite.setStatic(true);
     ///
-    block.sprite.tint = 0xffffff;
+    block.sprite.tint = 0x000000;
     game.dynamicBlockQueue.add(block);
     // block.owner.blocks.forEach((ownedBlock: Terrain) => {
     //   if (ownedBlock.sprite.active && ownedBlock.sprite.isStatic() && !seen.has(ownedBlock)) {
@@ -197,18 +196,29 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
         fireDisappear.once('animationcomplete', () => {
           fireDisappear.alpha = 0;
         });
+        // currCrate.owner.blocks.forEach((crate: Crate) => {
+        //   game.destroyQueue.add(crate);
+        //   //remove destroyed crate, might need to do this for all other crates too
+        //   delete game.blocks[blockId(crate)];
+        // });
         game.destroyQueue.add(currCrate);
         //remove destroyed crate, might need to do this for all other crates too
-        delete game.blocks[blockId(currCrate)];
+        if (game.blocks[blockId(currCrate)] == currCrate) {
+          delete game.blocks[blockId(currCrate)];
+        }
         ///////////////////////////////
-        let curr = new Set<Terrain>();
+        let curr: Set<Terrain>;
         let next = new Set<Terrain>();
-        const seen = new Set<string>();
+        const seen = new Set<Terrain>();
         const tempQueue = new Set<Terrain>();
         // const [px, py] = getTileCenter(currCrate.sprite.x, currCrate.sprite.y - 50);
         // const aboveBlock = game.blocks[px + ',' + py];
+        currCrate.getConnected(new Set<Terrain>()).forEach((connectedToCrate: Terrain) => {
+          next.add(connectedToCrate);
+          seen.add(connectedToCrate);
+        });
         next.add(currCrate);
-        seen.add(currCrate.sprite.name);
+        seen.add(currCrate);
         while (next.size > 0) {
           curr = next;
           next = new Set<Terrain>();
@@ -219,18 +229,25 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
               const aboveBlock: Terrain = game.blocks[px + ',' + py];
               if (
                 aboveBlock &&
-                !seen.has(aboveBlock.sprite.name) &&
+                !seen.has(aboveBlock) &&
                 aboveBlock.sprite.active &&
                 aboveBlock.sprite.name != 'dirt' &&
-                !currBlock.owner.blocks.has(aboveBlock) &&
+                // !currBlock.owner.blocks.has(aboveBlock) && //REDUNDANT?
                 !checkOwnerGrounded(game, aboveBlock, tempQueue)
               ) {
-                //SEEMS TO HAVE ISSUE WITH COMPOUNDS BURNING, compounds get destroyed? Issues with vertical compounds which might mean double checking
-
+                // check compound blocks
                 aboveBlock.owner.blocks.forEach((block: Terrain) => {
-                  if (!seen.has(block.sprite.name)) {
+                  if (!seen.has(block)) {
                     next.add(block);
-                    seen.add(block.sprite.name);
+                    seen.add(block);
+                    game.staticBlockQueue.add(block);
+                  }
+                });
+                // check any block connected with connectors
+                aboveBlock.owner.getConnected().forEach((block: Terrain) => {
+                  if (!seen.has(block)) {
+                    next.add(block);
+                    seen.add(block);
                     game.staticBlockQueue.add(block);
                   }
                 });
@@ -245,7 +262,7 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
             }
           });
         }
-        tempQueue.forEach((elem: Terrain) => game.staticBlockQueue.add(elem));
+        // tempQueue.forEach((elem: Terrain) => game.staticBlockQueue.add(elem));
         ////////////////////////////////
       }
       igniteNeighbors(game, x, y, currCrate);
@@ -311,7 +328,16 @@ export function initDynamicAndStaticQueues(game: GameScene) {
   game.dynamicBlockQueue.clear();
   for (const [pos, block] of Object.entries(game.blocks)) {
     //const [x, y] = unpack(pos);
-    if (!(block as Terrain).sprite.isStatic()) {
+    //LEFT OFF HERE CHECK IF CRATE THEN PRINT
+    const connected = (block as Terrain).getConnected(new Set<Terrain>());
+    console.log('asdfasdf ' + connected);
+    let connectedToStatic = false;
+    connected.forEach((connectedBlock: Terrain) => {
+      if (connectedBlock.sprite.active && connectedBlock.sprite.isStatic()) {
+        connectedToStatic = true;
+      }
+    });
+    if (!(block as Terrain).sprite.isStatic() || !connectedToStatic) {
       game.dynamicBlockQueue.add(block as Terrain);
       delete game.blocks[pos];
     }
@@ -329,7 +355,6 @@ export function updateStatic(game: GameScene) {
     const [dx, dy] = getDiffFromTileCenter(block.sprite.x, block.sprite.y);
     const [px, py] = getTileCenter(block.sprite.x, block.sprite.y);
     const downId = px + ',' + (py + 50);
-    console.log('updatestatic');
     // console.log(game.blocks);
     if (block.sprite.active) {
       //TODO MAYBE CHECK IF IN MAP ALREADY, add both curr and already in map block back into the queue to guarantee no bugs if slot is already occupied, or replace with grounded check
@@ -337,16 +362,28 @@ export function updateStatic(game: GameScene) {
         dy < 17 &&
         game.blocks[downId] &&
         game.blocks[downId].sprite.active &&
+        // !block.sprite.isStatic() && // block itself is not static already
         !game.blocks[downId].owner.blocks.has(block) &&
-        game.blocks[downId].sprite.isStatic()
+        !game.blocks[downId].owner.getConnected().has(block) &&
+        game.blocks[downId].sprite.isStatic() &&
+        !game.destroyQueue.has(game.blocks[downId])
       ) {
+        console.log(
+          dy < 17 &&
+            game.blocks[downId] &&
+            game.blocks[downId].sprite.active &&
+            !game.blocks[downId].owner.blocks.has(block) &&
+            !game.blocks[downId].owner.getConnected().has(block) &&
+            game.blocks[downId].sprite.isStatic() &&
+            !game.destroyQueue.has(game.blocks[downId]),
+        );
         block.owner.setAllGrounded();
         //TODO add all blocks in compound instead of just this, to enforce precondition of all blocks being dynamic in queue
         toAddToMap[px + ',' + py] = block;
       } else if (!block.sprite.isStatic()) {
         if (block.sprite.body.velocity.y > 12) block.sprite.setVelocityY(12);
         nextQueue.add(block);
-      } else if (block.sprite.isStatic()) {
+      } else if (block.sprite.active && block.sprite.isStatic()) {
         toAddToMap[px + ',' + py] = block;
       }
     }
@@ -358,7 +395,12 @@ export function updateStatic(game: GameScene) {
   //ultimate test, single crates and lots of clumped up crates
 }
 // check if to make block non static in case blocks are destroyed
-function checkBlockGrounded(game: GameScene, block: Terrain, tempQueue: Set<Terrain>): boolean {
+function checkBlockGrounded(
+  game: GameScene,
+  block: Terrain,
+  tempQueue: Set<Terrain>,
+  connectedBlocks: Set<Terrain>,
+): boolean {
   //const [dx, dy] = getDiffFromTileCenter(block.sprite.x, block.sprite.y);
   // TODO EDGE CASE OF OTHER BLOCKS ABOVE ONE THAT FELL DOWN IF A SPECIAL LONG SHAPE
   // TODO ALSO IF [][][]
@@ -371,12 +413,14 @@ function checkBlockGrounded(game: GameScene, block: Terrain, tempQueue: Set<Terr
   if (block.sprite.active) {
     return (
       downBlock &&
+      downBlock.sprite.active &&
       downBlock.sprite.isStatic() &&
       !game.staticBlockQueue.has(downBlock) && // not in queue to become unstatic
       !tempQueue.has(downBlock) &&
       !game.destroyQueue.has(downBlock) && // not about to be destroyed
       downBlock.sprite.name != 'dirt' && // can't become unstatic if is dirt
-      !block.owner.blocks.has(downBlock)
+      !block.owner.blocks.has(downBlock) &&
+      !connectedBlocks.has(downBlock)
     );
   }
 }
@@ -388,12 +432,20 @@ function checkOwnerGrounded(game: GameScene, block: Terrain, tempQueue: Set<Terr
   const owner = block.owner;
   const blocks = new Set(owner.blocks);
   blocks.delete(block);
+  const connected = owner.getConnected();
+  // TODO: might actually have to combine all blocks for the check
   blocks.forEach((block: Terrain) => {
     //if any blocks are grounded in a compound, the whole compound is grounded
-    if (checkBlockGrounded(game, block, tempQueue)) {
+    if (checkBlockGrounded(game, block, tempQueue, connected)) {
       result = true;
     }
   });
-  console.log(result);
+  // TODO: this might be redundant, might want to fix this
+  connected.forEach((block: Terrain) => {
+    if (checkBlockGrounded(game, block, tempQueue, connected)) {
+      result = true;
+    }
+  });
+  // console.log(result);
   return result;
 }

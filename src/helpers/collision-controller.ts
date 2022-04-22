@@ -235,7 +235,7 @@ export const createCollisions = (game: GameScene): void => {
       }
       if (a == 'playerTop' || b == 'playerTop') {
         const otherBody = a !== 'playerTop' ? bodyA : bodyB;
-        if (otherBody.velocity.y >= 0 && game.player.sprite.body.velocity.y == 0) {
+        if (!otherBody.isStatic && otherBody.label !== 'fire') {
           game.scene.restart();
         } else {
           game.player.sprite.setVelocityY(0);

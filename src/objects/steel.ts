@@ -11,7 +11,6 @@ class Steel extends Terrain {
     steel.setCollisionCategory(0x0100);
     steel.setPosition(x, y);
     steel.setBounce(0);
-    steel.setName('steel filler');
     this.sprite = steel;
   }
 }

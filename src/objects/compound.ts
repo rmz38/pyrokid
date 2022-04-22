@@ -1,3 +1,4 @@
+import { connectorBlocks } from '../helpers/init';
 import { GameScene } from '../scenes/game-scene';
 import Terrain from './terrain';
 class Compound {
@@ -19,11 +20,23 @@ class Compound {
     this.blocks.forEach((block) => {
       block.setGrounded();
     });
+    this.getConnected().forEach((connectedBlock) => {
+      connectedBlock.setGrounded();
+    });
   }
   public setAboveDynamic(game: GameScene) {
     this.blocks.forEach((block) => {
       block.setGrounded();
     });
+  }
+  public getConnected() {
+    const connectedBlocks = new Set<Terrain>();
+    this.blocks.forEach((block: Terrain) => {
+      block.getConnected(connectedBlocks).forEach((e) => {
+        connectedBlocks.add(e);
+      });
+    });
+    return connectedBlocks;
   }
 }
 export default Compound;
