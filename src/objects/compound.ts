@@ -16,11 +16,11 @@ class Compound {
     });
     this.onFire = false;
   }
-  public setAllGrounded() {
+  public setAllGrounded(game: GameScene) {
     this.blocks.forEach((block) => {
       block.setGrounded();
     });
-    this.getConnected().forEach((connectedBlock) => {
+    this.getConnected(game).forEach((connectedBlock) => {
       connectedBlock.setGrounded();
     });
   }
@@ -29,10 +29,10 @@ class Compound {
       block.setGrounded();
     });
   }
-  public getConnected() {
+  public getConnected(game: GameScene) {
     const connectedBlocks = new Set<Terrain>();
     this.blocks.forEach((block: Terrain) => {
-      block.getConnected(connectedBlocks).forEach((e) => {
+      block.getConnected(connectedBlocks, game).forEach((e) => {
         connectedBlocks.add(e);
       });
     });

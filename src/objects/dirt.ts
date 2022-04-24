@@ -13,6 +13,7 @@ class Dirt extends Terrain {
     sprite.setName('dirt');
     this.sprite = sprite;
     this.owner = new Compound(game, new Set<Terrain>()); // doesnt have anything in it bc its just dirt
+    this.owner.blocks.add(this);
   }
 }
 export default Dirt;

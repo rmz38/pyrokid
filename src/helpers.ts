@@ -115,7 +115,7 @@ export function updateDynamic(game: GameScene) {
     console.log(block);
     // ownedBlock.sprite.setStatic(true);
     ///
-    block.sprite.tint = 0x000000;
+    block.sprite.tint = 0xffffff;
     game.dynamicBlockQueue.add(block);
     // block.owner.blocks.forEach((ownedBlock: Terrain) => {
     //   if (ownedBlock.sprite.active && ownedBlock.sprite.isStatic() && !seen.has(ownedBlock)) {
@@ -201,6 +201,9 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
         //   //remove destroyed crate, might need to do this for all other crates too
         //   delete game.blocks[blockId(crate)];
         // });
+        currCrate.owner.blocks.forEach((e: Crate) => {
+          game.destroyQueue.add(e);
+        });
         game.destroyQueue.add(currCrate);
         //remove destroyed crate, might need to do this for all other crates too
         if (game.blocks[blockId(currCrate)] == currCrate) {
@@ -213,9 +216,19 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
         const tempQueue = new Set<Terrain>();
         // const [px, py] = getTileCenter(currCrate.sprite.x, currCrate.sprite.y - 50);
         // const aboveBlock = game.blocks[px + ',' + py];
-        currCrate.getConnected(new Set<Terrain>()).forEach((connectedToCrate: Terrain) => {
-          next.add(connectedToCrate);
-          seen.add(connectedToCrate);
+        currCrate.getConnected(new Set<Terrain>(), game).forEach((connectedToCrate: Terrain) => {
+          if (
+            connectedToCrate &&
+            !seen.has(connectedToCrate) &&
+            connectedToCrate.sprite.active &&
+            connectedToCrate.sprite.name != 'dirt' &&
+            // !currBlock.owner.blocks.has(aboveBlock) && //REDUNDANT?
+            !checkOwnerGrounded(game, connectedToCrate, tempQueue)
+          ) {
+            next.add(connectedToCrate);
+            seen.add(connectedToCrate);
+            game.staticBlockQueue.add(connectedToCrate);
+          }
         });
         next.add(currCrate);
         seen.add(currCrate);
@@ -244,7 +257,7 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
                   }
                 });
                 // check any block connected with connectors
-                aboveBlock.owner.getConnected().forEach((block: Terrain) => {
+                aboveBlock.owner.getConnected(game).forEach((block: Terrain) => {
                   if (!seen.has(block)) {
                     next.add(block);
                     seen.add(block);
@@ -329,15 +342,21 @@ export function initDynamicAndStaticQueues(game: GameScene) {
   for (const [pos, block] of Object.entries(game.blocks)) {
     //const [x, y] = unpack(pos);
     //LEFT OFF HERE CHECK IF CRATE THEN PRINT
-    const connected = (block as Terrain).getConnected(new Set<Terrain>());
-    console.log('asdfasdf ' + connected);
+    const connected = (block as Terrain).getConnected(new Set<Terrain>(), game);
     let connectedToStatic = false;
     connected.forEach((connectedBlock: Terrain) => {
+      // console.log(connectedBlock);
       if (connectedBlock.sprite.active && connectedBlock.sprite.isStatic()) {
         connectedToStatic = true;
       }
     });
-    if (!(block as Terrain).sprite.isStatic() || !connectedToStatic) {
+    console.log(block);
+    console.log(connectedToStatic);
+    if (connectedToStatic) {
+      (block as Terrain).setGrounded();
+    }
+    if (!(block as Terrain).sprite.isStatic()) {
+      console.log('added to dynamic init');
       game.dynamicBlockQueue.add(block as Terrain);
       delete game.blocks[pos];
     }
@@ -364,20 +383,11 @@ export function updateStatic(game: GameScene) {
         game.blocks[downId].sprite.active &&
         // !block.sprite.isStatic() && // block itself is not static already
         !game.blocks[downId].owner.blocks.has(block) &&
-        !game.blocks[downId].owner.getConnected().has(block) &&
+        !game.blocks[downId].owner.getConnected(game).has(block) &&
         game.blocks[downId].sprite.isStatic() &&
         !game.destroyQueue.has(game.blocks[downId])
       ) {
-        console.log(
-          dy < 17 &&
-            game.blocks[downId] &&
-            game.blocks[downId].sprite.active &&
-            !game.blocks[downId].owner.blocks.has(block) &&
-            !game.blocks[downId].owner.getConnected().has(block) &&
-            game.blocks[downId].sprite.isStatic() &&
-            !game.destroyQueue.has(game.blocks[downId]),
-        );
-        block.owner.setAllGrounded();
+        block.owner.setAllGrounded(game);
         //TODO add all blocks in compound instead of just this, to enforce precondition of all blocks being dynamic in queue
         toAddToMap[px + ',' + py] = block;
       } else if (!block.sprite.isStatic()) {
@@ -411,6 +421,17 @@ function checkBlockGrounded(
   const downBlock = game.blocks[downId];
   // console.log(game.blocks[downId]);
   if (block.sprite.active) {
+    console.log(
+      downBlock &&
+        downBlock.sprite.active &&
+        downBlock.sprite.isStatic() &&
+        !game.staticBlockQueue.has(downBlock) && // not in queue to become unstatic
+        !tempQueue.has(downBlock) &&
+        !game.destroyQueue.has(downBlock) && // not about to be destroyed
+        downBlock.sprite.name != 'dirt' && // can't become unstatic if is dirt
+        !block.owner.blocks.has(downBlock) &&
+        !connectedBlocks.has(downBlock),
+    );
     return (
       downBlock &&
       downBlock.sprite.active &&
@@ -432,7 +453,7 @@ function checkOwnerGrounded(game: GameScene, block: Terrain, tempQueue: Set<Terr
   const owner = block.owner;
   const blocks = new Set(owner.blocks);
   blocks.delete(block);
-  const connected = owner.getConnected();
+  const connected = owner.getConnected(game);
   // TODO: might actually have to combine all blocks for the check
   blocks.forEach((block: Terrain) => {
     //if any blocks are grounded in a compound, the whole compound is grounded
@@ -440,7 +461,7 @@ function checkOwnerGrounded(game: GameScene, block: Terrain, tempQueue: Set<Terr
       result = true;
     }
   });
-  // TODO: this might be redundant, might want to fix this
+  // TODO: this might be redundant, might want to fix this, for the connected blocks if they should ground too
   connected.forEach((block: Terrain) => {
     if (checkBlockGrounded(game, block, tempQueue, connected)) {
       result = true;

@@ -1,5 +1,7 @@
 import { getTileCenter } from '../helpers';
 import { connectorBlocks } from '../helpers/init';
+import { game } from '../main';
+import { GameScene } from '../scenes/game-scene';
 import Compound from './compound';
 
 class Terrain {
@@ -19,7 +21,7 @@ class Terrain {
       this.sprite.setTint(0xff0000);
     }
   }
-  public getConnected(connectedBlocks: Set<Terrain>) {
+  public getConnected(connectedBlocks: Set<Terrain>, game: GameScene) {
     const directions = ['left', 'right', 'up', 'down'];
     // const connected: Set<Terrain> = new Set<Terrain>();
     for (let i = 0; i < directions.length; i++) {
@@ -28,12 +30,13 @@ class Terrain {
         this[dir] &&
         this[dir].sprite.active &&
         !connectedBlocks.has(this[dir]) &&
-        !this.owner.blocks.has(this[dir])
+        !this.owner.blocks.has(this[dir]) &&
+        !game.destroyQueue.has(this[dir])
       ) {
         console.log(this[dir]);
         this[dir].owner.blocks.forEach((ownedBlock: Terrain) => {
           connectedBlocks.add(ownedBlock);
-          ownedBlock.getConnected(connectedBlocks);
+          ownedBlock.getConnected(connectedBlocks, game);
         });
       }
     }
