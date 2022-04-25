@@ -290,13 +290,13 @@ export const createCollisions = (game: GameScene): void => {
     // can probably condense the below section or combine lizard and spider object type
     for (const [key, value] of Object.entries(game.lizards)) {
       if (value.rightEdge == false) {
-        value.flip();
+        value.faceLeft();
         value.rightEdge = true;
       } else {
         value.rightEdge = false;
       }
       if (value.leftEdge == false) {
-        value.flip();
+        value.faceRight();
         value.leftEdge = true;
       } else {
         value.leftEdge = false;

@@ -170,6 +170,14 @@ class AlignGrid {
     const j = parseInt(coord.substring(split + 1));
     return [i, j];
   }
+  /**
+   * start and end of rectangle drawn by mouse to clump selected tiles
+   * FIX TO TAKE SET OF TILES INSTEAD OF RECTANGLE? TODO
+   * @param sx start x pixel coordinate
+   * @param sy start y pixel coordinate
+   * @param ex end x pixel coordinate
+   * @param ey end y pixel coordinate
+   */
   clumpBox(sr, sc, er, ec) {
     // sr = sr < er ? sr : er;
     // er = sr < er ? sr : er;
@@ -186,8 +194,7 @@ class AlignGrid {
           this.neighbors(i, j).forEach((e) => {
             const [nx, ny] = this.unpack(e);
             if (nx > 0 && nx < this.cols && ny > 0 && ny < this.rows) {
-              //@ts-ignore fix later or investigage issues
-              if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
+              if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != '0') {
                 check.add(e);
               }
             }
@@ -197,14 +204,6 @@ class AlignGrid {
     }
     this.clump(curr, check);
   }
-  /**
-   * start and end of rectangle drawn by mouse to clump selected tiles
-   * FIX TO TAKE SET OF TILES INSTEAD OF RECTANGLE? TODO
-   * @param sx start x pixel coordinate
-   * @param sy start y pixel coordinate
-   * @param ex end x pixel coordinate
-   * @param ey end y pixel coordinate
-   */
   clump(curr: Set<string>, check: Set<string>): void {
     // figure out which tile texture to use based on spritesheet
     // ensured that none are null in curr

@@ -80,6 +80,7 @@ export class GameScene extends Phaser.Scene {
     this.fire = null;
     this.fireActive = false;
     this.fireCooldown = false;
+    this.tiles = [];
     for (let i = 0; i < this.yTiles; i++) {
       const row = [];
       for (let j = 0; j < this.xTiles; j++) {
@@ -168,7 +169,7 @@ export class GameScene extends Phaser.Scene {
     if (wasdr.R.isDown) {
       this.scene.restart();
     }
-    if (this.player.getY() > this.yTiles * this.TILE_SIZE) {
+    if (this.player.getY() > this.xTiles * this.TILE_SIZE) {
       this.scene.restart();
     }
     Helpers.clearTiles(this);

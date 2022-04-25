@@ -1,11 +1,8 @@
-class Spider {
-  sprite: Phaser.Physics.Matter.Sprite;
-  velocity: integer;
-  collisionSensor: Phaser.Physics.Matter.Sprite;
+import Enemy from './enemy';
+class Spider extends Enemy {
   armored: boolean;
-  rightEdge: boolean;
-  leftEdge: boolean;
   constructor(x: integer, y: integer, game: Phaser.Scene, id: integer, armored: boolean) {
+    super();
     const spiderRight = game.matter.bodies.rectangle(20, 0, 10, 10, { isSensor: true, label: 'spider' + id });
     const spiderLeft = game.matter.bodies.rectangle(-20, 0, 10, 10, { isSensor: true, label: 'spider' + id });
     const spiRightEdge = game.matter.bodies.rectangle(17, 25, 3, 10, { isSensor: true, label: 'rightEdgeS,' + id });
@@ -46,10 +43,6 @@ class Spider {
       this.sprite.anims.play('spider', true);
     }
   }
-  public flip() {
-    this.sprite.flipX = !this.sprite.flipX;
-    this.velocity = -1 * this.velocity;
-  }
   public hitFire() {
     if (this.armored) {
       this.armored = false;
@@ -57,24 +50,8 @@ class Spider {
       this.sprite.anims.play({ key: 'spider', startFrame: lastIndex - 1 });
       //change sprite
     } else {
+      this.armored = false;
       this.destroy();
-    }
-  }
-  public syncSensor() {
-    if (this.sprite.active) {
-      this.collisionSensor.x = this.sprite.x;
-      this.collisionSensor.y = this.sprite.y;
-    }
-  }
-  public destroy() {
-    this.armored = false;
-    this.sprite.destroy();
-    this.collisionSensor.destroy();
-  }
-  public update() {
-    if (this.sprite.active) {
-      this.sprite.setVelocityX(this.velocity);
-      this.syncSensor();
     }
   }
 }

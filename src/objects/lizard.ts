@@ -1,15 +1,9 @@
-import { Physics } from 'phaser';
-
-class Lizard {
-  sprite: Phaser.Physics.Matter.Sprite;
+import Enemy from './enemy';
+class Lizard extends Enemy {
   onFire: boolean;
   fireSprite: Phaser.GameObjects.Sprite;
-  velocity: integer;
-  collisionSensor: Phaser.Physics.Matter.Sprite;
-  id: integer;
-  rightEdge: boolean;
-  leftEdge: boolean;
   constructor(x: integer, y: integer, game: Phaser.Scene, id: integer) {
+    super();
     const lizRight = game.matter.bodies.rectangle(15, 0, 10, 10, { isSensor: true, label: 'lizard' + id });
     const lizRightEdge = game.matter.bodies.rectangle(17, 25, 3, 10, { isSensor: true, label: 'rightEdgeL,' + id });
     const lizLeft = game.matter.bodies.rectangle(-15, 0, 10, 10, { isSensor: true, label: 'lizard' + id });
@@ -47,10 +41,6 @@ class Lizard {
     this.rightEdge = false;
     this.leftEdge = false;
   }
-  public flip() {
-    this.sprite.flipX = !this.sprite.flipX;
-    this.velocity = -1 * this.velocity;
-  }
   public ignite(game) {
     if (this.onFire) {
       return;
@@ -66,19 +56,9 @@ class Lizard {
       this.fireSprite.y = this.sprite.y - 10;
     }
   }
-  public syncSensor() {
-    if (this.sprite.active) {
-      this.collisionSensor.setPosition(this.sprite.x, this.sprite.y);
-    }
-  }
-  public destroy() {
-    this.sprite.destroy();
-    this.collisionSensor.destroy();
-  }
   public update() {
     if (this.sprite.active) {
-      this.sprite.setVelocityX(this.velocity);
-      this.syncSensor();
+      super.update();
       this.syncFire();
     }
   }
