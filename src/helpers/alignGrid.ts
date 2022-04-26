@@ -164,6 +164,18 @@ class AlignGrid {
     // eslint-disable-next-line prettier/prettier
     return [i + ',' + (j - 1), i + 1 + ',' + j, i + ',' + (j + 1), i - 1 + ',' + j];
   }
+  checkConnected(nx, ny, i, j, checkId) {
+    return (
+      (ny < j && nx == i && checkId.charAt(5) == '1') || // top
+      (ny < j && nx > i && checkId.charAt(4) == '1') || // top right
+      (ny > j && nx == i && checkId.charAt(1) == '1') || // bottom
+      (ny > j && nx > i && checkId.charAt(0) == '1') || // bottom right
+      (nx > i && ny == j && checkId.charAt(7) == '1') || // right
+      (nx < i && ny == j && checkId.charAt(3) == '1') || // left
+      (nx < i && ny > j && checkId.charAt(2) == '1') || // bottom left
+      (nx < i && ny < j && checkId.charAt(4) == '1') // top left
+    );
+  }
   unpack(coord: string): Array<integer> {
     const split = coord.indexOf(',');
     const i = parseInt(coord.substring(0, split));
@@ -195,10 +207,17 @@ class AlignGrid {
             const [nx, ny] = this.unpack(e);
             if (nx > 0 && nx < this.cols && ny > 0 && ny < this.rows) {
               if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != '0') {
-                check.add(e);
+                const checkId = indexes[parseInt(this.grid[nx][ny].frame.name)];
+                // const checkId = String(this.grid[nx][ny].frame.name);
+                if (this.checkConnected) {
+                  //   console.log('checking this bug man');
+                  //NEED TO BFS AGAIN
+                  check.add(e);
+                }
               }
             }
           });
+          console.log(check);
         }
       }
     }
