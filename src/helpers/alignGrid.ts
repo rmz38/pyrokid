@@ -195,22 +195,20 @@ class AlignGrid {
     // er = sr < er ? sr : er;
     // sc = sc < ec ? sc : ec;
     // ec = sc < ec ? sc : ec;
-    const curr = new Set<string>();
+    const highlighted = new Set<string>();
     const check = new Set<string>();
     // DO BFS
     for (let i = sr; i <= er; i++) {
       for (let j = sc; j <= ec; j++) {
         if (this.grid[i][j]) {
-          curr.add(i + ',' + j);
+          highlighted.add(i + ',' + j);
           check.add(i + ',' + j);
           this.neighbors(i, j).forEach((e) => {
             const [nx, ny] = this.unpack(e);
             if (nx > 0 && nx < this.cols && ny > 0 && ny < this.rows) {
               if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != '0') {
                 const checkId = indexes[parseInt(this.grid[nx][ny].frame.name)];
-                // const checkId = String(this.grid[nx][ny].frame.name);
-                if (this.checkConnected) {
-                  //   console.log('checking this bug man');
+                if (this.checkConnected(nx, ny, i, j, checkId)) {
                   //NEED TO BFS AGAIN
                   check.add(e);
                 }
@@ -221,7 +219,7 @@ class AlignGrid {
         }
       }
     }
-    this.clump(curr, check);
+    this.clump(highlighted, check);
   }
   clump(curr: Set<string>, check: Set<string>): void {
     // figure out which tile texture to use based on spritesheet
