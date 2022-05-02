@@ -87,7 +87,7 @@ export function igniteNeighbors(game, x, y, currCrate) {
   for (let i = 0; i < candidates.length; i++) {
     const x = candidates[i][0];
     const y = candidates[i][1];
-    if (x >= 0 && x < game.xTiles && y >= 0 && y < game.yTiles && game.tiles[x][y]) {
+    if (x >= 0 && x < game.yTiles && y >= 0 && y < game.xTiles && game.tiles[x][y]) {
       game.tiles[x][y].forEach((e) => {
         game.burnQueue.add(e.owner);
       });
@@ -183,7 +183,7 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
   currCrate.fireSprite = game.add.sprite(currCrate.sprite.x, currCrate.sprite.y - 10, 'squareFire');
   currCrate.fireSprite.anims.play('squareFire', false);
   currCrate.fireSprite.alpha = 0.7;
-  game.time.delayedCall(1000, () => {
+  game.time.delayedCall(700, () => {
     // TODO: move this fire stuff to the crate class
     if (currCrate.fireSprite.active && !currCrate.isLava) {
       currCrate.fireSprite.alpha = 0;

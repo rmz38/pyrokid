@@ -165,15 +165,19 @@ class AlignGrid {
     return [i + ',' + (j - 1), i + 1 + ',' + j, i + ',' + (j + 1), i - 1 + ',' + j];
   }
   checkConnected(nx, ny, i, j, checkId) {
+    console.log(checkId);
+    if (checkId == undefined) {
+      return false;
+    }
     return (
       (ny < j && nx == i && checkId.charAt(5) == '1') || // top
-      (ny < j && nx > i && checkId.charAt(4) == '1') || // top right
+      // (ny < j && nx > i && checkId.charAt(4) == '1') || // top right
       (ny > j && nx == i && checkId.charAt(1) == '1') || // bottom
-      (ny > j && nx > i && checkId.charAt(0) == '1') || // bottom right
+      // (ny > j && nx > i && checkId.charAt(0) == '1') || // bottom right
       (nx > i && ny == j && checkId.charAt(7) == '1') || // right
-      (nx < i && ny == j && checkId.charAt(3) == '1') || // left
-      (nx < i && ny > j && checkId.charAt(2) == '1') || // bottom left
-      (nx < i && ny < j && checkId.charAt(4) == '1') // top left
+      (nx < i && ny == j && checkId.charAt(3) == '1') // left
+      // (nx < i && ny > j && checkId.charAt(2) == '1') || // bottom left
+      // (nx < i && ny < j && checkId.charAt(4) == '1') // top left
     );
   }
   unpack(coord: string): Array<integer> {
@@ -196,7 +200,9 @@ class AlignGrid {
     // sc = sc < ec ? sc : ec;
     // ec = sc < ec ? sc : ec;
     const highlighted = new Set<string>();
-    const check = new Set<string>();
+    const check = new Set<string>(); // bascially seen set in bfs
+    let curr = new Set<string>();
+    let next = new Set<string>();
     // DO BFS
     for (let i = sr; i <= er; i++) {
       for (let j = sc; j <= ec; j++) {
@@ -207,9 +213,13 @@ class AlignGrid {
             const [nx, ny] = this.unpack(e);
             if (nx > 0 && nx < this.cols && ny > 0 && ny < this.rows) {
               if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != '0') {
+                console.log('frame name ' + this.grid[nx][ny].frame.name);
                 const checkId = indexes[parseInt(this.grid[nx][ny].frame.name)];
                 if (this.checkConnected(nx, ny, i, j, checkId)) {
                   //NEED TO BFS AGAIN
+                  if (!check.has(e)) {
+                    next.add(e);
+                  }
                   check.add(e);
                 }
               }
@@ -218,6 +228,29 @@ class AlignGrid {
           console.log(check);
         }
       }
+    }
+    while (next.size > 0) {
+      curr = next;
+      next = new Set<string>();
+      curr.forEach((node) => {
+        const [i, j] = this.unpack(node);
+        this.neighbors(i, j).forEach((e) => {
+          const [nx, ny] = this.unpack(e);
+          if (nx > 0 && nx < this.cols && ny > 0 && ny < this.rows) {
+            if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != '0') {
+              console.log('frame name ' + this.grid[nx][ny].frame.name);
+              const checkId = indexes[parseInt(this.grid[nx][ny].frame.name)];
+              if (this.checkConnected(nx, ny, i, j, checkId)) {
+                //NEED TO BFS AGAIN, need to add compound blocks to highlighted?
+                if (!check.has(e)) {
+                  next.add(e);
+                  check.add(e);
+                }
+              }
+            }
+          }
+        });
+      });
     }
     this.clump(highlighted, check);
   }

@@ -21,7 +21,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 let cursors;
 let wasdr;
 export class GameScene extends Phaser.Scene {
-  public speed = 200;
+  public speed = 100;
   public lizards: Helpers.LizardHash = {};
   public spiders: Helpers.SpiderHash = {};
   public lavas: Helpers.LavaHash = {};
@@ -179,7 +179,8 @@ export class GameScene extends Phaser.Scene {
         //TODO optimize later
         const [x, y] = Helpers.getTile(curr.sprite.x, curr.sprite.y);
         //TODO CHECK IF IN BOUNDS OF WORLD
-        if (y > 0 && y < this.xTiles) {
+        // if (y > 0 && y < this.yTiles) {
+        if (y > 0) {
           this.tiles[x][y].add(curr);
         } else {
           this.destroyQueue.add(curr);
@@ -202,7 +203,7 @@ export class GameScene extends Phaser.Scene {
       this.player.turn();
     }
     if (wasdr.W.isDown && this.player.touchingGround) {
-      this.player.jump();
+      this.player.jump(this);
     }
     Helpers.updateDynamic(this);
     Helpers.updateStatic(this);

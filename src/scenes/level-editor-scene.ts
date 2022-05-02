@@ -205,7 +205,7 @@ export class LevelEditor extends Phaser.Scene {
   public generateJson(start = true, resize = false): void {
     const json = {
       width: this.width,
-      height: this.height + 1,
+      height: this.height,
       player: [],
       lizard: [],
       spider: [],

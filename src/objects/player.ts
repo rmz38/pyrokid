@@ -1,6 +1,9 @@
+import { GameScene } from '../scenes/game-scene';
+
 class Player {
   sprite: Phaser.Physics.Matter.Sprite;
   touchingGround: boolean;
+  jumpCooldown: boolean;
   hittingRight: boolean;
   hittingLeft: boolean;
   constructor(x: integer, y: integer, game: any) {
@@ -27,12 +30,13 @@ class Player {
     this.sprite = player;
     this.hittingLeft = false;
     this.hittingRight = false;
+    this.jumpCooldown = true;
   }
   public moveLeft() {
     if (this.hittingLeft) {
       this.sprite.setVelocityX(0);
     } else {
-      this.sprite.setVelocityX(-3);
+      this.sprite.setVelocityX(-1.0);
     }
     this.sprite.anims.play('left', true);
   }
@@ -40,7 +44,7 @@ class Player {
     if (this.hittingRight) {
       this.sprite.setVelocityX(0);
     } else {
-      this.sprite.setVelocityX(3);
+      this.sprite.setVelocityX(1.0);
     }
     this.sprite.anims.play('right', true);
   }
@@ -70,9 +74,16 @@ class Player {
     }
   }
 
-  public jump() {
-    this.sprite.setVelocityY(-9);
-    this.touchingGround = false;
+  public jump(game: GameScene) {
+    if (this.jumpCooldown) {
+      this.sprite.setVelocityY(-7.5);
+      this.touchingGround = false;
+      this.jumpCooldown = false;
+      game.time.delayedCall(700, () => {
+        this.jumpCooldown = true;
+      });
+    }
+
     // const currAnim = this.sprite.anims.getName().toLowerCase();
     // if (currAnim.includes('left')) {
     //   this.sprite.anims.play('jumpLeft', true);
