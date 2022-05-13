@@ -23,7 +23,6 @@ class Lizard extends Enemy {
       inertia: Infinity,
       render: { sprite: { xOffset: 0.5, yOffset: 0.5 } },
     });
-    this.velocity = 0.5;
     const lizard = game.matter.add.sprite(0, 0, 'lizard');
     lizard.scaleX = 0.7;
     lizard.setExistingBody(compound);
@@ -49,6 +48,12 @@ class Lizard extends Enemy {
     this.fireSprite = game.add.sprite(this.sprite.x, this.sprite.y, 'squareFire');
     this.fireSprite.play('squareFire', false);
     this.fireSprite.alpha = 0.7;
+  }
+  public destroy() {
+    super.destroy();
+    if (this.fireSprite != null) {
+      this.fireSprite.destroy();
+    }
   }
   public syncFire() {
     if (this.onFire) {

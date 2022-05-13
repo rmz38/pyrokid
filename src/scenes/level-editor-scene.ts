@@ -164,6 +164,7 @@ export class LevelEditor extends Phaser.Scene {
     aGrid.show();
     // const preset = JSON.parse(JSON.stringify(localStorage.getItem('leveleditorlevel')));
     aGrid.placeAt(preset.player[0].x, preset.player[0].y, 'player', this);
+    //Can probably simplify below
     preset.dirt.forEach((e) => {
       aGrid.placeAtPreset(e.x, e.y, 'dirt', e.frame, this);
     });
@@ -181,6 +182,9 @@ export class LevelEditor extends Phaser.Scene {
     });
     preset.spider.forEach((e) => {
       aGrid.placeAtPreset(e.x, e.y, 'spider', '0', this);
+    });
+    preset.spiderArmored.forEach((e) => {
+      aGrid.placeAtPreset(e.x, e.y, 'spiderArmored', '0', this);
     });
     preset.exit.forEach((e) => {
       aGrid.placeAtPreset(e.x, e.y, 'exit', '0', this);
@@ -223,8 +227,10 @@ export class LevelEditor extends Phaser.Scene {
       for (let j = 0; j < grid[0].length; j++) {
         if (grid[i][j]) {
           const obj = grid[i][j];
+          console.log(obj.name);
           if ((i < this.width && j < this.height) || obj.name == 'player') {
             // check min in case new world size cuts off player location
+            console.log(obj.name);
             json[obj.name].push({
               x: obj.x,
               y: obj.y,

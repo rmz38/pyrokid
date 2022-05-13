@@ -86,8 +86,6 @@ class AlignGrid {
       if (clumpables.has(name) && frame != 0) {
         this.neighbors(row, col).forEach((e) => {
           const [nx, ny] = this.unpack(e);
-          console.log(nx);
-          console.log(ny);
           //@ts-ignore
           if (nx >= 0 && ny >= 0 && this.grid[nx][ny] && this.grid[nx][ny].frame.name != 0) {
             this.clumpBox(nx, ny, nx, ny);
@@ -98,6 +96,11 @@ class AlignGrid {
     this.grid[row][col] = null;
     this.clearConnector(row, col);
   }
+  // placeAtPreset(x1, y1, objName, game) {
+  //   this.placeAt(x1, y1, objName, game);
+  //   const row = Math.floor(x1 / TILE_SIZE);
+  //   const col = Math.floor(y1 / TILE_SIZE);
+  // }
   placeAtPreset(x1, y1, objName, frame: string, game) {
     this.placeAt(x1, y1, objName, game);
     const row = Math.floor(x1 / TILE_SIZE);
@@ -165,7 +168,6 @@ class AlignGrid {
     return [i + ',' + (j - 1), i + 1 + ',' + j, i + ',' + (j + 1), i - 1 + ',' + j];
   }
   checkConnected(nx, ny, i, j, checkId) {
-    console.log(checkId);
     if (checkId == undefined) {
       return false;
     }
@@ -213,7 +215,6 @@ class AlignGrid {
             const [nx, ny] = this.unpack(e);
             if (nx > 0 && nx < this.cols && ny > 0 && ny < this.rows) {
               if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != '0') {
-                console.log('frame name ' + this.grid[nx][ny].frame.name);
                 const checkId = indexes[parseInt(this.grid[nx][ny].frame.name)];
                 if (this.checkConnected(nx, ny, i, j, checkId)) {
                   //NEED TO BFS AGAIN
@@ -225,7 +226,6 @@ class AlignGrid {
               }
             }
           });
-          console.log(check);
         }
       }
     }
@@ -238,7 +238,6 @@ class AlignGrid {
           const [nx, ny] = this.unpack(e);
           if (nx > 0 && nx < this.cols && ny > 0 && ny < this.rows) {
             if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != '0') {
-              console.log('frame name ' + this.grid[nx][ny].frame.name);
               const checkId = indexes[parseInt(this.grid[nx][ny].frame.name)];
               if (this.checkConnected(nx, ny, i, j, checkId)) {
                 //NEED TO BFS AGAIN, need to add compound blocks to highlighted?

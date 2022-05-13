@@ -89,7 +89,7 @@ export class GameScene extends Phaser.Scene {
       this.tiles.push(row);
     }
     this.player = new Player(data.player[0].x, data.player[0].y, this);
-    this.cameras.main.startFollow(this.player.sprite, false, 0.2, 0.2);
+    this.cameras.main.startFollow(this.player.sprite, false, 0.05, 0.05);
     this.cameras.main.fadeIn(100, 0, 0, 0);
     // make lizards
     this.lizards = {};
@@ -180,7 +180,7 @@ export class GameScene extends Phaser.Scene {
         const [x, y] = Helpers.getTile(curr.sprite.x, curr.sprite.y);
         //TODO CHECK IF IN BOUNDS OF WORLD
         // if (y > 0 && y < this.yTiles) {
-        if (y > 0) {
+        if (y > 0 && y < this.xTiles) {
           this.tiles[x][y].add(curr);
         } else {
           this.destroyQueue.add(curr);

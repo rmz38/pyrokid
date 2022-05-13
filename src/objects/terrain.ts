@@ -24,6 +24,9 @@ class Terrain {
   public getConnected(connectedBlocks: Set<Terrain>, game: GameScene) {
     const directions = ['left', 'right', 'up', 'down'];
     // const connected: Set<Terrain> = new Set<Terrain>();
+    if (this.sprite.name == 'dirt') {
+      return connectedBlocks;
+    }
     for (let i = 0; i < directions.length; i++) {
       const dir = directions[i];
       if (
@@ -33,7 +36,6 @@ class Terrain {
         !this.owner.blocks.has(this[dir]) &&
         !game.destroyQueue.has(this[dir])
       ) {
-        console.log(this[dir]);
         this[dir].owner.blocks.forEach((ownedBlock: Terrain) => {
           connectedBlocks.add(ownedBlock);
           ownedBlock.getConnected(connectedBlocks, game);

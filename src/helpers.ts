@@ -114,7 +114,6 @@ export function updateDynamic(game: GameScene) {
 
     block.sprite.setStatic(false);
     // ownedBlock.sprite.setPosition(bx, by);
-    console.log(block);
     // ownedBlock.sprite.setStatic(true);
     ///
     block.sprite.tint = 0xffffff;
@@ -183,7 +182,7 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
   currCrate.fireSprite = game.add.sprite(currCrate.sprite.x, currCrate.sprite.y - 10, 'squareFire');
   currCrate.fireSprite.anims.play('squareFire', false);
   currCrate.fireSprite.alpha = 0.7;
-  game.time.delayedCall(700, () => {
+  game.time.delayedCall(600, () => {
     // TODO: move this fire stuff to the crate class
     if (currCrate.fireSprite.active && !currCrate.isLava) {
       currCrate.fireSprite.alpha = 0;
@@ -220,12 +219,13 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
         // const aboveBlock = game.blocks[px + ',' + py];
         currCrate.getConnected(new Set<Terrain>(), game).forEach((connectedToCrate: Terrain) => {
           if (
-            connectedToCrate &&
+            connectedToCrate && // is not undefined
             !seen.has(connectedToCrate) &&
             connectedToCrate.sprite.active &&
             isDynamicTerrain(connectedToCrate.sprite.name) &&
             // !currBlock.owner.blocks.has(aboveBlock) && //REDUNDANT?
-            !checkOwnerGrounded(game, connectedToCrate, tempQueue)
+            !checkOwnerGrounded(game, connectedToCrate, tempQueue) &&
+            connectedToCrate.sprite.name != 'dirt'
           ) {
             next.add(connectedToCrate);
             seen.add(connectedToCrate);
@@ -248,11 +248,12 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
                 aboveBlock.sprite.active &&
                 isDynamicTerrain(aboveBlock.sprite.name) &&
                 // !currBlock.owner.blocks.has(aboveBlock) && //REDUNDANT?
-                !checkOwnerGrounded(game, aboveBlock, tempQueue)
+                !checkOwnerGrounded(game, aboveBlock, tempQueue) &&
+                currBlock.sprite.name != 'dirt'
               ) {
                 // check compound blocks
                 aboveBlock.owner.blocks.forEach((block: Terrain) => {
-                  if (!seen.has(block)) {
+                  if (!seen.has(block) && block.sprite.name != 'dirt') {
                     next.add(block);
                     seen.add(block);
                     game.staticBlockQueue.add(block);
@@ -260,7 +261,7 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
                 });
                 // check any block connected with connectors
                 aboveBlock.owner.getConnected(game).forEach((block: Terrain) => {
-                  if (!seen.has(block)) {
+                  if (!seen.has(block) && block.sprite.name != 'dirt') {
                     next.add(block);
                     seen.add(block);
                     game.staticBlockQueue.add(block);
@@ -353,13 +354,10 @@ export function initDynamicAndStaticQueues(game: GameScene) {
           connectedToStatic = true;
         }
       });
-      console.log(block);
-      console.log(connectedToStatic);
       if (connectedToStatic) {
         (block as Terrain).setGrounded();
       }
       if (!(block as Terrain).sprite.isStatic()) {
-        console.log('added to dynamic init');
         game.dynamicBlockQueue.add(block as Terrain);
         delete game.blocks[pos];
       }
@@ -395,7 +393,7 @@ export function updateStatic(game: GameScene) {
         //TODO add all blocks in compound instead of just this, to enforce precondition of all blocks being dynamic in queue
         toAddToMap[px + ',' + py] = block;
       } else if (!block.sprite.isStatic()) {
-        if (block.sprite.body.velocity.y > 12) block.sprite.setVelocityY(12);
+        if (block.sprite.body.velocity.y > 8) block.sprite.setVelocityY(8);
         nextQueue.add(block);
       } else if (block.sprite.active && block.sprite.isStatic()) {
         toAddToMap[px + ',' + py] = block;
@@ -425,17 +423,6 @@ function checkBlockGrounded(
   const downBlock = game.blocks[downId];
   // console.log(game.blocks[downId]);
   if (block.sprite.active) {
-    console.log(
-      downBlock &&
-        downBlock.sprite.active &&
-        downBlock.sprite.isStatic() &&
-        !game.staticBlockQueue.has(downBlock) && // not in queue to become unstatic
-        !tempQueue.has(downBlock) &&
-        !game.destroyQueue.has(downBlock) && // not about to be destroyed
-        isDynamicTerrain(downBlock.sprite.name) && // can't become unstatic if is dirt
-        !block.owner.blocks.has(downBlock) &&
-        !connectedBlocks.has(downBlock),
-    );
     return (
       downBlock &&
       downBlock.sprite.active &&

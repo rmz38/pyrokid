@@ -36,7 +36,7 @@ class Player {
     if (this.hittingLeft) {
       this.sprite.setVelocityX(0);
     } else {
-      this.sprite.setVelocityX(-1.0);
+      this.sprite.setVelocityX(-1.35);
     }
     this.sprite.anims.play('left', true);
   }
@@ -44,7 +44,7 @@ class Player {
     if (this.hittingRight) {
       this.sprite.setVelocityX(0);
     } else {
-      this.sprite.setVelocityX(1.0);
+      this.sprite.setVelocityX(1.35);
     }
     this.sprite.anims.play('right', true);
   }
@@ -76,7 +76,7 @@ class Player {
 
   public jump(game: GameScene) {
     if (this.jumpCooldown) {
-      this.sprite.setVelocityY(-7.5);
+      this.sprite.setVelocityY(-5.5);
       this.touchingGround = false;
       this.jumpCooldown = false;
       game.time.delayedCall(700, () => {
