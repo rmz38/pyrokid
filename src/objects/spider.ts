@@ -30,6 +30,7 @@ class Spider extends Enemy {
     spider.setExistingBody(compound);
     spider.setPosition(x, y);
     spider.setCollidesWith(0x0100);
+    spider.setFriction(0.0);
     this.collisionSensor.scaleX = 0.7;
     this.collisionSensor.scaleY = 0.8;
     this.sprite = spider;

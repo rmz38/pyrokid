@@ -29,6 +29,7 @@ class Lizard extends Enemy {
     lizard.setPosition(x, y);
     lizard.setCollisionCategory(0x001);
     lizard.setCollidesWith(0x0100);
+    lizard.setFriction(0.0);
     this.collisionSensor.setCollisionCategory(0x1000);
     this.collisionSensor.setCollidesWith(0x101000);
     this.collisionSensor.scaleX = 0.7;

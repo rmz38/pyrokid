@@ -15,6 +15,10 @@ export class LevelSelect extends Phaser.Scene {
   }
 
   public create(): void {
+    new MenuButton(this, 10, 10, 'Back to Menu', () => {
+      this.scene.stop('Game');
+      this.scene.start('MainMenu');
+    });
     this.add
       .text(100, 50, 'Level Select', {
         color: '#FFFFFF',

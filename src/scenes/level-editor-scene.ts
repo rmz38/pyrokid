@@ -93,8 +93,8 @@ export class LevelEditor extends Phaser.Scene {
       'Steel',
       'Lizard',
       'Spider',
-      'Player',
       'Armor Spider',
+      'Player',
     ];
     const menuSelects = [
       'start',
@@ -111,8 +111,8 @@ export class LevelEditor extends Phaser.Scene {
       'steel',
       'lizard',
       'spider',
-      'player',
       'spiderArmored',
+      'player',
     ];
     const menuButtons = [];
     for (let i = 0; i < menuNames.length; i++) {

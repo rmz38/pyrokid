@@ -20,6 +20,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 };
 let cursors;
 let wasdr;
+
 export class GameScene extends Phaser.Scene {
   public speed = 100;
   public lizards: Helpers.LizardHash = {};
@@ -44,6 +45,7 @@ export class GameScene extends Phaser.Scene {
 
   // public compounds = {};
   public level = 'level' + localStorage.getItem('level');
+  graphics: Phaser.GameObjects.Graphics;
   constructor() {
     super(sceneConfig);
   }
@@ -51,6 +53,7 @@ export class GameScene extends Phaser.Scene {
     this.load.json('level' + localStorage.getItem('level'), 'assets/levels/' + localStorage.getItem('level') + '.json');
   }
   public create(): void {
+    wasdr = this.input.keyboard.addKeys('W,S,A,D,R,ESC,J');
     //this.mover = this.matter.add.sprite(300, 500, 'lizard');
     this.burnQueue.clear();
     this.destroyQueue.clear();
@@ -156,11 +159,6 @@ export class GameScene extends Phaser.Scene {
     // Helpers.updateDynamic(this);
     Helpers.updateStatic(this);
     cursors = this.input.keyboard.createCursorKeys();
-
-    wasdr = this.input.keyboard.addKeys('W,S,A,D,R');
-    new MenuButton(this, 10, 10, 'Back to Menu', () => {
-      this.scene.start('MainMenu');
-    });
   }
   public update(): void {
     // add crates to tiles
@@ -194,6 +192,10 @@ export class GameScene extends Phaser.Scene {
     }
     for (const [key, spider] of Object.entries(this.spiders)) {
       spider.update();
+    }
+    if (wasdr.ESC.isDown) {
+      this.scene.launch('PauseMenu');
+      this.scene.pause();
     }
     if (wasdr.A.isDown) {
       this.player.moveLeft();

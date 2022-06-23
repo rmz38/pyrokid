@@ -3,5 +3,6 @@ import { BootScene } from './boot-scene';
 import { GameScene } from './game-scene';
 import { LevelEditor } from './level-editor-scene';
 import { LevelSelect } from './level-select-scene';
+import { PauseMenu } from './pause-menu';
 
-export default [BootScene, MainMenuScene, GameScene, LevelEditor, LevelSelect];
+export default [BootScene, MainMenuScene, GameScene, LevelEditor, LevelSelect, PauseMenu];
