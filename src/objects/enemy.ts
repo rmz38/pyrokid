@@ -1,6 +1,6 @@
 class Enemy {
   sprite: Phaser.Physics.Matter.Sprite;
-  velocity = 0.75;
+  velocity = 0.8;
   collisionSensor: Phaser.Physics.Matter.Sprite;
   rightEdge: boolean;
   leftEdge: boolean;

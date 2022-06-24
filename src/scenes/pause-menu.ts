@@ -33,8 +33,16 @@ export class PauseMenu extends Phaser.Scene {
       this.scene.stop('Game');
       this.scene.start('MainMenu');
     });
-    // graphics.strokeRect(sx, sy, pointer.worldX - sx, pointer.worldY - sy);
+    new MenuButton(this, 200, 300, 'Open in Editor', () => {
+      localStorage.setItem('upload', 'true');
+      this.scene.stop('Game');
+      this.scene.start('LevelEditor');
+    });
   }
+  //   let preset =
+  //       localStorage.getItem('upload') == 'true'
+  //         ? JSON.parse(localStorage.getItem('leveleditorlevel'))
+  //         : this.cache.json.get('leveleditorlevel');
   public update() {
     if (keys.ESC.isDown) {
       this.scene.resume('Game');

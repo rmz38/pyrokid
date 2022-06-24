@@ -21,6 +21,10 @@ TODO:
 - fireball zeroes player y velocity bug
 - update lab 4 markdown instructions!!!
 - add help screen during pause and in main menu
+- add open level in editor in the pause screen (I think it'd be good to have, old game did not have this)
+- fix level editor UI so that you don't accidentally go back to menu
+- fix infinite loop when uploading a level a second time
+- fix do flaming crate interaction as soon as crate is ignited
 
 Notes: missing water bat and plated crates, so levels 15, 21, 28 are removed. Levels 27, 29, 30, 31, 37 will be adjusted or removed.
 

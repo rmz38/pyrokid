@@ -18,7 +18,7 @@ class Terrain {
       const [px, py] = getTileCenter(this.sprite.x, this.sprite.y);
       this.sprite.setPosition(px, py);
       //to debug
-      this.sprite.setTint(0xff0000);
+      // this.sprite.setTint(0xff0000);
     }
   }
   public getConnected(connectedBlocks: Set<Terrain>, game: GameScene) {

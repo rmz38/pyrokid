@@ -64,6 +64,8 @@ export class GameScene extends Phaser.Scene {
       localStorage.getItem('useleveleditor') == 'true'
         ? JSON.parse(localStorage.getItem('leveleditorlevel'))
         : this.cache.json.get('level' + localStorage.getItem('level'));
+    // in case to open in level editor
+    localStorage.setItem('leveleditorlevel', JSON.stringify(data));
     const world_bound_width = data.width * this.TILE_SIZE;
     const world_bound_height = data.height * this.TILE_SIZE;
     const background = this.add.tileSprite(
