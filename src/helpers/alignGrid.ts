@@ -83,18 +83,11 @@ class AlignGrid {
       this.grid[row][col].destroy();
       this.grid[row][col] = null;
       //@ts-ignore
-      if (clumpables.has(name) && frame != 0) {
+      if (clumpables.has(name) && frame != '0') {
         this.neighbors(row, col).forEach((e) => {
           const [nx, ny] = this.unpack(e);
           //@ts-ignore
-          if (
-            nx >= 0 &&
-            nx < this.grid.length &&
-            ny >= 0 &&
-            ny < this.grid[0].length &&
-            this.grid[nx][ny] &&
-            true == true
-          ) {
+          if (nx >= 0 && nx < this.grid.length && ny >= 0 && ny < this.grid[0].length && this.grid[nx][ny]) {
             this.clumpBox(nx, ny, nx, ny);
           }
         });
@@ -178,6 +171,18 @@ class AlignGrid {
     if (checkId == undefined) {
       return false;
     }
+    if (ny < j && nx == i && checkId.charAt(5) == '1') {
+      console.log(i + ' ' + j + ' ' + 'top');
+    }
+    // if (ny > j && nx == i && checkId.charAt(1) == '1') {
+    //   console.log('bottom');
+    // }
+    // if (nx > i && ny == j && checkId.charAt(7) == '1') {
+    //   console.log('right');
+    // }
+    if (nx < i && ny == j && checkId.charAt(3) == '1') {
+      console.log(i + ' ' + j + ' ' + 'left');
+    }
     return (
       (ny < j && nx == i && checkId.charAt(5) == '1') || // top
       // (ny < j && nx > i && checkId.charAt(4) == '1') || // top right
@@ -220,7 +225,7 @@ class AlignGrid {
           check.add(i + ',' + j);
           this.neighbors(i, j).forEach((e) => {
             const [nx, ny] = this.unpack(e);
-            if (nx > 0 && nx < this.cols && ny > 0 && ny < this.rows) {
+            if (nx >= 0 && nx < this.cols && ny >= 0 && ny < this.rows) {
               if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != '0') {
                 const checkId = indexes[parseInt(this.grid[nx][ny].frame.name)];
                 if (this.checkConnected(nx, ny, i, j, checkId)) {
@@ -243,7 +248,7 @@ class AlignGrid {
         const [i, j] = this.unpack(node);
         this.neighbors(i, j).forEach((e) => {
           const [nx, ny] = this.unpack(e);
-          if (nx > 0 && nx < this.cols && ny > 0 && ny < this.rows) {
+          if (nx >= 0 && nx < this.cols && ny >= 0 && ny < this.rows) {
             if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != '0') {
               const checkId = indexes[parseInt(this.grid[nx][ny].frame.name)];
               if (this.checkConnected(nx, ny, i, j, checkId)) {
@@ -251,6 +256,7 @@ class AlignGrid {
                 if (!check.has(e)) {
                   next.add(e);
                   check.add(e);
+                  highlighted.add(e);
                 }
               }
             }
@@ -258,7 +264,7 @@ class AlignGrid {
         });
       });
     }
-    this.clump(highlighted, check);
+    this.clump(check, check);
   }
   clump(curr: Set<string>, check: Set<string>): void {
     // figure out which tile texture to use based on spritesheet
