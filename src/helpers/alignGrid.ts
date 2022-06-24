@@ -93,7 +93,7 @@ class AlignGrid {
             ny >= 0 &&
             ny < this.grid[0].length &&
             this.grid[nx][ny] &&
-            this.grid[nx][ny].frame.name != 0
+            true == true
           ) {
             this.clumpBox(nx, ny, nx, ny);
           }
