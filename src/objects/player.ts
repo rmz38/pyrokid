@@ -76,7 +76,7 @@ class Player {
 
   public jump(game: GameScene) {
     if (this.jumpCooldown) {
-      this.sprite.setVelocityY(-5.5);
+      this.sprite.setVelocityY(-5.3);
       this.touchingGround = false;
       this.jumpCooldown = false;
       game.time.delayedCall(700, () => {
