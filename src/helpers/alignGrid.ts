@@ -213,7 +213,7 @@ class AlignGrid {
           check.add(i + ',' + j);
           this.neighbors(i, j).forEach((e) => {
             const [nx, ny] = this.unpack(e);
-            if (nx > 0 && nx < this.cols && ny > 0 && ny < this.rows) {
+            if (nx >= 0 && nx < this.cols && ny >= 0 && ny < this.rows) {
               if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != '0') {
                 const checkId = indexes[parseInt(this.grid[nx][ny].frame.name)];
                 if (this.checkConnected(nx, ny, i, j, checkId)) {
@@ -236,7 +236,7 @@ class AlignGrid {
         const [i, j] = this.unpack(node);
         this.neighbors(i, j).forEach((e) => {
           const [nx, ny] = this.unpack(e);
-          if (nx > 0 && nx < this.cols && ny > 0 && ny < this.rows) {
+          if (nx >= 0 && nx < this.cols && ny >= 0 && ny < this.rows) {
             if (this.grid[nx][ny] && this.grid[nx][ny].frame.name != '0') {
               const checkId = indexes[parseInt(this.grid[nx][ny].frame.name)];
               if (this.checkConnected(nx, ny, i, j, checkId)) {
@@ -251,7 +251,7 @@ class AlignGrid {
         });
       });
     }
-    this.clump(highlighted, check);
+    this.clump(check, check);
   }
   clump(curr: Set<string>, check: Set<string>): void {
     // figure out which tile texture to use based on spritesheet

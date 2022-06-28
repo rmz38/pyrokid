@@ -53,8 +53,18 @@ export class GameScene extends Phaser.Scene {
     this.load.json('level' + localStorage.getItem('level'), 'assets/levels/' + localStorage.getItem('level') + '.json');
   }
   public create(): void {
+    // skip button
+    new MenuButton(this, 10, 10, 'Skip Level', () => {
+      if (localStorage.getItem('useleveleditor') == 'false') {
+        const currLevel = parseInt(localStorage.getItem('level'));
+        const nextLevel = currLevel + 1;
+        localStorage.setItem('level', nextLevel.toString());
+      }
+      this.scene.restart();
+    });
+
+    //keyboard inputs TODO: rename now that there are more than wasdr keys
     wasdr = this.input.keyboard.addKeys('W,S,A,D,R,ESC,J');
-    //this.mover = this.matter.add.sprite(300, 500, 'lizard');
     this.burnQueue.clear();
     this.destroyQueue.clear();
     this.dynamicBlockQueue.clear();

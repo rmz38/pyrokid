@@ -67,12 +67,12 @@ export const createCollisions = (game: GameScene): void => {
           game.scene.restart();
         }
       }
-      if ((a.includes('crate') && b.includes('player')) || (b.includes('crate') && a.includes('player'))) {
-        const crate = a.includes('crate') ? a : b;
-        if (game.crates[crate].onFire) {
-          game.scene.restart();
-        }
-      }
+      // if ((a.includes('crate') && b.includes('player')) || (b.includes('crate') && a.includes('player'))) {
+      //   const crate = a.includes('crate') ? a : b;
+      //   if (game.crates[crate].onFire) {
+      //     game.scene.restart();
+      //   }
+      // }
       if (
         (isTerrain(a) && b.includes('bomb') && bodyB.isSensor) ||
         (isTerrain(b) && a.includes('bomb') && bodyA.isSensor)

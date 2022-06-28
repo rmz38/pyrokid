@@ -26,7 +26,7 @@ TODO:
 - fix infinite loop when uploading a level a second time
 - fix do flaming crate interaction as soon as crate is ignited
 - add new fireball asset
--
+- maybe issue lvl 10 if u put crates under the connected part then burn, it may mess up the static part?
 
 Notes: missing water bat and plated crates, so levels 15, 21, 28 are removed. Levels 27, 29, 30, 31, 37 will be adjusted or removed.
 

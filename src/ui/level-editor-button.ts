@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
 import { game } from '../main';
 import { GameScene } from '../scenes/game-scene';
-import { MenuButton } from '../ui/menu-button';
+import { MenuButton } from './menu-button';
 // function handleUpload(e) {
 //   const reader = new FileReader();
 //   reader.readAsText(e.target.files[0]);

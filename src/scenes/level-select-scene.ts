@@ -1,3 +1,4 @@
+import { LevelSelectButton } from '../ui/level-select-button';
 import { MenuButton } from '../ui/menu-button';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
@@ -21,6 +22,7 @@ export class LevelSelect extends Phaser.Scene {
   }
 
   public create(): void {
+    const background = this.add.tileSprite(400, 300, 800, 600, 'backgroundDirt');
     new MenuButton(this, 10, 10, 'Back to Menu', () => {
       this.scene.stop('Game');
       this.scene.start('MainMenu');
@@ -40,7 +42,7 @@ export class LevelSelect extends Phaser.Scene {
       for (let j = 0; j < 5; j++) {
         if (counter <= numLevels) {
           const num = counter.toString();
-          new MenuButton(
+          new LevelSelectButton(
             this,
             left + j * 150,
             top + 50 + i * 100,
@@ -59,7 +61,7 @@ export class LevelSelect extends Phaser.Scene {
     }
     //left and right page buttons
     if (page > 0) {
-      new MenuButton(
+      new LevelSelectButton(
         this,
         10,
         300,
@@ -73,7 +75,7 @@ export class LevelSelect extends Phaser.Scene {
       );
     }
     if (page < Math.floor(numLevels / 20)) {
-      new MenuButton(
+      new LevelSelectButton(
         this,
         750,
         300,
