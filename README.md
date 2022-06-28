@@ -12,7 +12,7 @@ TODO:
 
 - kill other objects that fall down holes and hit world bounds, currently objects not destroyed
 - have back to menu button show over other blocks.
-- level 17 has a bug due to connector + dirt + connector.
+- -level 17 has a bug due to connector + dirt + connector-
 - level 33 (26 here) has a bug with the fast burning?
 - clean up UI for level select
 - fix bug if spider falls while at edge it can get stuck (fixed? need to test more)
@@ -25,6 +25,8 @@ TODO:
 - fix level editor UI so that you don't accidentally go back to menu
 - fix infinite loop when uploading a level a second time
 - fix do flaming crate interaction as soon as crate is ignited
+- add new fireball asset
+- maybe issue lvl 10 if u put crates under the connected part then burn, it may mess up the static part?
 
 Notes: missing water bat and plated crates, so levels 15, 21, 28 are removed. Levels 27, 29, 30, 31, 37 will be adjusted or removed.
 

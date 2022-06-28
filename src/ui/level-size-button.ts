@@ -1,5 +1,5 @@
-import { MenuButton } from '../ui/menu-button';
-import LevelEditorButton from './levelEditorButton';
+import { MenuButton } from './menu-button';
+import LevelEditorButton from './level-editor-button';
 class LevelSizeButton {
   up: any;
   down: any;

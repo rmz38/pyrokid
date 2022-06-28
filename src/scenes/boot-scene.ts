@@ -93,6 +93,7 @@ export class BootScene extends Phaser.Scene {
     this.load.spritesheet('fireDisappear', 'assets/squares/fireDisappear.png', { frameWidth: 84, frameHeight: 133 });
     this.load.spritesheet('explosion', 'assets/explosion.png', { frameWidth: 150, frameHeight: 150 });
     this.load.image('exit', 'assets/exit.png');
+    this.load.image('instructions', 'assets/instructions.png');
     this.load.image('connector', 'assets/connector.png');
   }
 }
