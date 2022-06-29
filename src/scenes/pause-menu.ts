@@ -42,7 +42,7 @@ export class PauseMenu extends Phaser.Scene {
     new MenuButton(this, 550, 400, 'Level Select', () => {
       this.scene.stop('Game');
       localStorage.setItem('useleveleditor', 'false');
-      this.scene.start('Level Select');
+      this.scene.start('LevelSelect');
     });
   }
   //   let preset =

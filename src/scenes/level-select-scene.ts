@@ -1,4 +1,6 @@
+import { LevelSelectButton } from '../ui/level-select-button';
 import { MenuButton } from '../ui/menu-button';
+import { numLevels } from '../helpers/init';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -11,7 +13,6 @@ const top = 100;
 // leftmost x coordinate of the level select portion, to help with positioning
 const left = 80;
 
-const numLevels = 31; // manually set number of levels bc reading max level in browser kind of a pain
 /**
  * The initial scene that starts, shows the splash screens, and loads the necessary assets.
  */
@@ -40,7 +41,7 @@ export class LevelSelect extends Phaser.Scene {
       for (let j = 0; j < 5; j++) {
         if (counter <= numLevels) {
           const num = counter.toString();
-          new MenuButton(
+          new LevelSelectButton(
             this,
             left + j * 150,
             top + 50 + i * 100,

@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import CompoundCrate from '../objects/compound';
 import Crate from '../objects/crate';
 import { GameScene } from '../scenes/game-scene';
+import { progressLevel } from './game-processes';
 const monsterCollisionLabels = new Set<string>(['lizard', 'spider', 'fire', 'exit']);
 
 function isMonster(s: string) {
@@ -31,12 +32,7 @@ export const createCollisions = (game: GameScene): void => {
         game.lizards[lizard].ignite(game);
       }
       if ((a == 'exit' && b == 'player') || (b == 'exit' && a == 'player')) {
-        if (localStorage.getItem('useleveleditor') == 'false') {
-          const currLevel = parseInt(localStorage.getItem('level'));
-          const nextLevel = currLevel + 1;
-          localStorage.setItem('level', nextLevel.toString());
-        }
-        game.scene.restart();
+        progressLevel(game);
       }
       if ((a == 'fire' && b.includes('bomb')) || (b == 'fire' && a.includes('bomb'))) {
         const bomb = a.includes('bomb') ? a : b;

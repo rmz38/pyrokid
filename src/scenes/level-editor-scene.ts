@@ -1,6 +1,6 @@
 import { MenuButton } from '../ui/menu-button';
 import AlignGrid from '../helpers/alignGrid';
-import LevelEditorButton from '../helpers/levelEditorButton';
+import LevelEditorButton from '../ui/level-editor-button';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -8,7 +8,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   key: 'LevelEditor',
 };
 import FileSaver = require('file-saver');
-import LevelSizeButton from '../helpers/levelSizeButton';
+import LevelSizeButton from '../ui/level-size-button';
 let cursors;
 let controls;
 let pointer;

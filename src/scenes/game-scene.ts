@@ -12,6 +12,7 @@ import { createCollisions } from '../helpers/collision-controller';
 import Bomb from '../objects/bomb';
 import * as Helpers from '../helpers';
 import Terrain from '../objects/terrain';
+import { progressLevel } from '../helpers/game-processes';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -53,6 +54,11 @@ export class GameScene extends Phaser.Scene {
     this.load.json('level' + localStorage.getItem('level'), 'assets/levels/' + localStorage.getItem('level') + '.json');
   }
   public create(): void {
+    // skip button
+    new MenuButton(this, 10, 10, 'Skip Level', () => {
+      progressLevel(this);
+    });
+
     wasdr = this.input.keyboard.addKeys('W,S,A,D,R,ESC,J');
     //this.mover = this.matter.add.sprite(300, 500, 'lizard');
     this.burnQueue.clear();

@@ -251,7 +251,7 @@ class AlignGrid {
         });
       });
     }
-    this.clump(highlighted, check);
+    this.clump(check, check);
   }
   clump(curr: Set<string>, check: Set<string>): void {
     // figure out which tile texture to use based on spritesheet
