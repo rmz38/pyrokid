@@ -158,8 +158,6 @@ class AlignGrid {
           this.grid[nx][ny] &&
           this.grid[nx][ny].name == 'dirt'
         ) {
-          console.log(nx - row);
-          console.log(ny - col);
           const sr = Math.min(row, nx);
           const sc = Math.min(col, ny);
           const er = Math.max(row, nx);
