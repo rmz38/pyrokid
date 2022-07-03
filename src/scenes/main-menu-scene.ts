@@ -67,8 +67,6 @@ export class MainMenuScene extends Phaser.Scene {
       this.scene.start('LevelEditor');
     });
 
-    // new MenuButton(this, 100, 350, 'Help', () => console.log('help button clicked'));
-
     new MenuButton(this, 100, 350, 'Credits', () => {
       this.scene.start('Credits');
     });

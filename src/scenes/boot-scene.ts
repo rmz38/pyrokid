@@ -76,7 +76,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image('tutorialBackground1', 'assets/backgrounds/TutorialBackground1.png');
     this.load.image('tutorialBackground2', 'assets/backgrounds/TutorialBackground2.png');
     this.load.image('tutorialBackground3', 'assets/backgrounds/TutorialBackground3.png');
-    this.load.image('house', 'assets/squares/house.png');
+    this.load.image('house', 'assets/house.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.image('backgroundDirt', 'assets/backgrounds/level-editor.png');
     this.load.spritesheet('crate', 'assets/clumpables/crateTiles.png', { frameWidth: 50, frameHeight: 50 });

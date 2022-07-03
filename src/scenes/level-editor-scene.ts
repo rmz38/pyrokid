@@ -227,10 +227,8 @@ export class LevelEditor extends Phaser.Scene {
       for (let j = 0; j < grid[0].length; j++) {
         if (grid[i][j]) {
           const obj = grid[i][j];
-          console.log(obj.name);
           if ((i < this.width && j < this.height) || obj.name == 'player') {
             // check min in case new world size cuts off player location
-            console.log(obj.name);
             json[obj.name].push({
               x: obj.x,
               y: obj.y,

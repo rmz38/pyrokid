@@ -70,7 +70,6 @@ export function clearTiles(game: GameScene) {
 }
 export function makeTipText(game: GameScene, level: integer, tips: any) {
   if (localStorage.getItem('useleveleditor') == 'false') {
-    console.log(level);
     if (tips[level]) {
       for (let x = 0; x < tips[level].length; x++) {
         const textItem = tips[level][x];
