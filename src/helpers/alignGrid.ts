@@ -144,6 +144,30 @@ class AlignGrid {
     this.grid[row][col] = obj;
     obj.x = x2;
     obj.y = y2;
+    //auto clump dirt tiles
+    if (objName == 'dirt') {
+      const neighbors = this.neighbors4(row, col);
+      const autoClumpSet: Set<string> = new Set();
+      for (let x = 0; x < neighbors.length; x++) {
+        const [nx, ny] = this.unpack(neighbors[x]);
+        if (
+          nx >= 0 &&
+          ny >= 0 &&
+          nx < this.grid.length &&
+          ny < this.grid[0].length &&
+          this.grid[nx][ny] &&
+          this.grid[nx][ny].name == 'dirt'
+        ) {
+          console.log(nx - row);
+          console.log(ny - col);
+          const sr = Math.min(row, nx);
+          const sc = Math.min(col, ny);
+          const er = Math.max(row, nx);
+          const ec = Math.max(col, ny);
+          this.clumpBox(sr, sc, er, ec);
+        }
+      }
+    }
   }
   getRowOrCol(pixel: integer): integer {
     return Math.floor(pixel / TILE_SIZE);
@@ -191,10 +215,10 @@ class AlignGrid {
   /**
    * start and end of rectangle drawn by mouse to clump selected tiles
    * FIX TO TAKE SET OF TILES INSTEAD OF RECTANGLE? TODO
-   * @param sx start x pixel coordinate
-   * @param sy start y pixel coordinate
-   * @param ex end x pixel coordinate
-   * @param ey end y pixel coordinate
+   * @param sx start x row coordinate
+   * @param sy start y col coordinate
+   * @param ex end x row coordinate
+   * @param ey end y col coordinate
    */
   clumpBox(sr, sc, er, ec) {
     // sr = sr < er ? sr : er;
