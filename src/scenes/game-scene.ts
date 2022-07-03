@@ -13,6 +13,7 @@ import Bomb from '../objects/bomb';
 import * as Helpers from '../helpers';
 import Terrain from '../objects/terrain';
 import { progressLevel } from '../helpers/game-processes';
+import Villager from '../objects/villager';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -26,6 +27,7 @@ export class GameScene extends Phaser.Scene {
   public speed = 100;
   public lizards: Helpers.LizardHash = {};
   public spiders: Helpers.SpiderHash = {};
+  public villagers: Helpers.VillagerHash = {};
   public lavas: Helpers.LavaHash = {};
   public crates: Helpers.CrateHash = {};
   public bombs: Helpers.BombHash = {};
@@ -52,6 +54,7 @@ export class GameScene extends Phaser.Scene {
   }
   public preload() {
     this.load.json('level' + localStorage.getItem('level'), 'assets/levels/' + localStorage.getItem('level') + '.json');
+    this.load.json('tips', 'assets/levels/tutorial-tips.json');
   }
   public create(): void {
     // skip button
@@ -66,20 +69,34 @@ export class GameScene extends Phaser.Scene {
     this.dynamicBlockQueue.clear();
     this.staticBlockQueue.clear();
     initAnims(this);
+    //check use level editor or saved level
+    const levelNum = parseInt(localStorage.getItem('level'));
     const data =
       localStorage.getItem('useleveleditor') == 'true'
         ? JSON.parse(localStorage.getItem('leveleditorlevel'))
-        : this.cache.json.get('level' + localStorage.getItem('level'));
+        : this.cache.json.get('level' + levelNum);
+    //check is tutorial (levels 1-4) to reskin objects or enemies
+    const isTutorial = localStorage.getItem('useleveleditor') == 'false' && levelNum < 5;
+    //make any tutorial text on screen
+    Helpers.makeTipText(this, levelNum, this.cache.json.get('tips'));
     // in case to open in level editor
     localStorage.setItem('leveleditorlevel', JSON.stringify(data));
     const world_bound_width = data.width * this.TILE_SIZE;
     const world_bound_height = data.height * this.TILE_SIZE;
+    let backgroundName = 'backgroundDirt';
+    if (isTutorial) {
+      if (levelNum < 4) {
+        backgroundName = 'tutorialBackground' + levelNum;
+      } else {
+        backgroundName = 'tutorialBackground3';
+      }
+    }
     const background = this.add.tileSprite(
       world_bound_width / 2,
       world_bound_height / 2,
       world_bound_width,
       world_bound_height,
-      'backgroundDirt',
+      backgroundName,
     );
     // background.setScale(world_bound_width / background.width);
     background.setDepth(-10);
@@ -102,11 +119,19 @@ export class GameScene extends Phaser.Scene {
     this.player = new Player(data.player[0].x, data.player[0].y, this);
     this.cameras.main.startFollow(this.player.sprite, false, 0.05, 0.05);
     this.cameras.main.fadeIn(100, 0, 0, 0);
-    // make lizards
-    this.lizards = {};
-    for (let i = 0; i < data.lizard.length; i++) {
-      const e = data.lizard[i];
-      this.lizards['lizard' + i] = new Lizard(e.x, e.y, this, i);
+    // make lizards (change to villagers in tutorial)
+    if (isTutorial) {
+      this.villagers = {};
+      for (let i = 0; i < data.lizard.length; i++) {
+        const e = data.lizard[i];
+        this.villagers['villager' + i] = new Villager(e.x, e.y, this, i);
+      }
+    } else {
+      this.lizards = {};
+      for (let i = 0; i < data.lizard.length; i++) {
+        const e = data.lizard[i];
+        this.lizards['lizard' + i] = new Lizard(e.x, e.y, this, i);
+      }
     }
     // make spiders
     this.spiders = {};
@@ -124,6 +149,12 @@ export class GameScene extends Phaser.Scene {
     data.steel.forEach((e) => {
       this.blocks[e.x + ',' + e.y] = new Steel(e.x, e.y, this, e.frame);
       this.blocks[e.x + ',' + e.y].sprite.setName('steeltemp');
+      if (isTutorial) {
+        this.blocks[e.x + ',' + e.y].sprite.alpha = 0.0;
+        if (e.frame == 37) {
+          this.add.image(e.x + 50, e.y - 80, 'brickbuilding');
+        }
+      }
     });
     // make dirts
     data.dirt.forEach((e) => {
@@ -144,6 +175,14 @@ export class GameScene extends Phaser.Scene {
       crates.add(this.blocks[e.x + ',' + e.y]);
       this.crates['crate' + counter] = this.blocks[e.x + ',' + e.y];
       counter += 1;
+      if (isTutorial) {
+        if (e.frame != 0) {
+          this.blocks[e.x + ',' + e.y].sprite.alpha = 0.0;
+        }
+        if (e.frame == 37) {
+          this.blocks[e.x + ',' + e.y].house = this.add.image(e.x + 50, e.y - 80, 'house');
+        }
+      }
     });
     data.lava.forEach((e) => {
       this.blocks[e.x + ',' + e.y] = new Crate(e.x, e.y, counter, this, e.frame, true);
@@ -197,6 +236,9 @@ export class GameScene extends Phaser.Scene {
 
     for (const [key, lizard] of Object.entries(this.lizards)) {
       lizard.update();
+    }
+    for (const [key, villager] of Object.entries(this.villagers)) {
+      villager.update();
     }
     for (const [key, spider] of Object.entries(this.spiders)) {
       spider.update();

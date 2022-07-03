@@ -57,6 +57,9 @@ export const createCollisions = (game: GameScene): void => {
       if ((a.includes('spider') && b == 'player') || (b.includes('spider') && a == 'player')) {
         game.scene.restart();
       }
+      if ((a.includes('villager') && b == 'player') || (b.includes('villager') && a == 'player')) {
+        game.scene.restart();
+      }
       if ((a.includes('crate') && b == 'player') || (b.includes('crate') && a == 'player')) {
         const crate = a.includes('crate') ? a : b;
         if (game.crates[crate].onFire) {

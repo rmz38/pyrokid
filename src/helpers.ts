@@ -8,6 +8,7 @@ import Lava from './objects/lava';
 import Lizard from './objects/lizard';
 import Spider from './objects/spider';
 import Terrain from './objects/terrain';
+import Villager from './objects/villager';
 import { GameScene } from './scenes/game-scene';
 
 // lots of these functions are really for helping with block movement or burning
@@ -33,6 +34,9 @@ export interface LizardHash {
 }
 export interface SpiderHash {
   [details: string]: Spider;
+}
+export interface VillagerHash {
+  [details: string]: Villager;
 }
 export interface BombHash {
   [details: string]: Bomb;
@@ -61,6 +65,23 @@ export function clearTiles(game: GameScene) {
   for (let i = 0; i < game.tiles.length; i++) {
     for (let j = 0; j < game.tiles[0].length; j++) {
       game.tiles[i][j].clear();
+    }
+  }
+}
+export function makeTipText(game: GameScene, level: integer, tips: any) {
+  if (localStorage.getItem('useleveleditor') == 'false') {
+    console.log(level);
+    if (tips[level]) {
+      for (let x = 0; x < tips[level].length; x++) {
+        const textItem = tips[level][x];
+        game.add
+          .text(textItem.x, textItem.y, textItem.text, {
+            color: '#FFFFFF',
+            fontStyle: 'bold',
+          })
+          .setFontSize(20)
+          .setDepth(2);
+      }
     }
   }
 }

@@ -73,7 +73,9 @@ export class BootScene extends Phaser.Scene {
     // Load sample assets
 
     // Source: Open Game Art
-    this.load.image('background', 'assets/backgrounds/TutorialBackground1.png');
+    this.load.image('tutorialBackground1', 'assets/backgrounds/TutorialBackground1.png');
+    this.load.image('tutorialBackground2', 'assets/backgrounds/TutorialBackground2.png');
+    this.load.image('tutorialBackground3', 'assets/backgrounds/TutorialBackground3.png');
     this.load.image('house', 'assets/squares/house.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.image('backgroundDirt', 'assets/backgrounds/level-editor.png');
@@ -95,5 +97,9 @@ export class BootScene extends Phaser.Scene {
     this.load.image('exit', 'assets/exit.png');
     this.load.image('instructions', 'assets/instructions.png');
     this.load.image('connector', 'assets/connector.png');
+    this.load.image('brickbuilding', 'assets/brickbuilding.png');
+    this.load.image('villager1', 'assets/monsters/villager1.png');
+    this.load.image('villager2', 'assets/monsters/villager2.png');
+    this.load.image('villager3', 'assets/monsters/villager3.png');
   }
 }

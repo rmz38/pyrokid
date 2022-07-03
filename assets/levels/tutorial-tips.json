@@ -1,0 +1,87 @@
+{
+    "1": [
+        {
+            "text": "Use the WASD keys to move and jump. Use Esc to pause.",
+            "x": 360,
+            "y": 540
+        }
+    ],
+    "2": [
+        {
+            "text": "Press the right arrow key to shoot right",
+            "x": 380,
+            "y": 500
+        }
+    ],
+    "3": [
+        {
+            "text": "Use an arrow key to shoot a fireball.",
+            "x": 360,
+            "y": 500
+        }
+    ],
+    "4": [
+        {
+            "text": "The kid is burning houses, get them!",
+            "x": 380,
+            "y": 75
+        }
+    ],
+    "6": [
+        {
+            "text": "Remember, you can shoot in any direction.",
+            "x": 180,
+            "y": 10
+        }
+    ],
+    "7": [
+        {
+            "text": "Latches will hold objects together",
+            "x": 180,
+            "y": 10
+        }
+    ],
+    "8": [
+        {
+            "text": "Sometimes you have to make your own exit.",
+            "x": 180,
+            "y": 10
+        },
+        {
+            "text": "Look for a bomb to blow up.",
+            "x": 180,
+            "y": 50
+        }
+    ],
+    "9": [
+        {
+            "text": "If you get stuck, press R to restart.",
+            "x": 180,
+            "y": 10
+        }
+    ],
+    "15": [
+        {
+            "text": "You can shoot while falling.",
+            "x": 400,
+            "y": 50
+        },
+        {
+            "text": "Press R to restart.",
+            "x": 400,
+            "y": 90
+        }
+    ],
+    "16": [
+        {
+            "text": "Sometimes you'll need to jump and",
+            "x": 390,
+            "y": 30
+        },
+        {
+            "text": "shoot down at the same time.",
+            "x": 390,
+            "y": 70
+        }
+    ]
+}

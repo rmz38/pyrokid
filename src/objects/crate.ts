@@ -8,6 +8,8 @@ class Crate extends Terrain {
   fireSprite: Phaser.GameObjects.Sprite;
   connectors: Set<Connector>;
   isLava: boolean;
+  //only used to skin houses in tutorial
+  house: Phaser.GameObjects.Sprite;
   // timeIgnite: number;
   constructor(x: integer, y: integer, id: integer, game: Phaser.Scene, frame = 0, isLava: boolean) {
     super();
@@ -43,6 +45,11 @@ class Crate extends Terrain {
   }
   public destroy(game: GameScene) {
     if (!this.isLava && this.sprite.active) {
+      // only relevant in tutorial
+      if (this.house && this.house.active) {
+        this.house.destroy();
+      }
+      // end tutorial code
       this.sprite.destroy();
       this.connectors.forEach((e) => {
         e.destroy(game);
