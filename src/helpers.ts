@@ -202,7 +202,7 @@ export function igniteCrate(game: GameScene, currCrate: Crate) {
   currCrate.fireSprite = game.add.sprite(currCrate.sprite.x, currCrate.sprite.y - 10, 'squareFire');
   currCrate.fireSprite.anims.play('squareFire', false);
   currCrate.fireSprite.alpha = 0.7;
-  game.time.delayedCall(600, () => {
+  game.time.delayedCall(900, () => {
     // TODO: move this fire stuff to the crate class
     if (currCrate.fireSprite.active && !currCrate.isLava) {
       currCrate.fireSprite.alpha = 0;

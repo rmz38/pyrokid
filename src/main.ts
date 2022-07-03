@@ -21,6 +21,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
       gravity: { y: 0.25 },
     },
   },
+  //fix framerate to be consistent on all monitors to avoid weird speed issues
   fps: {
     target: 120,
     forceSetTimeOut: true,
@@ -29,7 +30,6 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
   parent: 'game',
   backgroundColor: '#000000',
 };
-
 export const game = new Phaser.Game(gameConfig);
 
 window.addEventListener('resize', () => {
