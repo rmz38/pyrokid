@@ -19,8 +19,8 @@ TODO:
 - add collision interaction where if crate is already touching enemy, it can also ignite them
 - prevent blocks slowing down when they fall on top of enemies and kill them
 - fireball zeroes player y velocity bug
-- update lab 4 markdown instructions!!!
-- add help screen during pause and in main menu
+- -update lab 4 markdown instructions!!!-
+- fix help screen graphic on photoshop
 - add open level in editor in the pause screen (I think it'd be good to have, old game did not have this)
 - fix level editor UI so that you don't accidentally go back to menu
 - fix infinite loop when uploading a level a second time

@@ -4,9 +4,9 @@ class Lizard extends Enemy {
   fireSprite: Phaser.GameObjects.Sprite;
   constructor(x: integer, y: integer, game: Phaser.Scene, id: integer) {
     super();
-    const lizRight = game.matter.bodies.rectangle(15, 0, 10, 10, { isSensor: true, label: 'lizard' + id });
+    const lizRight = game.matter.bodies.rectangle(17, 0, 3, 10, { isSensor: true, label: 'lizard' + id });
     const lizRightEdge = game.matter.bodies.rectangle(17, 25, 3, 10, { isSensor: true, label: 'rightEdgeL,' + id });
-    const lizLeft = game.matter.bodies.rectangle(-15, 0, 10, 10, { isSensor: true, label: 'lizard' + id });
+    const lizLeft = game.matter.bodies.rectangle(-17, 0, 3, 10, { isSensor: true, label: 'lizard' + id });
     const lizLeftEdge = game.matter.bodies.rectangle(-17, 25, 3, 10, { isSensor: true, label: 'leftEdgeL,' + id });
     const lizTop = game.matter.bodies.rectangle(0, -20, 30, 2, { isSensor: true, label: 'lizTop,' + id });
     const lizardBody = game.matter.bodies.rectangle(0, 0, 35, 40, { label: 'lizard' + id });

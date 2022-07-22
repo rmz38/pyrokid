@@ -14,7 +14,7 @@ export const initAnims = (game: Phaser.Scene): void => {
 
   game.anims.create({
     key: 'fireball',
-    frames: game.anims.generateFrameNumbers('fireball', { start: 0, end: 1 }),
+    frames: game.anims.generateFrameNumbers('fireball', { start: 3, end: 5 }),
     frameRate: 10,
     repeat: -1,
   });

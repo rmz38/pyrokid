@@ -32,8 +32,8 @@ export class MainMenuScene extends Phaser.Scene {
       repeat: -1,
     });
     this.anims.create({
-      key: 'screenfireball',
-      frames: this.anims.generateFrameNumbers('screenfireball', { start: 3, end: 5 }),
+      key: 'fireball',
+      frames: this.anims.generateFrameNumbers('fireball', { start: 3, end: 5 }),
       frameRate: 10,
       repeat: -1,
     });
@@ -51,10 +51,10 @@ export class MainMenuScene extends Phaser.Scene {
     //   }
     // }
 
-    const fireball = this.add.sprite(600, 250, 'screenfireball');
+    const fireball = this.add.sprite(600, 250, 'fireball');
     fireball.scaleX = 3;
     fireball.scaleY = 3;
-    fireball.anims.play('screenfireball');
+    fireball.anims.play('fireball');
 
     new MenuButton(this, 100, 150, 'Level Select', () => {
       localStorage.setItem('useleveleditor', 'false');

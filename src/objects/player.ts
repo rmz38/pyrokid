@@ -11,7 +11,7 @@ class Player {
     const recRight = game.matter.bodies.rectangle(16, 0, 15, 27, { isSensor: true, label: 'playerRight' });
     const recLeft = game.matter.bodies.rectangle(-16, 0, 15, 27, { isSensor: true, label: 'playerLeft' });
     const recTop = game.matter.bodies.rectangle(0, -15, 10, 5, { isSensor: true, label: 'playerTop' });
-    const playerBody = game.matter.bodies.rectangle(0, 0, 20, 30, { label: 'player' });
+    const playerBody = game.matter.bodies.rectangle(0, 0, 20, 30, { label: 'playerBody' });
     const compound = game.matter.body.create({
       parts: [playerBody, rec, recRight, recLeft, recTop],
       inertia: Infinity,

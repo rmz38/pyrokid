@@ -6,7 +6,7 @@ import { progressLevel } from './game-processes';
 const monsterCollisionLabels = new Set<string>(['lizard', 'spider', 'fire', 'exit']);
 
 function isMonster(s: string) {
-  return s.includes('spider') || s.includes('lizard');
+  return s.includes('spider') || s.includes('lizard') || s.includes('villager');
 }
 function isTerrain(s: string) {
   return s.includes('crate') || s.includes('steel') || s.includes('lava') || s.includes('dirt');
@@ -51,13 +51,7 @@ export const createCollisions = (game: GameScene): void => {
           game.bombs[bomb].makeExit(game);
         }
       }
-      if ((a.includes('lizard') && b == 'player') || (b.includes('lizard') && a == 'player')) {
-        game.scene.restart();
-      }
-      if ((a.includes('spider') && b == 'player') || (b.includes('spider') && a == 'player')) {
-        game.scene.restart();
-      }
-      if ((a.includes('villager') && b == 'player') || (b.includes('villager') && a == 'player')) {
+      if ((isMonster(a) && b == 'playerBody') || (isMonster(b) && a == 'playerBody')) {
         game.scene.restart();
       }
       if ((a.includes('crate') && b == 'player') || (b.includes('crate') && a == 'player')) {
@@ -303,13 +297,13 @@ export const createCollisions = (game: GameScene): void => {
     }
     for (const [key, value] of Object.entries(game.spiders)) {
       if (value.rightEdge == false) {
-        value.flip();
+        value.faceLeft();
         value.rightEdge = true;
       } else {
         value.rightEdge = false;
       }
       if (value.leftEdge == false) {
-        value.flip();
+        value.faceRight();
         value.leftEdge = true;
       } else {
         value.leftEdge = false;

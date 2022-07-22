@@ -285,6 +285,7 @@ export class GameScene extends Phaser.Scene {
         isSensor: true,
         label: 'fire',
       });
+      this.fire.setScale(0.8, 1);
       let direction: 'right' | 'left' | 'none' = 'right';
       this.fire.setCollisionCategory(0x0100);
       if (cursors.left.isDown) {
@@ -309,13 +310,13 @@ export class GameScene extends Phaser.Scene {
       const yVel = cursors.down.isDown || cursors.up.isDown ? 10 : 0;
       this.fire.setVelocityY(yVel * yDir);
       this.fireActive = true;
-      setTimeout(() => {
+      this.time.delayedCall(500, () => {
         if (this.fireActive) {
           this.fireActive = false;
           this.fire.destroy();
         }
         this.fireCooldown = false;
-      }, 500);
+      });
     }
     Object.keys(this.crates).forEach((key) => {
       const crate = this.crates[key];
