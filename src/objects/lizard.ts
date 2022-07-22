@@ -9,7 +9,7 @@ class Lizard extends Enemy {
     const lizLeft = game.matter.bodies.rectangle(-17, 0, 3, 10, { isSensor: true, label: 'lizard' + id });
     const lizLeftEdge = game.matter.bodies.rectangle(-17, 25, 3, 10, { isSensor: true, label: 'leftEdgeL,' + id });
     const lizTop = game.matter.bodies.rectangle(0, -20, 30, 2, { isSensor: true, label: 'lizTop,' + id });
-    const lizardBody = game.matter.bodies.rectangle(0, 0, 35, 40, { label: 'lizard' + id });
+    const lizardBody = game.matter.bodies.rectangle(0, 0, 35, 35, { label: 'lizard' + id });
     // const collisionBody = game.matter.bodies.rectangle(0, 0, 1, 40, { isSensor: true, label: 'lizard' + id });
     this.collisionSensor = game.matter.add.sprite(0, 0, 'lizard', null, {
       isSensor: true,

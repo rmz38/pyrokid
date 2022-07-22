@@ -11,21 +11,20 @@ Running `yarn dev` runs the game in development mode, which produces larger bund
 TODO:
 
 - kill other objects that fall down holes and hit world bounds, currently objects not destroyed
-- have back to menu button show over other blocks.
+- -have back to menu button show over other blocks.-
 - -level 17 has a bug due to connector + dirt + connector-
 - level 33 (26 here) has a bug with the fast burning?
-- clean up UI for level select
-- fix bug if spider falls while at edge it can get stuck (fixed? need to test more)
+- -clean up UI for level select-
+- -fix bug if spider falls while at edge it can get stuck (fixed? need to test more)-
 - add collision interaction where if crate is already touching enemy, it can also ignite them
-- prevent blocks slowing down when they fall on top of enemies and kill them
+- -prevent blocks slowing down when they fall on top of enemies and kill them-
 - fireball zeroes player y velocity bug
 - -update lab 4 markdown instructions!!!-
-- fix help screen graphic on photoshop
-- add open level in editor in the pause screen (I think it'd be good to have, old game did not have this)
-- fix level editor UI so that you don't accidentally go back to menu
+- -fix help screen graphic on photoshop-
+- -add open level in editor in the pause screen-
+- -fix level editor UI so that you don't accidentally go back to menu- (maybe?)
 - fix infinite loop when uploading a level a second time
 - fix do flaming crate interaction as soon as crate is ignited
-- add new fireball asset
 - maybe issue lvl 10 if u put crates under the connected part then burn, it may mess up the static part?
 
 Notes: missing water bat and plated crates, so levels 15, 21, 28 are removed. Levels 27, 29, 30, 31, 37 will be adjusted or removed.
