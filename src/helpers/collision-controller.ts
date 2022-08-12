@@ -31,7 +31,7 @@ export const createCollisions = (game: GameScene): void => {
         const lizard = a.includes('lizard') ? a : b;
         game.lizards[lizard].ignite(game);
       }
-      if ((a == 'exit' && b == 'player') || (b == 'exit' && a == 'player')) {
+      if ((a == 'exit' && b.includes('player')) || (b == 'exit' && a.includes('player'))) {
         progressLevel(game);
       }
       if ((a == 'fire' && b.includes('bomb')) || (b == 'fire' && a.includes('bomb'))) {
@@ -228,12 +228,22 @@ export const createCollisions = (game: GameScene): void => {
       }
       if (a == 'playerTop' || b == 'playerTop') {
         const otherBody = a !== 'playerTop' ? bodyA : bodyB;
-        if (!otherBody.isStatic && otherBody.label !== 'fire') {
-          game.scene.restart();
-        } else {
-          game.player.sprite.setVelocityY(0);
+        if (otherBody.label != 'exit') {
+          if (otherBody.velocity.y > 0 && game.player.sprite.body.velocity.y == 0) {
+            game.scene.restart();
+          } else {
+            game.player.sprite.setVelocityY(0);
+          }
         }
       }
+      // if (a == 'playerTop' || b == 'playerTop') {
+      //   const otherBody = a !== 'playerTop' ? bodyA : bodyB;
+      //   if (!otherBody.isStatic && otherBody.label !== 'fire') {
+      //     game.scene.restart();
+      //   } else {
+      //     game.player.sprite.setVelocityY(0);
+      //   }
+      // }
       if ((b.includes('spider') && a.includes('lizard')) || a.includes('spider' && b.includes('lizard)'))) {
         const spider = b.includes('spider') ? b : a;
         const lizard = b.includes('lizard') ? b : a;
