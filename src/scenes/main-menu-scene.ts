@@ -10,6 +10,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
  * The initial scene that starts, shows the splash screens, and loads the necessary assets.
  */
 export class MainMenuScene extends Phaser.Scene {
+  backgroundMusic: Phaser.Sound.BaseSound;
   constructor() {
     super(sceneConfig);
   }

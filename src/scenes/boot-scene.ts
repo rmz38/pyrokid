@@ -63,6 +63,10 @@ export class BootScene extends Phaser.Scene {
 
     this.loadAssets();
   }
+  public create() {
+    const backgroundMusic = this.sound.add('background-music', { loop: true, volume: 0.1 });
+    backgroundMusic.play();
+  }
 
   /**
    * All assets that need to be loaded by the game (sprites, images, animations, tiles, music, etc)
@@ -70,9 +74,6 @@ export class BootScene extends Phaser.Scene {
    * is currently active, so they can be accessed anywhere.
    */
   private loadAssets() {
-    // Load sample assets
-
-    // Source: Open Game Art
     this.load.image('tutorialBackground1', 'assets/backgrounds/TutorialBackground1.png');
     this.load.image('tutorialBackground2', 'assets/backgrounds/TutorialBackground2.png');
     this.load.image('tutorialBackground3', 'assets/backgrounds/TutorialBackground3.png');
@@ -101,5 +102,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image('villager1', 'assets/monsters/villager1.png');
     this.load.image('villager2', 'assets/monsters/villager2.png');
     this.load.image('villager3', 'assets/monsters/villager3.png');
+    this.load.audio('background-music', ['assets/sounds/background-music.mp3']);
+    this.load.audio('shooting-fire', ['assets/sounds/shooting-fire.wav']);
   }
 }
