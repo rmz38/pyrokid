@@ -21,6 +21,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
       gravity: { y: 0.25 },
     },
   },
+  //TODO: CHANGE FRAMERATE TO SOMETHING LOWER PROBABLY?
   //fix framerate to be consistent on all monitors to avoid weird speed issues
   fps: {
     target: 120,
