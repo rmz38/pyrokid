@@ -13,6 +13,7 @@ export class PauseMenu extends Phaser.Scene {
     super(sceneConfig);
   }
   public create() {
+    this.sound.stopByKey('background-music');
     keys = this.input.keyboard.addKeys('ESC');
     this.graphics = this.add.graphics();
     this.graphics.depth = -1;
@@ -51,6 +52,7 @@ export class PauseMenu extends Phaser.Scene {
   //         : this.cache.json.get('leveleditorlevel');
   public update() {
     if (keys.ESC.isDown) {
+      // this.sound.play('background-music', { volume: 0.1, loop: true });
       this.scene.resume('Game');
       this.scene.stop();
     }

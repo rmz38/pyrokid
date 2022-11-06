@@ -14,15 +14,15 @@ export class Credits extends Phaser.Scene {
   }
   public create() {
     this.add
-      .text(250, 50, 'Credits', {
+      .text(250, 30, 'Credits', {
         color: '#FFFFFF',
       })
       .setFontSize(48);
     this.add
       .text(
         250,
-        150,
-        "Remake Developer: \nRose Zhou \n \nRemake Designers: \nSh'yee Meng, \nLucien Eckert \n \nOriginal Creators: \nNick Cheng, \nMichelle Liu, \nAaron Nelson, \nEvan NiederHoffer, \nChristian Zaloj",
+        100,
+        "Remake Developer: \nRose Zhou \n \nRemake Designers: \nSh'yee Meng, \nLucien Eckert \n \nRemake Audio: \nDevin Chin \n \nOriginal Creators: \nNick Cheng, \nMichelle Liu, \nAaron Nelson, \nEvan NiederHoffer, \nChristian Zaloj",
         {
           color: '#FFFFFF',
         },

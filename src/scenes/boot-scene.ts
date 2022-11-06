@@ -64,8 +64,7 @@ export class BootScene extends Phaser.Scene {
     this.loadAssets();
   }
   public create() {
-    const backgroundMusic = this.sound.add('background-music', { loop: true, volume: 0.1 });
-    backgroundMusic.play();
+    this.sound.play('background-music', { loop: true, volume: 0.1 });
   }
 
   /**
@@ -104,5 +103,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image('villager3', 'assets/monsters/villager3.png');
     this.load.audio('background-music', ['assets/sounds/background-music.mp3']);
     this.load.audio('shooting-fire', ['assets/sounds/shooting-fire.wav']);
+    this.load.audio('lizard-cry', ['assets/sounds/lizard-cry-a.wav']);
+    this.load.audio('crush', ['assets/sounds/crush.wav']);
   }
 }

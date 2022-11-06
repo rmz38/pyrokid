@@ -1,3 +1,4 @@
+import { game } from '../main';
 import Enemy from './enemy';
 class Lizard extends Enemy {
   onFire: boolean;
@@ -49,6 +50,8 @@ class Lizard extends Enemy {
     this.fireSprite = game.add.sprite(this.sprite.x, this.sprite.y, 'squareFire');
     this.fireSprite.play('squareFire', false);
     this.fireSprite.alpha = 0.7;
+    //to adjust volume, pass into game object?
+    game.sound.play('lizard-cry');
   }
   public destroy() {
     super.destroy();

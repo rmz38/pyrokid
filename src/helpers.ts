@@ -159,7 +159,7 @@ export function updateDynamic(game: GameScene) {
   game.staticBlockQueue.clear();
 }
 // export function updateDynamic(game: GameScene) {
-//   //TODO: FIX THIS CRAP AND MAKE SURE BLOCKS ABOVE A DESTROYED BLOCK WILL BE CHECKED IF ALSO BURNING OR NOT, PLUS CORRECTLY SET STATIC OR NOT
+//   //TODO: FIX THIS AND MAKE SURE BLOCKS ABOVE A DESTROYED BLOCK WILL BE CHECKED IF ALSO BURNING OR NOT, PLUS CORRECTLY SET STATIC OR NOT
 //   const nextQueue: Array<Terrain> = [];
 //   game.staticBlockQueue.forEach((block: Terrain) => {
 //     let cont = true;
@@ -361,6 +361,7 @@ function unpack(coord: string): Array<integer> {
 
 //CALL AFTER ALL COMPOUNDING IS DONE SINCE GAME.BLOCKS IS USED THERE TOO
 export function initDynamicAndStaticQueues(game: GameScene) {
+  // game.matter.world.setGravity(0, 0);
   game.dynamicBlockQueue.clear();
   for (const [pos, block] of Object.entries(game.blocks)) {
     //const [x, y] = unpack(pos);
@@ -383,6 +384,7 @@ export function initDynamicAndStaticQueues(game: GameScene) {
       }
     }
   }
+  // game.matter.world.setGravity(0, 0.25);
 }
 export function updateStatic(game: GameScene) {
   //HAVE TO MAKE COPY OF BLOCK MAP OR ELSE OLD POSITION GETS ERASED BY NEW THINGS?
@@ -399,6 +401,7 @@ export function updateStatic(game: GameScene) {
     // console.log(game.blocks);
     if (block.sprite.active) {
       //TODO MAYBE CHECK IF IN MAP ALREADY, add both curr and already in map block back into the queue to guarantee no bugs if slot is already occupied, or replace with grounded check
+      //ACTUALLY MIGHT HAVE TO DO WITH BEING IN THE DESTROY QUEUE OOP
       if (
         dy < 17 &&
         game.blocks[downId] &&
@@ -406,8 +409,8 @@ export function updateStatic(game: GameScene) {
         // !block.sprite.isStatic() && // block itself is not static already
         !game.blocks[downId].owner.blocks.has(block) &&
         !game.blocks[downId].owner.getConnected(game).has(block) &&
-        game.blocks[downId].sprite.isStatic() &&
-        !game.destroyQueue.has(game.blocks[downId])
+        game.blocks[downId].sprite.isStatic()
+        // !game.destroyQueue.has(game.blocks[downId])
       ) {
         block.owner.setAllGrounded(game);
         //TODO add all blocks in compound instead of just this, to enforce precondition of all blocks being dynamic in queue

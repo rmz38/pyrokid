@@ -285,6 +285,7 @@ export class GameScene extends Phaser.Scene {
         isSensor: true,
         label: 'fire',
       });
+      this.sound.play('shooting-fire');
       this.fire.setScale(0.8, 1);
       let direction: 'right' | 'left' | 'none' = 'right';
       this.fire.setCollisionCategory(0x0100);

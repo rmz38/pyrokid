@@ -3507,6 +3507,11 @@ pbkdf2@^3.0.3:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
+phaser-raycaster@^0.10.4:
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/phaser-raycaster/-/phaser-raycaster-0.10.4.tgz#8b0e02a2bce6051c6981635590029c4614cf52f9"
+  integrity sha512-TtRBKhgIs8EDbPm+qQGVstfeS4ZmLSsV5pcp4urgrEkWL19EIgPOxOeSh1fseEPgbj0ohmsWEXyWiHR9nH5x3Q==
+
 phaser@^3.50.0:
   version "3.50.0"
   resolved "https://registry.yarnpkg.com/phaser/-/phaser-3.50.0.tgz#aef157e51af7881e4e869a489b836d38598b8544"

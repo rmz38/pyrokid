@@ -1,4 +1,5 @@
 import { MenuButton } from '../ui/menu-button';
+// import raycasterPlugin from 'phaser-raycaster';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -19,6 +20,11 @@ export class MainMenuScene extends Phaser.Scene {
     // this.load.json('level' + localStorage.getItem('level'), 'assets/levels/' + localStorage.getItem('level') + '.json');
   }
   public create(): void {
+    // console.log(this.plugins);
+    // // @ts-ignore
+    // this.raycaster = this.raycasterPlugin.createRaycaster({});
+    // //@ts-ignore
+    // this.ray = this.raycaster.createRay();
     const background = this.add.tileSprite(400, 300, 800, 600, 'backgroundDirt');
     this.add
       .text(100, 50, 'Pyrokid', {

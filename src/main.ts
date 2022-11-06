@@ -17,7 +17,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
     default: 'matter',
     matter: {
       enableSleeping: false,
-      debug: true,
+      debug: false,
       gravity: { y: 0.25 },
     },
   },
@@ -26,7 +26,16 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
     target: 120,
     forceSetTimeOut: true,
   },
-
+  // plugins: {
+  //   global: [
+  //     {
+  //       key: 'PhaserRaycaster',
+  //       plugin: PhaserRaycaster,
+  //       start: true,
+  //       mapping: 'raycasterPlugin',
+  //     },
+  //   ],
+  // },
   parent: 'game',
   backgroundColor: '#000000',
 };
