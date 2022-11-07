@@ -3,7 +3,7 @@ import { indexes } from '../helpers/clump';
 import Connector from '../objects/connector';
 import { GameScene } from '../scenes/game-scene';
 
-export const numLevels = 31; // manually set number of levels bc reading max level in browser kind of a pain
+export const numLevels = 30; // manually set number of levels bc reading max level in browser kind of a pain
 export const initAnims = (game: Phaser.Scene): void => {
   game.anims.create({
     key: 'squareFire',
