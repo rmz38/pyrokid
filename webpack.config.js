@@ -24,8 +24,12 @@ module.exports = {
   },
 
   output: {
-    filename: 'app.bundle.js',
     path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
+    // sourceMapFilename: '[name].[fullhash:8].map',
+    // chunkFilename: '[id].[fullhash:8].js',
+    // filename: 'app.bundle.js',
+    // path: path.resolve(__dirname, 'dist'),
   },
 
   mode: process.env.NODE_ENV == 'production' ? 'production' : 'development',
@@ -57,15 +61,15 @@ module.exports = {
   ],
 
   // optimization: {
-  //   splitChunks: {
-  //     cacheGroups: {
-  //       commons: {
-  //         test: /[\\/]node_modules[\\/]/,
-  //         name: 'vendors',
-  //         chunks: 'all',
-  //         filename: '[name].app.bundle.js',
-  //       },
-  //     },
-  //   },
+    // splitChunks: {
+    //   cacheGroups: {
+    //     commons: {
+    //       test: /[\\/]node_modules[\\/]/,
+    //       name: 'vendors',
+    //       chunks: 'all',
+    //       filename: '[name].app.bundle.js',
+    //     },
+    //   },
+    // },
   // },
 };

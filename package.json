@@ -11,8 +11,8 @@
     "build": "yarn build:prod",
     "build:dev": "NODE_ENV=development webpack",
     "build:prod": "NODE_ENV=production webpack",
-    "dev": "NODE_ENV=development webpack-dev-server --hot --inline",
-    "prod": "NODE_ENV=production webpack-dev-server",
+    "dev": "NODE_ENV=development webpack serve --hot --inline",
+    "prod": "NODE_ENV=production webpack serve",
     "lint": "eslint src"
   },
   "dependencies": {

@@ -13,7 +13,7 @@ export class PauseMenu extends Phaser.Scene {
     super(sceneConfig);
   }
   public create() {
-    this.sound.stopByKey('background-music');
+    // this.sound.stopByKey('background-music');
     keys = this.input.keyboard.addKeys('ESC');
     this.graphics = this.add.graphics();
     this.graphics.depth = -1;
