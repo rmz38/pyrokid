@@ -36,7 +36,7 @@ export class GameScene extends Phaser.Scene {
   public fireCooldown = false;
   public tiles = [];
   public blocks = {};
-  public player: Player;
+  public player: Player = null;
   public TILE_SIZE: integer = 50;
   public xTiles: integer = 0;
   public yTiles: integer = 0;
@@ -61,7 +61,6 @@ export class GameScene extends Phaser.Scene {
     new MenuButton(this, 10, 10, 'Skip Level', () => {
       progressLevel(this);
     });
-
     wasdr = this.input.keyboard.addKeys('W,S,A,D,R,ESC,J');
     //this.mover = this.matter.add.sprite(300, 500, 'lizard');
     this.burnQueue.clear();
@@ -305,10 +304,10 @@ export class GameScene extends Phaser.Scene {
       this.fire.anims.play('fireball', true);
       this.fire.setIgnoreGravity(true);
       const xDir = cursors.right.isDown ? 1 : -1;
-      const xVel = cursors.right.isDown || cursors.left.isDown ? 10 : 0;
+      const xVel = cursors.right.isDown || cursors.left.isDown ? 15 : 0;
       this.fire.setVelocityX(xVel * xDir);
       const yDir = cursors.down.isDown ? 1 : -1;
-      const yVel = cursors.down.isDown || cursors.up.isDown ? 10 : 0;
+      const yVel = cursors.down.isDown || cursors.up.isDown ? 15 : 0;
       this.fire.setVelocityY(yVel * yDir);
       this.fireActive = true;
       this.time.delayedCall(500, () => {

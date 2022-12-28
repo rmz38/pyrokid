@@ -8,17 +8,17 @@ class LevelSizeButton {
   upPressed = false;
   downPressed = false;
   constructor(x: integer, y: integer, type: 'width' | 'height', game) {
-    function handleUpload(e) {
-      localStorage.setItem('upload', 'true');
-      const reader = new FileReader();
-      reader.readAsText(e.target.files[0]);
-      reader.onload = function (json) {
-        localStorage.setItem('leveleditorlevel', JSON.stringify(json.target.result));
-        game.scene.restart();
-      };
-    }
-    const loader = document.getElementById('levelLoader');
-    loader.addEventListener('change', handleUpload, false);
+    // function handleUpload(e) {
+    //   localStorage.setItem('upload', 'true');
+    //   const reader = new FileReader();
+    //   reader.readAsText(e.target.files[0]);
+    //   reader.onload = function (json) {
+    //     localStorage.setItem('leveleditorlevel', JSON.stringify(json.target.result));
+    //     game.scene.restart();
+    //   };
+    // }
+    // const loader = document.getElementById('levelLoader');
+    // loader.addEventListener('change', handleUpload, false);
     const button = new MenuButton(
       game,
       x + 20,

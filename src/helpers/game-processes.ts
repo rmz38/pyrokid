@@ -8,6 +8,7 @@ export const progressLevel = (game: GameScene): void => {
     if (nextLevel > numLevels) {
       game.scene.start('Credits');
     } else {
+      console.log(nextLevel);
       localStorage.setItem('level', nextLevel.toString());
       game.scene.restart();
     }

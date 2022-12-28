@@ -2,6 +2,8 @@ import { GameScene } from '../scenes/game-scene';
 
 class Player {
   sprite: Phaser.Physics.Matter.Sprite;
+  speed = 1.35 * 2; // originally 1.35 speed for 120 fps, changed for 60fps target in main.ts
+  jumpSpeed = 10; // same thing as above as 5.3 originally, changed to something else
   touchingGround: boolean;
   jumpCooldown: boolean;
   hittingRight: boolean;
@@ -36,7 +38,7 @@ class Player {
     if (this.hittingLeft) {
       this.sprite.setVelocityX(0);
     } else {
-      this.sprite.setVelocityX(-1.35);
+      this.sprite.setVelocityX(-this.speed);
     }
     this.sprite.anims.play('left', true);
   }
@@ -44,7 +46,7 @@ class Player {
     if (this.hittingRight) {
       this.sprite.setVelocityX(0);
     } else {
-      this.sprite.setVelocityX(1.35);
+      this.sprite.setVelocityX(this.speed);
     }
     this.sprite.anims.play('right', true);
   }
@@ -76,7 +78,7 @@ class Player {
 
   public jump(game: GameScene) {
     if (this.jumpCooldown) {
-      this.sprite.setVelocityY(-5.3);
+      this.sprite.setVelocityY(-this.jumpSpeed);
       this.touchingGround = false;
       this.jumpCooldown = false;
       game.time.delayedCall(700, () => {

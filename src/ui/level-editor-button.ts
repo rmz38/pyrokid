@@ -1,3 +1,4 @@
+import { ReadStream } from 'fs';
 import * as Phaser from 'phaser';
 import { game } from '../main';
 import { GameScene } from '../scenes/game-scene';
@@ -11,17 +12,28 @@ import { MenuButton } from './menu-button';
 // }
 // const loader = document.getElementById('levelLoader');
 // loader.addEventListener('change', handleUpload, false);
+let lock = false; // to make sure stuff doesn't get triggered multiple times
 class LevelEditorButton {
   button: any;
   constructor(x: integer, y: integer, text: string, color: string, select: string, game) {
     function handleUpload(e) {
+      if (lock) {
+        return;
+      }
+      lock = true;
       localStorage.setItem('upload', 'true');
+      console.log('Handling upload');
       const reader = new FileReader();
       reader.readAsText(e.target.files[0]);
-      reader.onload = function (json) {
+
+      const onLevelLoad = function (json) {
         localStorage.setItem('leveleditorlevel', JSON.parse(JSON.stringify(json.target.result)));
+        console.log('onload complete');
+        e.target.value = '';
+        lock = false;
         game.scene.restart();
       };
+      reader.onload = onLevelLoad;
     }
     const loader = document.getElementById('levelLoader');
     loader.addEventListener('change', handleUpload, false);
