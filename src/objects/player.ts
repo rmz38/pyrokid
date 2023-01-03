@@ -2,7 +2,7 @@ import { GameScene } from '../scenes/game-scene';
 
 class Player {
   sprite: Phaser.Physics.Matter.Sprite;
-  speed = 1.35 * 2; // originally 1.35 speed for 120 fps, changed for 60fps target in main.ts
+  speed = 1.35 * 2.5; // originally 1.35 speed for 120 fps, changed for 60fps target in main.ts
   jumpSpeed = 10; // same thing as above as 5.3 originally, changed to something else
   touchingGround: boolean;
   jumpCooldown: boolean;
@@ -10,8 +10,8 @@ class Player {
   hittingLeft: boolean;
   constructor(x: integer, y: integer, game: any) {
     const rec = game.matter.bodies.rectangle(0, 21, 10, 1, { isSensor: true, label: 'groundSensor' });
-    const recRight = game.matter.bodies.rectangle(16, 0, 15, 27, { isSensor: true, label: 'playerRight' });
-    const recLeft = game.matter.bodies.rectangle(-16, 0, 15, 27, { isSensor: true, label: 'playerLeft' });
+    const recRight = game.matter.bodies.rectangle(13, 0, 10, 27, { isSensor: true, label: 'playerRight' });
+    const recLeft = game.matter.bodies.rectangle(-13, 0, 10, 27, { isSensor: true, label: 'playerLeft' });
     const recTop = game.matter.bodies.rectangle(0, -15, 10, 5, { isSensor: true, label: 'playerTop' });
     const playerBody = game.matter.bodies.rectangle(0, 0, 20, 30, { label: 'playerBody' });
     const compound = game.matter.body.create({
@@ -23,6 +23,7 @@ class Player {
     const player = game.matter.add.sprite(0, 0, 'player', { label: 'player' });
     player.setExistingBody(compound);
     player.setFriction(0);
+    player.setBounce(0);
     player.body.render.sprite.xOffset = 0;
     player.body.render.sprite.yOffset = 0;
     player.setPosition(x, y);

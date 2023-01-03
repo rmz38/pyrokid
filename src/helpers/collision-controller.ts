@@ -102,10 +102,11 @@ export const createCollisions = (game: GameScene): void => {
           game.sound.play('crush');
           game.scene.restart();
         } else if (otherBody.label !== 'fire') {
-          game.player.sprite.setVelocityY(0);
+          // game.player.sprite.setVelocityY(0);
+          game.player.sprite.applyForce(new Phaser.Math.Vector2(0, 5));
         }
       }
-      if ((b.includes('spider') && a === 'fire') || (a.includes('spider') && b === 'fire')) {
+      if (game.fireActive && ((b.includes('spider') && a === 'fire') || (a.includes('spider') && b === 'fire'))) {
         game.fire.destroy();
         game.fireActive = false;
         const spider = b.includes('spider') ? b : a;
