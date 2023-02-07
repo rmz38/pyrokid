@@ -69,7 +69,7 @@ export class MainMenuScene extends Phaser.Scene {
     });
 
     new MenuButton(this, 100, 250, 'Level Editor', () => {
-      // localStorage.setItem('leveleditorlevel', JSON.stringify(this.cache.json.get('leveleditorlevel')));
+      localStorage.setItem('leveleditorlevel', JSON.stringify(this.cache.json.get('leveleditorlevel')));
       localStorage.setItem('upload', 'false');
       this.scene.start('LevelEditor');
     });
